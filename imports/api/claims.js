@@ -1,7 +1,7 @@
 import { HTTP } from 'meteor/http';
 
 if (Meteor.isServer) {
-	const base = process.env.BUGZILLA_URL || 'http://localhost:8081';
+	const base = process.env.BUGZILLA_URL || 'http://localhost:8081'
 	/**
 		This publication is using the low-level meteor API to manage a published collection to the client
 		It has five available methods on 'this':
