@@ -1,22 +1,21 @@
 import React, { Component, PropTypes } from 'react'
-import { connect }  from 'react-redux'
+import { connect } from 'react-redux'
 import { createContainer } from 'meteor/react-meteor-data'
 import moment from 'moment'
-import { Claims } from '../../api/claims'
+import { Meteor } from 'meteor/meteor'
+import Claims from '../../api/claims'
 
 import styles from './claim.mss'
 
 // const dateFormat = 'DD MMM YYYY'
-function formatDate(date) {
+function formatDate (date) {
   return moment(date).format('DD MMM YYYY')
 }
 
 class Claim extends Component {
-  render() {
+  render () {
     const { claim } = this.props
-    if (! claim) return <h1>Loading...</h1>
-
-    console.log('claim', claim);
+    if (!claim) return <h1>Loading...</h1>
 
     return (
       <div className={styles.container}>
@@ -28,7 +27,7 @@ class Claim extends Component {
     )
   }
 
-  renderTitle({ id, summary, creation_time }) {
+  renderTitle ({ id, summary, creation_time }) {
     return (
       <div className={styles.section}>
         <div>{id}</div>
@@ -41,7 +40,7 @@ class Claim extends Component {
     )
   }
 
-  renderStatusLine({ status, last_change_time }) {
+  renderStatusLine ({ status, last_change_time }) {
     return (
       <div className={styles.section}>
         <div>
@@ -62,7 +61,7 @@ class Claim extends Component {
     )
   }
 
-  renderDependenciesLine({ depends_on, blocks }) {
+  renderDependenciesLine ({ depends_on, blocks }) {
     return (
       <div className={styles.section}>
         <div className={[styles.dependenciesDetails, styles.itemFlow].join(' ')}>
@@ -85,7 +84,7 @@ class Claim extends Component {
         </div>
         <div className={styles.dependencyTreeAccess}>
           <div className={styles.label}>
-            Dependency<br/>trees
+            Dependency<br />trees
           </div>
           <div>
             <button className={styles.treeViewerButton}><i className='icon icon-tree' /></button>
@@ -95,7 +94,7 @@ class Claim extends Component {
     )
   }
 
-  renderBody({}) {
+  renderBody () {
     return (
       <div className={styles.section}>
         <h1>asdasdsad</h1>
@@ -105,21 +104,20 @@ class Claim extends Component {
 }
 
 Claim.propTypes = {
-  claim: PropTypes.object,
+  claim: PropTypes.object
 }
 
 const ClaimContainer = createContainer(() => {
-  Meteor.subscribe('claims');
+  Meteor.subscribe('claims')
 
   return {
-    claim: Claims.findOne({}),
+    claim: Claims.findOne({})
   }
 }, Claim)
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
   return {
   }
 }
-
 
 export default connect(mapStateToProps)(ClaimContainer)
