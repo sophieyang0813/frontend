@@ -4,7 +4,7 @@ import { createContainer } from 'meteor/react-meteor-data'
 import moment from 'moment'
 import { Claims } from '../../api/claims'
 
-import styles from './claim.css'
+import styles from './claim.mss'
 
 // const dateFormat = 'DD MMM YYYY'
 function formatDate(date) {
