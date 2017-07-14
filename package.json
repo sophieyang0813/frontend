@@ -21,7 +21,8 @@
     "redux": "^3.7.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "spacejam": "^1.6.1"
+    "spacejam": "^1.6.1",
+    "react-router-dom": "^4.1.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
