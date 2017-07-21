@@ -1,9 +1,8 @@
-import { HTTP } from 'meteor/http'
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
+import { callAPI } from '../util/bugzilla-api'
 
 if (Meteor.isServer) {
-  const base = process.env.BUGZILLA_URL || 'http://localhost:8081'
   /**
    This publication is using the low-level meteor API to manage a published collection to the client
    It has five available methods on 'this':
@@ -15,11 +14,16 @@ if (Meteor.isServer) {
    */
   Meteor.publish('claims', function () {
     // Fetching simple data
-    HTTP.get(`${base}/rest/bug/1`, {/* options */}, (err, result) => {
-      if (err) throw new Meteor.Error({message: 'REST API error', origError: err})
-      this.added('claims', '1', result.data.bugs[0])
-      this.ready()
-    })
+    callAPI('get', '/rest/bug/21')
+      .then(data => {
+        this.added('claims', '1', data.bugs[0])
+        this.ready()
+      })
+      .catch(err => {
+        // TODO: make this method handle errors better, or be less prone to errors
+        console.error(err)
+        throw new Meteor.Error({message: 'REST API error', origError: err})
+      })
   })
 }
 let Claims
