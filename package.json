@@ -26,15 +26,21 @@
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
+    "postcss-easy-import": "^2.1.0",
     "postcss-modules-extract-imports": "^1.1.0",
     "postcss-modules-local-by-default": "^1.2.0",
     "postcss-modules-scope": "^1.1.0",
     "postcss-nested": "^1.0.1",
     "snazzy": "^7.0.0",
-    "standard": "^10.0.2"
+    "standard": "^10.0.2",
+    "tachyons": "^4.7.0"
   },
   "cssModules": {
+    "cssClassNamingConvention": {
+      "replacements": ["_client__main__"]
+    },
     "postcssPlugins": {
+      "postcss-easy-import": {},
       "postcss-nested": {},
       "postcss-modules-local-by-default": {},
       "postcss-modules-extract-imports": {},
