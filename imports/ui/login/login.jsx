@@ -1,6 +1,17 @@
 import React, { Component } from 'react'
 
 class LoginPage extends Component {
+  constructor () {
+    super(...arguments)
+    this.state = {
+      showPass: false
+    }
+  }
+  toggleShowPass() {
+    this.setState({
+      showPass: !this.state.showPass
+    })
+  }
   render() {
     const textInputClassStr = 'pa2 input-reset ba bg-transparent w-100'
     const inputLabelClassStr = 'db fw6 lh-copy f6'
@@ -19,13 +30,15 @@ class LoginPage extends Component {
             <fieldset id='sign_up' className='ba b--transparent ph0 mh0'>
               <div className='mt3'>
                 <label className={inputLabelClassStr} htmlFor='email-address'>Email</label>
-                <input className={textInputClassStr} type='email' name='email-address'  id='email-address' />
+                <input className={textInputClassStr} type='email' name='email-address' />
               </div>
               <div className='mv3'>
                 <label className={inputLabelClassStr} htmlFor='password'>Password</label>
-                <input className={textInputClassStr + ' b'} type='password' name='password'  id='password' />
+                <input className={textInputClassStr + ' b'} type={this.state.showPass ? 'text' : 'password'} name='password' />
               </div>
-              <label className='pa0 ma0 lh-copy f6 pointer'><input type='checkbox' /> Remember me</label>
+              <label className='pa0 ma0 lh-copy f6 pointer'>
+                <input type='checkbox' checked={this.state.showPass} onChange={this.toggleShowPass.bind(this)} /> Show password
+              </label>
             </fieldset>
             <div className='tc'>
               <input className='b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib' type='submit' value='Login' />
