@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import { createContainer } from 'meteor/react-meteor-data'
 import { Meteor } from 'meteor/meteor'
@@ -90,7 +91,7 @@ App.propTypes = {
   tasks: PropTypes.array.isRequired,
   incompleteCount: PropTypes.number.isRequired,
   currentUser: PropTypes.object,
-  hideCompleted: React.PropTypes.bool.isRequired
+  hideCompleted: PropTypes.bool.isRequired
 }
 
 const AppContainer = createContainer(() => {
