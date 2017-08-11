@@ -1,4 +1,9 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import ReactDOM from 'react-dom'
+import { createContainer } from 'meteor/react-meteor-data'
+import { submitCredentials } from './login.actions'
 
 class LoginPage extends Component {
   constructor () {
@@ -11,6 +16,12 @@ class LoginPage extends Component {
     this.setState({
       showPass: !this.state.showPass
     })
+  }
+  handleSubmit(event) {
+    event.preventDefault()
+    const email = ReactDOM.findDOMNode(this.refs.emailInput).value.trim()
+    const pass = ReactDOM.findDOMNode(this.refs.passInput).value.trim()
+    this.props.dispatch(submitCredentials(email, pass))
   }
   render() {
     const textInputClassStr = 'pa2 input-reset ba bg-transparent w-100'
@@ -26,15 +37,15 @@ class LoginPage extends Component {
             {this.renderSocialSignupLink('linked-in')}
           </div>
           <h3 className='f4 fw6 ph0 mh0 tc'>Or</h3>
-          <form className='measure center'>
+          <form className='measure center' onSubmit={this.handleSubmit.bind(this)}>
             <fieldset id='sign_up' className='ba b--transparent ph0 mh0'>
               <div className='mt3'>
                 <label className={inputLabelClassStr} htmlFor='email-address'>Email</label>
-                <input className={textInputClassStr} type='email' name='email-address' />
+                <input className={textInputClassStr} ref='emailInput' type='email' name='email-address' />
               </div>
               <div className='mv3'>
                 <label className={inputLabelClassStr} htmlFor='password'>Password</label>
-                <input className={textInputClassStr + ' b'} type={this.state.showPass ? 'text' : 'password'} name='password' />
+                <input className={textInputClassStr + ' b'} ref='passInput' type={this.state.showPass ? 'text' : 'password'} name='password' />
               </div>
               <label className='pa0 ma0 lh-copy f6 pointer'>
                 <input type='checkbox' checked={this.state.showPass} onChange={this.toggleShowPass.bind(this)} /> Show password
@@ -44,7 +55,7 @@ class LoginPage extends Component {
               <input className='b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib' type='submit' value='Login' />
             </div>
             <div className='lh-copy mt3'>
-              <a href='#0' className='f6 link dim black db'>Sign up</a>
+              <Link className='f6 link dim black db' to='/signup'>Sign up</Link>
               <a href='#0' className='f6 link dim black db'>Forgot your password?</a>
             </div>
           </form>
@@ -63,4 +74,11 @@ class LoginPage extends Component {
   }
 }
 
-export default LoginPage
+LoginPage.propTypes = {}
+const LoginPageContainer = createContainer(() => ({}), LoginPage)
+
+function mapStateToProps() {
+  return {}
+}
+
+export default connect(mapStateToProps)(LoginPageContainer)
