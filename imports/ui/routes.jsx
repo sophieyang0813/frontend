@@ -13,7 +13,7 @@ import AccountsUIWrapper from './accounts-ui-wrapper.jsx'
 export class Routes extends React.Component {
   render () {
     return (
-      <div className="sans-serif">
+      <div className='sans-serif'>
         <AccountsUIWrapper />
         <Route exact path='/' component={LoginPage} />
         <Route exact path='/signup' component={SignupPage} />

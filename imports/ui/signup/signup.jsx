@@ -8,12 +8,12 @@ class SignupPage extends Component {
       showPass: false
     }
   }
-  toggleShowPass() {
+  toggleShowPass () {
     this.setState({
       showPass: !this.state.showPass
     })
   }
-  render() {
+  render () {
     return (
       <div className='w-100'>
         <main className='pa4 black-80'>

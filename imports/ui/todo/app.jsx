@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import Task from './task/task.jsx'
 import AccountsUIWrapper from '../accounts-ui-wrapper.jsx'
 
-import styles from './app.mss';
+import styles from './app.mss'
 
 // App component - represents the whole app
 class App extends Component {

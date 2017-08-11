@@ -12,18 +12,18 @@ class LoginPage extends Component {
       showPass: false
     }
   }
-  toggleShowPass() {
+  toggleShowPass () {
     this.setState({
       showPass: !this.state.showPass
     })
   }
-  handleSubmit(event) {
+  handleSubmit (event) {
     event.preventDefault()
     const email = ReactDOM.findDOMNode(this.refs.emailInput).value.trim()
     const pass = ReactDOM.findDOMNode(this.refs.passInput).value.trim()
     this.props.dispatch(submitCredentials(email, pass))
   }
-  render() {
+  render () {
     const textInputClassStr = 'pa2 input-reset ba bg-transparent w-100'
     const inputLabelClassStr = 'db fw6 lh-copy f6'
     return (
@@ -63,7 +63,7 @@ class LoginPage extends Component {
       </div>
     )
   }
-  renderSocialSignupLink(type) {
+  renderSocialSignupLink (type) {
     return (
       <a href='#1' className='link dim mr3'>
         <svg viewBox='0 0 16 16' className='dib h2 w2'>
@@ -77,7 +77,7 @@ class LoginPage extends Component {
 LoginPage.propTypes = {}
 const LoginPageContainer = createContainer(() => ({}), LoginPage)
 
-function mapStateToProps() {
+function mapStateToProps () {
   return {}
 }
 

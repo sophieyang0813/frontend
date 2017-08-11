@@ -1,7 +1,7 @@
 import React from 'react'
 
 class UnderConstruction extends React.Component {
-  render() {
+  render () {
     return (
       <h1>Under Construction</h1>
     )
