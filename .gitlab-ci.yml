@@ -22,7 +22,8 @@ node.js:
     - curl https://install.meteor.com/ | bash
 
     # STFU meteor
-#    - export METEOR_ALLOW_SUPERUSER="true"
+    - export METEOR_ALLOW_SUPERUSER="true"
+    - meteor --get-ready
 
     # Install dependencies and run tests
     - export NPM_CONFIG_LOGLEVEL="warn"
