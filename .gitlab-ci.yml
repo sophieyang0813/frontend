@@ -23,7 +23,10 @@ node.js:
 
     # STFU meteor
     - export METEOR_ALLOW_SUPERUSER="true"
-    - meteor --get-ready
+
+    # STFU meteor 2
+    - sudo chown -Rh $USER .meteor/local
+#    - meteor --get-ready
 
     # Install dependencies and run tests
     - export NPM_CONFIG_LOGLEVEL="warn"
