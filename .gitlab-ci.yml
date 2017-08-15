@@ -25,7 +25,7 @@ node.js:
     - export METEOR_ALLOW_SUPERUSER="true"
 
     # STFU meteor 2
-    - sudo chown -Rh $USER .meteor/local
+    - chown -Rh $USER .meteor/local
 #    - meteor --get-ready
 
     # Install dependencies and run tests
