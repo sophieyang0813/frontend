@@ -28,7 +28,7 @@ node.js:
     - export GL_USER=$(whoami)
     - echo $USER
     - echo $GL_USER
-    - chown -Rh $GL_USER .meteor/local
+    - chown -Rh $GL_USER ~/.meteor/local
 #    - meteor --get-ready
 
     # Install dependencies and run tests
