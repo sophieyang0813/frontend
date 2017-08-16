@@ -1,8 +1,8 @@
 node.js:
   image: node:latest
-  cache:
-    paths:
-      - node_modules
+#  cache:
+#    paths:
+#      - node_modules
   script:
     # Set up packages registry
     - apt-get update
