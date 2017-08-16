@@ -25,7 +25,10 @@ node.js:
     - export METEOR_ALLOW_SUPERUSER="true"
 
     # STFU meteor 2
-    - chown -Rh $USER .meteor/local
+    - export GL_USER=$(whoami)
+    - echo $USER
+    - echo $GL_USER
+    - chown -Rh $GL_USER .meteor/local
 #    - meteor --get-ready
 
     # Install dependencies and run tests
