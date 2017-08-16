@@ -26,10 +26,9 @@ node.js:
 
     # STFU meteor 2
     - export GL_USER=$(whoami)
-    - echo $USER
-    - echo $GL_USER
-    - chown -Rh $GL_USER ~/.meteor/local
-#    - meteor --get-ready
+    - meteor --get-ready
+    - chown -Rh $GL_USER .meteor/local
+
 
     # Install dependencies and run tests
     - export NPM_CONFIG_LOGLEVEL="warn"
