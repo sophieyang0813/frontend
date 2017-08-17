@@ -13,11 +13,9 @@ cache:
     - "~/.meteor"
     - "~/meteor"
 
-before_script:
-  - meteor npm install
-
-script:
-  - meteor npm run test
+test:
+  script:
+    - meteor npm it
 
 
 
