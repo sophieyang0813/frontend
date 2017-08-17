@@ -1,14 +1,23 @@
-image: christiankiely/meteord:test
-
-services:
-    - mongo
+image: blurri/meteor-node
 
 variables:
     METEOR_ALLOW_SUPERUSER: "true"
 
-before_script:
-    - meteor update
+services:
+  - mongo
 
-test:
-  script:
-    - meteor npm it
+cache:
+  paths:
+    - "node_modules"
+    - "~/.npm"
+    - "~/.meteor"
+    - "~/meteor"
+
+before_script:
+  - meteor npm install
+
+script:
+  - meteor npm run test
+
+
+
