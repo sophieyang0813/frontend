@@ -5,7 +5,7 @@
     "start": "meteor run",
     "test": "npm run lint && npm run proof",
     "lint": "standard --verbose | snazzy",
-    "proof": "./node_modules/spacejam/bin/spacejam test --driver-package practicalmeteor:mocha",
+    "proof": "./node_modules/spacejam/bin/spacejam test --driver-package practicalmeteor:mocha --mongo-url mongodb://mongo:27017/",
     "test-local": "meteor test --driver-package practicalmeteor:mocha"
   },
   "dependencies": {

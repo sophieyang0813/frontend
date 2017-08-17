@@ -8,8 +8,6 @@ variables:
 
 before_script:
     - meteor update
-    - meteor npm install
-    - meteor npm rebuild
 
 test:
   script:
