@@ -1,8 +1,8 @@
 node.js:
   image: node:latest
-#  cache:
-#    paths:
-#      - node_modules
+  cache:
+    paths:
+      - node_modules
   script:
     # Set up packages registry
     - apt-get update
@@ -23,12 +23,6 @@ node.js:
 
     # STFU meteor
     - export METEOR_ALLOW_SUPERUSER="true"
-
-    # STFU meteor 2
-    - export GL_USER=$(whoami)
-    - meteor --get-ready
-    - chown -Rh $GL_USER .meteor/local
-
 
     # Install dependencies and run tests
     - export NPM_CONFIG_LOGLEVEL="warn"
