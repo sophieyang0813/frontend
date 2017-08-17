@@ -7,7 +7,6 @@ variables:
     METEOR_ALLOW_SUPERUSER: "true"
 
 before_script:
-    - cd app
     - meteor npm install
     - meteor npm rebuild
 
