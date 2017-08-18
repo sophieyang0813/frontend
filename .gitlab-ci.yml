@@ -20,6 +20,7 @@ node.js:
 
     # Install Meteor
     - curl https://install.meteor.com/ | bash
+    - meteor update
 
     # STFU meteor
     - export METEOR_ALLOW_SUPERUSER="true"
