@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import ReactDOM from 'react-dom'
 import { createContainer } from 'meteor/react-meteor-data'
 import { submitCredentials } from './login.actions'
+import PropTypes from 'prop-types'
 
 class LoginPage extends Component {
   constructor () {
@@ -51,6 +52,12 @@ class LoginPage extends Component {
                 <input type='checkbox' checked={this.state.showPass} onChange={this.toggleShowPass.bind(this)} /> Show password
               </label>
             </fieldset>
+            { this.props.showLoginError
+              ? (
+                <div className='tc pv1'>
+                  <small>Email or password do not match</small>
+                </div>
+              ) : null}
             <div className='tc'>
               <input className='b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib' type='submit' value='Login' />
             </div>
@@ -74,11 +81,10 @@ class LoginPage extends Component {
   }
 }
 
-LoginPage.propTypes = {}
-const LoginPageContainer = createContainer(() => ({}), LoginPage)
-
-function mapStateToProps () {
-  return {}
+LoginPage.propTypes = {
+  showLoginError: PropTypes.string
 }
 
-export default connect(mapStateToProps)(LoginPageContainer)
+export default connect(
+  ({showLoginError}) => ({showLoginError}) // map redux state to props
+)(createContainer(() => ({}), LoginPage)) // map meteor state to props

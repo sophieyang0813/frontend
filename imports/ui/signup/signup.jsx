@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+import { createContainer } from 'meteor/react-meteor-data'
+import { connect } from 'react-redux'
 
 class SignupPage extends Component {
   constructor () {
@@ -58,4 +60,8 @@ class SignupPage extends Component {
   }
 }
 
-export default SignupPage
+SignupPage.propTypes = {}
+
+export default connect
+(() => ({})) // map redux state to props
+(createContainer(() => ({}), SignupPage)) // map meteor state to props
