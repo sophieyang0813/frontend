@@ -13,8 +13,10 @@ if (Meteor.isServer) {
    - onStop(callback) - adds a handler for when a subscribed client removes its subscription
    */
   Meteor.publish('claims', function () {
+    if (!this.userId) return
+    const currUser = Meteor.users.findOne({_id: this.userId})
     // Fetching simple data
-    callAPI('get', '/rest/bug/21')
+    callAPI('get', '/rest/bug/21', {token: currUser.bugzillaCreds.token})
       .then(data => {
         this.added('claims', '1', data.bugs[0])
         this.ready()
