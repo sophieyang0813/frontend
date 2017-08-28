@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor'
 import React from 'react'
 import { render } from 'react-dom'
-// import { BrowserRouter } from 'react-router-dom'
 import { Routes } from '../imports/ui/routes.jsx'
 import { ConnectedRouter } from 'react-router-redux'
 

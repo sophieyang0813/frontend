@@ -1,32 +1,25 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import ReactDOM from 'react-dom'
 import { createContainer } from 'meteor/react-meteor-data'
 import { submitCredentials } from './login.actions'
 import PropTypes from 'prop-types'
 
+import InputRow from '../components/input-row'
+import PasswordInput from '../components/password-input'
+
 class LoginPage extends Component {
-  constructor () {
-    super(...arguments)
-    this.state = {
-      showPass: false
-    }
-  }
-  toggleShowPass () {
-    this.setState({
-      showPass: !this.state.showPass
-    })
-  }
   handleSubmit (event) {
     event.preventDefault()
-    const email = ReactDOM.findDOMNode(this.refs.emailInput).value.trim()
-    const pass = ReactDOM.findDOMNode(this.refs.passInput).value.trim()
+    const email = this.emailInput.value.trim()
+    const pass = this.passInput.value.trim()
     this.props.dispatch(submitCredentials(email, pass))
   }
+  // Handles setting members on the component as "standard" doesn't allow for assignment as return values in handlers
+  setMember (memName, el) {
+    this[memName] = el
+  }
   render () {
-    const textInputClassStr = 'pa2 input-reset ba bg-transparent w-100'
-    const inputLabelClassStr = 'db fw6 lh-copy f6'
     return (
       <div className='w-100'>
         <main className='pa4 black-80'>
@@ -40,17 +33,8 @@ class LoginPage extends Component {
           <h3 className='f4 fw6 ph0 mh0 tc'>Or</h3>
           <form className='measure center' onSubmit={this.handleSubmit.bind(this)}>
             <fieldset id='sign_up' className='ba b--transparent ph0 mh0'>
-              <div className='mt3'>
-                <label className={inputLabelClassStr} htmlFor='email-address'>Email</label>
-                <input className={textInputClassStr} ref='emailInput' type='email' name='email-address' />
-              </div>
-              <div className='mv3'>
-                <label className={inputLabelClassStr} htmlFor='password'>Password</label>
-                <input className={textInputClassStr + ' b'} ref='passInput' type={this.state.showPass ? 'text' : 'password'} name='password' />
-              </div>
-              <label className='pa0 ma0 lh-copy f6 pointer'>
-                <input type='checkbox' checked={this.state.showPass} onChange={this.toggleShowPass.bind(this)} /> Show password
-              </label>
+              <InputRow label='Email' identifier='email-address' inpRef={el => this.setMember('emailInput', el)} inpType='email' />
+              <PasswordInput inpRef={el => this.setMember('passInput', el)} />
             </fieldset>
             { this.props.showLoginError
               ? (
@@ -70,6 +54,7 @@ class LoginPage extends Component {
       </div>
     )
   }
+
   renderSocialSignupLink (type) {
     return (
       <a href='#1' className='link dim mr3'>
