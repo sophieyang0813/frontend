@@ -22,7 +22,7 @@ export class Routes extends React.Component {
         <Route exact path='/demo-claim' component={Claim} />
         <Route exact path='/todo' component={App} />
         <nav>
-          <Link to='/'>Dashboard</Link>
+          <Link to='/dashboard'>Dashboard</Link>
         </nav>
       </div>
     )
