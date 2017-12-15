@@ -23,6 +23,9 @@ script:
   - aws s3 cp --acl public-read $HOME/frontend.tar.gz s3://unee-t-media/frontend/commit/${COMMIT}.tar.gz
   - aws s3 cp --acl public-read $HOME/frontend.tar.gz s3://unee-t-media/frontend/${TRAVIS_BRANCH}.tar.gz
 
+after_success:
+    - ./deploy.sh
+
 env:
   global:
   - COMMIT=${TRAVIS_COMMIT::7}
