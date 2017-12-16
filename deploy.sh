@@ -36,6 +36,7 @@ then
 fi
 
 # /usr/local/bin/ecs-cli compose --aws-profile lmb-dev -p meteor -f docker-compose-meteor.yml service create --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:812644853088:targetgroup/meteor/0617ca622a59e7e2 --container-name meteor --container-port 3000 --load-balancer-name meteor
+# ecs-cli compose --aws-profile lmb-prod -p meteor -f docker-compose-meteor.yml service create --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:192458993663:targetgroup/meteor/96a08bd201369039 --container-name meteor --container-port 3000 --role ecsServiceRole
 
 ecs-cli configure --cluster master --region ap-southeast-1 --compose-service-name-prefix ecscompose-service-
 test -f aws-env.$STAGE && source aws-env.$STAGE
