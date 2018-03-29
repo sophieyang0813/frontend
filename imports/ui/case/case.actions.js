@@ -8,12 +8,15 @@ export const CREATE_COMMENT = 'create_comment'
 export const ADD_ROLE_USER = 'add_role_user'
 export const REMOVE_ROLE_USER = 'remove_role_user'
 export const INVITE_NEW_USER = 'invite_new_user'
+export const ASSIGN_NEW_USER = 'assign_new_user'
+export const ASSIGN_EXISTING_USER = 'assign_existing_user'
 export const INVITATION_INITIATED = 'invitation_initiated'
 export const INVITATION_SUCCESS = 'invitation_success'
 export const INVITATION_ERROR = 'invitation_error'
 export const INVITATION_CLEARED = 'invitation_cleared'
 export const CLEAR_WELCOME_MESSAGE = 'clear_welcome_message'
 export const UPDATE_INVITED_USER_NAME = 'update_invited_user_name'
+export const EDIT_CASE_FIELD = 'edit_case_field'
 
 export function createComment (text, caseId) {
   return {
@@ -68,6 +71,25 @@ export function inviteNewUser (email, role, isOccupant, caseId, unitId) {
   }
 }
 
+export function assignNewUser (email, role, isOccupant, caseId, unitId) {
+  return {
+    type: ASSIGN_NEW_USER,
+    email,
+    role,
+    isOccupant,
+    caseId,
+    unitId
+  }
+}
+
+export function assignExistingUser (user, caseId) {
+  return {
+    type: ASSIGN_EXISTING_USER,
+    user,
+    caseId
+  }
+}
+
 export function clearInvitation () {
   return {
     type: INVITATION_CLEARED
@@ -84,5 +106,13 @@ export function updateInvitedUserName (name) {
   return {
     type: UPDATE_INVITED_USER_NAME,
     name
+  }
+}
+
+export function editCaseField (changeSet, caseId) {
+  return {
+    type: EDIT_CASE_FIELD,
+    changeSet,
+    caseId
   }
 }

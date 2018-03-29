@@ -13,14 +13,15 @@ import Cases, { getCaseUsers, collectionName as casesCollName } from '../../api/
 import Comments from '../../api/comments'
 import Units, { getUnitRoles, collectionName as unitsCollName } from '../../api/units'
 import PendingInvitations, { collectionName as inviteCollName } from '../../api/pending-invitations'
+import CaseFieldValues, { collectionName as cfvCollName } from '../../api/case-field-values'
 import InnerAppBar from '../components/inner-app-bar'
 import actions from './case.actions'
 import MaximizedAttachment from './maximized-attachment'
 import CaseMessages from './case-messages'
 import CaseDetails from './case-details'
 import { attachmentTextMatcher } from '../../util/matchers'
+import WelcomeDialog from '../dialogs/welcome-dialog'
 import { formatDayText } from '../../util/formatters'
-import WelcomeDialog from '../components/welcome-dialog'
 import Preloader from '../preloader/preloader'
 
 export class Case extends Component {
@@ -45,17 +46,32 @@ export class Case extends Component {
     const {
       caseItem, comments, loadingCase, loadingComments, loadingUnit, caseError, commentsError, unitError, unitItem,
       attachmentUploads, match, userEmail, dispatch, unitUsers, invitationState, caseUserTypes,
-      loadingPendingInvitations, pendingInvitations, showWelcomeDialog, invitedByDetails
+      loadingPendingInvitations, pendingInvitations, showWelcomeDialog, invitedByDetails,
+      cfvDictionary, loadingCfv, cfvError
     } = this.props
-    if (caseError) return <h1>Error loading the case: {caseError.error.message}</h1>
-    if (commentsError) return <h1>Error loading the comments: {commentsError.error.message}</h1>
-    if (unitError) return <h1>Error loading the unit: {unitError.error.message}</h1>
-    if (loadingCase || loadingComments || loadingUnit || loadingPendingInvitations) return <Preloader />
+    const errors = [
+      [caseError, 'case'], [commentsError, 'comments'], [unitError, 'unit'], [cfvError, 'potential field values']
+    ].filter(pair => !!pair[0])
+    if (errors.length) {
+      return (
+        <div>
+          {errors.reduce((all, pair, i) => {
+            const [e, name] = pair
+            console.log('API error occurrued', e.error.origError)
+
+            return all.concat([
+              <h1 key={i}>Error loading the {name}: {e.error.message}</h1>
+            ])
+          }, [])}
+        </div>
+      )
+    }
+    if (loadingCase || loadingComments || loadingUnit || loadingPendingInvitations || loadingCfv) return <Preloader />
 
     const { push } = routerRedux
     const {
       createComment, createAttachment, retryAttachment, addRoleUser, removeRoleUser, inviteNewUser, clearInvitation,
-      clearWelcomeMessage, updateInvitedUserName
+      clearWelcomeMessage, updateInvitedUserName, assignNewUser, assignExistingUser, editCaseField
     } = actions
     const { caseId } = match.params
     const detailsUrl = `${match.url}/details`
@@ -88,14 +104,28 @@ export class Case extends Component {
               )} />
               <Route path={detailsUrl} render={() => (
                 <CaseDetails
-                  {...{caseItem, comments, unitUsers, invitationState, unitItem, caseUserTypes, pendingInvitations}}
+                  {...{
+                    caseItem,
+                    comments,
+                    unitUsers,
+                    invitationState,
+                    unitItem,
+                    caseUserTypes,
+                    pendingInvitations,
+                    cfvDictionary
+                  }}
                   onRoleUserAdded={user => dispatch(addRoleUser(user.login, caseId))}
                   onRoleUserRemoved={user => dispatch(removeRoleUser(user.login, caseId))}
                   onNewUserInvited={
                     (email, role, isOccupant) => dispatch(inviteNewUser(email, role, isOccupant, caseId, unitItem.id))
                   }
+                  onNewUserAssigned={
+                    (email, role, isOccupant) => dispatch(assignNewUser(email, role, isOccupant, caseId, unitItem.id))
+                  }
+                  onExistingUserAssigned={user => dispatch(assignExistingUser(user, caseId))}
                   onResetInvitation={() => dispatch(clearInvitation())}
                   onSelectAttachment={this.navigateToAttachment.bind(this)}
+                  onFieldEdit={changeSet => dispatch(editCaseField(changeSet, caseId))}
                 />
               )} />
             </Switch>
@@ -126,6 +156,9 @@ Case.propTypes = {
   loadingUnit: PropTypes.bool,
   unitError: PropTypes.object,
   unitItem: PropTypes.object,
+  loadingCfv: PropTypes.bool,
+  cfvDictionary: PropTypes.object,
+  cfvError: PropTypes.object,
   unitUsers: PropTypes.array,
   caseUserTypes: PropTypes.object,
   invitationState: PropTypes.object.isRequired,
@@ -135,9 +168,10 @@ Case.propTypes = {
   invitedByDetails: PropTypes.object
 }
 
-let caseError, commentsError, unitError
+let caseError, commentsError, unitError, cfvError
 const CaseContainer = createContainer(props => {
   const { caseId } = props.match.params
+
   const caseHandle = Meteor.subscribe(`${casesCollName}.byId`, caseId, {
     onStop: error => {
       caseError = error
@@ -148,16 +182,22 @@ const CaseContainer = createContainer(props => {
       commentsError = error
     }
   })
-  const currCase = Cases.findOne(caseId)
+  const currCase = caseHandle.ready() ? Cases.findOne(caseId) : null
   let currUnit, unitHandle
   if (currCase) {
-    unitHandle = Meteor.subscribe(`${unitsCollName}.byId`, currCase.product, {
+    unitHandle = Meteor.subscribe(`${unitsCollName}.byId`, currCase.selectedUnit, {
       onStop: error => {
         unitError = error
       }
     })
-    currUnit = Units.findOne({name: currCase.product})
+    currUnit = unitHandle.ready() ? Units.findOne({name: currCase.selectedUnit}) : null
   }
+  const cfvHandle = Meteor.subscribe(`${cfvCollName}.fetchByName`, 'status', {
+    onStop: error => {
+      cfvError = error
+    }
+  })
+
   const caseUserTypes = currCase ? getCaseUsers(currCase) : null
   const unitRoles = currUnit && getUnitRoles(currUnit)
   const makeMatchingUser = bzUser => {
@@ -170,7 +210,10 @@ const CaseContainer = createContainer(props => {
     caseItem: currCase,
     loadingComments: !commentsHandle.ready(),
     commentsError,
-    comments: Comments.find({bug_id: parseInt(caseId)}).fetch(),
+    comments: Comments.find({bug_id: parseInt(caseId)}).fetch().map(comment => {
+      const creatorUser = Meteor.users.findOne({ 'bugzillaCreds.login': comment.creator })
+      return { ...comment, creatorUser }
+    }),
     userEmail: Meteor.user() ? Meteor.user().emails[0].address : null,
     loadingUnit: !unitHandle || !unitHandle.ready(),
     unitError,
@@ -187,6 +230,9 @@ const CaseContainer = createContainer(props => {
         : mapUser(caseUserTypes[userType])
       return all
     }, {}),
+    loadingCfv: !cfvHandle.ready(),
+    cfvDictionary: cfvHandle.ready() ? {status: CaseFieldValues.findOne({name: 'status'})} : null,
+    cfvError,
     loadingPendingInvitations: !Meteor.subscribe(`${inviteCollName}.byCaseId`, parseInt(caseId)).ready(),
     pendingInvitations: PendingInvitations.find({caseId: parseInt(caseId)}).fetch()
   }
@@ -241,7 +287,7 @@ const MobileHeader = props => {
       }} />
       <Route path={match.url} render={routeProps => (
         <InnerAppBar
-          title={caseItem.summary} onBack={() => handleBack(props.match.isExact ? null : match.url)}
+          title={caseItem.title} onBack={() => handleBack(props.match.isExact ? null : match.url)}
         />
       )} />
     </Switch>
