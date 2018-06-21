@@ -11,13 +11,12 @@ import Cases, { collectionName } from '../../api/cases'
 import { push } from 'react-router-redux'
 import RootAppBar from '../components/root-app-bar'
 import { storeBreadcrumb } from '../general-actions'
+import { isClosed } from '../../api/cases'
 
 import {
   unitIconsStyle,
   moreIconColor
 } from './case-explorer.mui-styles'
-
-const isClosed = caseItem => ['RESOLVED', 'VERIFIED', 'CLOSED'].includes(caseItem.status)
 
 class CaseExplorer extends Component {
   constructor () {

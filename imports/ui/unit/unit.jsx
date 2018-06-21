@@ -19,6 +19,7 @@ import Preloader from '../preloader/preloader'
 import { infoItemMembers } from '../util/static-info-rendering'
 import { userInfoItem } from '../../util/user'
 import { storeBreadcrumb } from '../general-actions'
+import { isClosed } from '../../api/cases'
 
 const viewsOrder = ['cases', 'reports', 'overview']
 
@@ -57,6 +58,22 @@ class Unit extends Component {
       sortedCases: []
     }
   }
+
+
+  // 2. is this setState correctly updating open/close cases? 
+ openClicked = () => {
+    this.setState(prevState => ({
+      sortedCases: openCases 
+    }));
+  }
+  
+  closedClicked = () => {
+    this.setState(prevState => ({
+      sortedCases: closedCases 
+    }));
+  }
+
+
   handleChange = val => {
     const { match, dispatch } = this.props
     dispatch(push(`${match.url}/${viewsOrder[val]}`))
@@ -76,6 +93,15 @@ class Unit extends Component {
     const { unitItem, isLoading, unitError, casesError, unitUsers, dispatch, match } = this.props
     const { sortedCases } = this.state
 
+    if ( sortedCases.length !== 0 ){
+    const closedCases = sortedCases.filter(x => isClosed(x)); 
+    console.log(sortedCases)
+    const openCases = sortedCases.filter(val => !closedCases.includes(val));
+    const openNum = openCases.length;  
+    console.log("closed cases", closedCases.length);
+    console.log("open cases", openCases.length ); 
+    }
+ 
     const rootMatch = match
 
     if (isLoading) return <Preloader />
@@ -126,7 +152,15 @@ class Unit extends Component {
                   index={viewIdx}
                   onChangeIndex={this.handleChange}
                 >
+
                   <div className='flex-grow bg-very-light-gray'>
+                    <button onClick={this.openClicked}>
+                     Open
+                     {/*  P1: does not display {openCases.length} */}
+                    </button>
+                    <button onClick={this.closedClicked}>
+                     Closed
+                    </button>
                     {sortedCases.map(({id, title, severity}) => (
                       <div key={id} className='bb b--very-light-gray bg-white'>
                         <Link
