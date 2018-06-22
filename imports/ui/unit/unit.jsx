@@ -91,6 +91,7 @@ class Unit extends Component {
     const { match, dispatch } = this.props
     dispatch(push(`${match.url}/${viewsOrder[val]}`))
   }
+
   componentWillReceiveProps (nextProps) {
     const { caseList } = this.props
     if ((!caseList && nextProps.caseList) || (caseList && caseList.length !== nextProps.caseList.length)) {
@@ -102,6 +103,7 @@ class Unit extends Component {
       })
     }
   }
+
   render () {
     const { unitItem, isLoading, unitError, casesError, unitUsers, dispatch, match } = this.props
     const { sortedCases, showOpenCases } = this.state
@@ -126,8 +128,6 @@ class Unit extends Component {
         disabled: true
       }
     ]
-
-
 
     return (
       <div className='full-height flex flex-column'>
@@ -161,14 +161,14 @@ class Unit extends Component {
                 >
 
                   <div className='flex-grow bg-very-light-gray'>
-                   <div className='pl3 pv3 bb b--very-light-gray bg-white'>
-                    <button onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
-                     { this.openCases.length } Open 
+                    <div className='pl3 pv3 bb b--very-light-gray bg-white'>
+                      <button onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
+                        { this.openCases.length } Open
+                      </button>
+                      <button onClick={this.handleClosedClicked} className={'f6 fw5 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
+                        { this.closedCases.length } Closed
                     </button>
-                    <button onClick={this.handleClosedClicked} className={'f6 fw5 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
-                    { this.closedCases.length } Closed
-                    </button>
-                   </div>
+                    </div>
                     {filteredCases.map(({id, title, severity}) => (
                       <div key={id} className='bb b--very-light-gray bg-white'>
                         <Link
