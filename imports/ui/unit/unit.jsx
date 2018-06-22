@@ -21,11 +21,6 @@ import { userInfoItem } from '../../util/user'
 import { storeBreadcrumb } from '../general-actions'
 import { isClosed } from '../../api/cases'
 
-// const CASE_STATUS = Object.freeze({
-//   OPEN: 0,
-//   CLOSED: 1,
-// });
-
 const viewsOrder = ['cases', 'reports', 'overview']
 
 const severityIcons = {
@@ -61,34 +56,33 @@ class Unit extends Component {
     super(...arguments)
     this.state = {
       sortedCases: [],
-      showOpenCases: true 
+      showOpenCases: true
     }
-
   }
 
-  get openCases() {
-    const { sortedCases } = this.state;
-    return sortedCases.filter(x => !isClosed(x)); 
+  get openCases () {
+    const { sortedCases } = this.state
+    return sortedCases.filter(x => !isClosed(x))
   }
 
-  get closedCases() {
-    const { sortedCases } = this.state;
-    return sortedCases.filter(x => isClosed(x));
+  get closedCases () {
+    const { sortedCases } = this.state
+    return sortedCases.filter(x => isClosed(x))
   }
 
-  get filteredCases() {
-    const { showOpenCases } = this.state;
+  get filteredCases () {
+    const { showOpenCases } = this.state
     if (showOpenCases) {
-      return this.openCases; 
+      return this.openCases
     } else {
-      return this.closedCases; 
+      return this.closedCases
     }
   }
-   
+
   handleOpenClicked = () => {
     this.setState({ showOpenCases: true })
   }
-  
+
   handleClosedClicked = () => {
     this.setState({ showOpenCases: false })
   }
@@ -110,8 +104,8 @@ class Unit extends Component {
   }
   render () {
     const { unitItem, isLoading, unitError, casesError, unitUsers, dispatch, match } = this.props
-    const { sortedCases, showOpenCases } = this.state;
-    const { filteredCases } = this; 
+    const { sortedCases, showOpenCases } = this.state
+    const { filteredCases } = this
 
     const rootMatch = match
 
@@ -167,12 +161,12 @@ class Unit extends Component {
                 >
 
                   <div className='flex-grow bg-very-light-gray'>
-                   <div className='pl3 pv2 mv1 b--very-light-gray bg-white'>
+                   <div className='pl3 pv3 bb b--very-light-gray bg-white'>
                     <button onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
-                     Open
+                     { this.openCases.length } Open 
                     </button>
-                    <button onClick={this.handleClosedClicked} className={'f6 fw5 ml3 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
-                     Closed
+                    <button onClick={this.handleClosedClicked} className={'f6 fw5 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
+                    { this.closedCases.length } Closed
                     </button>
                    </div>
                     {filteredCases.map(({id, title, severity}) => (
