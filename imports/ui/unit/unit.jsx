@@ -107,7 +107,7 @@ class Unit extends Component {
   render () {
     const { unitItem, isLoading, unitError, casesError, unitUsers, dispatch, match } = this.props
     const { sortedCases, showOpenCases } = this.state
-    const { filteredCases } = this
+    const { filteredCases, closedCases, openCases } = this
 
     const rootMatch = match
 
@@ -161,13 +161,13 @@ class Unit extends Component {
                 >
 
                   <div className='flex-grow bg-very-light-gray'>
-                    <div className='pl3 pv3 bb b--very-light-gray bg-white'>
-                      <button onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
-                        { this.openCases.length } Open
-                      </button>
-                      <button onClick={this.handleClosedClicked} className={'f6 fw5 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
-                        { this.closedCases.length } Closed
-                    </button>
+                    <div className='flex pl3 pv3 bb b--very-light-gray bg-white'>
+                      <div onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
+                        { openCases.length } Open 
+                      </div>
+                      <div onClick={this.handleClosedClicked} className={'f6 fw5 ml2 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
+                        { closedCases.length } Closed
+                    </div>
                     </div>
                     {filteredCases.map(({id, title, severity}) => (
                       <div key={id} className='bb b--very-light-gray bg-white'>
