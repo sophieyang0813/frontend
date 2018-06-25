@@ -12,7 +12,7 @@ import FontIcon from 'material-ui/FontIcon'
 import { CSSTransition } from 'react-transition-group'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import Units, { collectionName as unitsCollName, getUnitRoles } from '../../api/units'
-import Cases, { collectionName as casesCollName } from '../../api/cases'
+import Cases, { openCases, closeCases, collectionName as casesCollName } from '../../api/cases'
 import InnerAppBar from '../components/inner-app-bar'
 import { makeMatchingUser } from '../../api/custom-users'
 import Preloader from '../preloader/preloader'
@@ -57,6 +57,24 @@ class Unit extends Component {
       sortedCases: []
     }
   }
+
+  get filteredCases () {
+    const { showOpenCases, sortedCases } = this.state
+    if (showOpenCases) {
+      return openCases(sortedCases)
+    } else {
+      return closeCases(sortedCases)
+    }
+  }
+
+  handleOpenClicked = () => {
+    this.setState({ showOpenCases: true })
+  }
+
+  handleClosedClicked = () => {
+    this.setState({ showOpenCases: false })
+  }
+
   handleChange = val => {
     const { match, dispatch } = this.props
     dispatch(push(`${match.url}/${viewsOrder[val]}`))
@@ -74,7 +92,12 @@ class Unit extends Component {
   }
   render () {
     const { unitItem, isLoading, unitError, casesError, unitUsers, dispatch, match } = this.props
-    const { sortedCases } = this.state
+    const { sortedCases, showOpenCases } = this.state
+    const { filteredCases } = this
+    const openCasesCount = openCases(sortedCases)
+    const closeCasesCount = closeCases(sortedCases)
+  
+    // const { filteredCases, closedCases, openCases } = this
 
     const rootMatch = match
 
@@ -127,7 +150,15 @@ class Unit extends Component {
                   onChangeIndex={this.handleChange}
                 >
                   <div className='flex-grow bg-very-light-gray'>
-                    {sortedCases.map(({id, title, severity}) => (
+                    <div className='flex pl3 pv3 bb b--very-light-gray bg-white'>
+                      <div onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
+                        { openCasesCount.length } Open
+                      </div>
+                      <div onClick={this.handleClosedClicked} className={'f6 fw5 ml2 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
+                        { closeCasesCount.length } Closed
+                    </div>
+                    </div>
+                    {filteredCases.map(({id, title, severity}) => (
                       <div key={id} className='bb b--very-light-gray bg-white'>
                         <Link
                           to={`/case/${id}`}

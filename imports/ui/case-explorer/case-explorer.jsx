@@ -7,7 +7,7 @@ import { Link, withRouter } from 'react-router-dom'
 import IconButton from 'material-ui/IconButton'
 import FontIcon from 'material-ui/FontIcon'
 import RaisedButton from 'material-ui/RaisedButton'
-import Cases, { collectionName } from '../../api/cases'
+import Cases, { openCases, closeCases, collectionName, isClosed } from '../../api/cases'
 import { push } from 'react-router-redux'
 import RootAppBar from '../components/root-app-bar'
 import { storeBreadcrumb } from '../general-actions'
@@ -17,7 +17,7 @@ import {
   moreIconColor
 } from './case-explorer.mui-styles'
 
-const isClosed = caseItem => ['RESOLVED', 'VERIFIED', 'CLOSED'].includes(caseItem.status)
+// const isClosed = caseItem => ['RESOLVED', 'VERIFIED', 'CLOSED'].includes(caseItem.status)
 
 class CaseExplorer extends Component {
   constructor () {
@@ -25,9 +25,19 @@ class CaseExplorer extends Component {
     this.state = {
       caseId: '',
       expandedUnits: [],
-      unitsDict: {}
+      unitsDict: {},
+      // unitsShowOpenDict: {},
+      showOpenCases: true
     }
   }
+  handleOpenClicked = () => {
+    this.setState({ showOpenCases: true })
+  }
+
+  handleClosedClicked = () => {
+    this.setState({ showOpenCases: false })
+  }
+
   handleExpandUnit (evt, unitTitle) {
     evt.preventDefault()
     const { expandedUnits } = this.state
@@ -61,17 +71,27 @@ class CaseExplorer extends Component {
       this.setState({
         unitsDict
       })
+      console.log(unitsDict)
+      // const unitsShowOpenDict = Object.assign({}, this.state.unitsShowOpenDict)
+      // Object.keys(unitsDict).forEach(unitTitle => {
+      //   // console.log(unitsDict[unitTitle])
+      //   // unitsShowOpenDict[unitTitle] = unitsShowOpenDict[unitTitle] || true //1.Naor
+      //   unitsShowOpenDict[unitTitle] = unitsDict[unitTitle] || true
+      //   // console.log(unitsShowOpenDict[unitTitle])
+      // })
     }
   }
   render () {
     const { isLoading, dispatch, match } = this.props
-    const { unitsDict } = this.state
-
+    const { unitsDict, unitsShowOpenDict, showOpenCases } = this.state
+    
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100'>
         <div className='bb b--black-10 overflow-auto flex-grow'>
           {!isLoading && Object.keys(unitsDict).map(unitTitle => {
             const isExpanded = this.state.expandedUnits.includes(unitTitle)
+            const relevantCases = showOpenCases ? openCases(unitsDict[unitTitle]) : closeCases(unitsDict[unitTitle])
+            // const relevantCases = unitsShowOpenDict[unitTitle] ? openCases(unitsDict[unitTitle]) : closeCases(unitsDict[unitTitle]) 1.Naor
             return (
               <div key={unitTitle}>
                 <div className='flex items-center h3 bt b--light-gray'
@@ -87,7 +107,15 @@ class CaseExplorer extends Component {
                 </div>
                 {isExpanded && (
                   <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
-                    {unitsDict[unitTitle].map(caseItem => (
+                    <div className='flex pl3 pv3 bb b--very-light-gray bg-white'>
+                      <div onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
+                        Open
+                      </div>
+                      <div onClick={this.handleClosedClicked} className={'f6 fw5 ml2 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
+                        Closed
+                      </div>
+                    </div>
+                    {relevantCases.map(caseItem => (
                       <li key={caseItem.id} className='h2-5 bt b--black-10'>
                         <div className='flex items-center'>
                           <Link

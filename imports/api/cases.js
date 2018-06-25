@@ -40,6 +40,10 @@ export const caseServerFieldMapping = {
   resolution: 'resolution'
 }
 
+export const isClosed = caseItem => ['RESOLVED', 'VERIFIED', 'CLOSED'].includes(caseItem.status)
+export const openCases = caseList => caseList.filter(x => !isClosed(x))
+export const closeCases = caseList => caseList.filter(x => isClosed(x))
+
 export const caseClientFieldMapping = Object.assign(
   Object.keys(caseServerFieldMapping).reduce((all, key) => ({
     ...all,
