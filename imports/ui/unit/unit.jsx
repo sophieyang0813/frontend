@@ -12,14 +12,13 @@ import FontIcon from 'material-ui/FontIcon'
 import { CSSTransition } from 'react-transition-group'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import Units, { collectionName as unitsCollName, getUnitRoles } from '../../api/units'
-import Cases, { collectionName as casesCollName } from '../../api/cases'
+import Cases, { isClosed, collectionName as casesCollName } from '../../api/cases'
 import InnerAppBar from '../components/inner-app-bar'
 import { makeMatchingUser } from '../../api/custom-users'
 import Preloader from '../preloader/preloader'
 import { infoItemMembers } from '../util/static-info-rendering'
 import { userInfoItem } from '../../util/user'
 import { storeBreadcrumb } from '../general-actions'
-import { isClosed } from '../../api/cases'
 
 const viewsOrder = ['cases', 'reports', 'overview']
 
@@ -98,7 +97,7 @@ class Unit extends Component {
       const severityList = Object.keys(severityIcons)
       this.setState({
         sortedCases: nextProps.caseList.slice().sort((a, b) =>
-          severityList.indexOf(a.severity) - severityList.indexOf(b.severity),
+          severityList.indexOf(a.severity) - severityList.indexOf(b.severity)
         )
       })
     }
@@ -163,7 +162,7 @@ class Unit extends Component {
                   <div className='flex-grow bg-very-light-gray'>
                     <div className='flex pl3 pv3 bb b--very-light-gray bg-white'>
                       <div onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
-                        { openCases.length } Open 
+                        { openCases.length } Open
                       </div>
                       <div onClick={this.handleClosedClicked} className={'f6 fw5 ml2 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
                         { closedCases.length } Closed
