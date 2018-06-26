@@ -7,7 +7,7 @@ import { Link, withRouter } from 'react-router-dom'
 import IconButton from 'material-ui/IconButton'
 import FontIcon from 'material-ui/FontIcon'
 import RaisedButton from 'material-ui/RaisedButton'
-import Cases, { openCases, closeCases, collectionName, isClosed } from '../../api/cases'
+import Cases, { openCases as filterOpenCases, closeCases as filterClosedCases, collectionName, isClosed } from '../../api/cases'
 import { push } from 'react-router-redux'
 import RootAppBar from '../components/root-app-bar'
 import { storeBreadcrumb } from '../general-actions'
@@ -26,20 +26,26 @@ class CaseExplorer extends Component {
       caseId: '',
       expandedUnits: [],
       unitsDict: {},
-      // unitsShowOpenDict: {},
-      showOpenCases: true
+      unitsShowOpenDict: {},
+      caseStatus: true
     }
   }
-  handleOpenClicked = () => {
-    this.setState({ showOpenCases: true })
+
+  handleOpenClicked (unitTitle) {
+    const unitsShowOpenDict = Object.assign({}, this.state.unitsShowOpenDict)
+    unitsShowOpenDict[unitTitle] = true
+    this.setState({ unitsShowOpenDict })
   }
 
-  handleClosedClicked = () => {
-    this.setState({ showOpenCases: false })
+  handleClosedClicked (unitTitle) {
+    const unitsShowOpenDict = Object.assign({}, this.state.unitsShowOpenDict)
+    unitsShowOpenDict[unitTitle] = false
+    this.setState({ unitsShowOpenDict })
   }
 
   handleExpandUnit (evt, unitTitle) {
     evt.preventDefault()
+    this.setState({ caseStatus: true })
     const { expandedUnits } = this.state
     let stateMutation
     if (expandedUnits.includes(unitTitle)) {
@@ -68,30 +74,29 @@ class CaseExplorer extends Component {
         unitCases.push(caseItem)
         return dict
       }, {})
-      this.setState({
-        unitsDict
+      const unitsShowOpenDict = Object.assign({}, this.state.unitsShowOpenDict)
+      Object.keys(unitsDict).forEach(unitTitle => {
+        unitsShowOpenDict[unitTitle] = unitsShowOpenDict[unitTitle] || true
       })
-      console.log(unitsDict)
-      // const unitsShowOpenDict = Object.assign({}, this.state.unitsShowOpenDict)
-      // Object.keys(unitsDict).forEach(unitTitle => {
-      //   // console.log(unitsDict[unitTitle])
-      //   // unitsShowOpenDict[unitTitle] = unitsShowOpenDict[unitTitle] || true //1.Naor
-      //   unitsShowOpenDict[unitTitle] = unitsDict[unitTitle] || true
-      //   // console.log(unitsShowOpenDict[unitTitle])
-      // })
+      this.setState({
+        unitsDict,
+        unitsShowOpenDict
+      })
     }
   }
   render () {
     const { isLoading, dispatch, match } = this.props
-    const { unitsDict, unitsShowOpenDict, showOpenCases } = this.state
-    
+    const { unitsDict, unitsShowOpenDict } = this.state
+
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100'>
         <div className='bb b--black-10 overflow-auto flex-grow'>
           {!isLoading && Object.keys(unitsDict).map(unitTitle => {
             const isExpanded = this.state.expandedUnits.includes(unitTitle)
-            const relevantCases = showOpenCases ? openCases(unitsDict[unitTitle]) : closeCases(unitsDict[unitTitle])
-            // const relevantCases = unitsShowOpenDict[unitTitle] ? openCases(unitsDict[unitTitle]) : closeCases(unitsDict[unitTitle]) 1.Naor
+            const openCases = filterOpenCases(unitsDict[unitTitle])
+            const closedCases = filterClosedCases(unitsDict[unitTitle])
+            const caseStatus = unitsShowOpenDict[unitTitle]
+            const selectedCases = caseStatus ? openCases : closedCases
             return (
               <div key={unitTitle}>
                 <div className='flex items-center h3 bt b--light-gray'
@@ -99,6 +104,9 @@ class CaseExplorer extends Component {
                   <FontIcon className='material-icons mh3' style={unitIconsStyle}>home</FontIcon>
                   <div className='flex-grow ellipsis mid-gray'>
                     {unitTitle}
+                    <div className={'f6 silver mt1'}>
+                      {unitsDict[unitTitle].length } cases
+                    </div>
                   </div>
                   <FontIcon className={'material-icons mr2 pr1' + (isExpanded ? ' rotate-90' : '')}
                     style={unitIconsStyle}>
@@ -107,15 +115,15 @@ class CaseExplorer extends Component {
                 </div>
                 {isExpanded && (
                   <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
-                    <div className='flex pl3 pv3 bb b--very-light-gray bg-white'>
-                      <div onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
-                        Open
+                    <div className='flex pl3 pv3 bb b--very-light-gray'>
+                      <div onClick={this.handleOpenClicked.bind(this, unitTitle)} className={'f6 fw5 ' + (caseStatus ? 'mid-gray' : 'silver')}>
+                        { openCases.length } Open
                       </div>
-                      <div onClick={this.handleClosedClicked} className={'f6 fw5 ml2 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
-                        Closed
+                      <div onClick={this.handleClosedClicked.bind(this, unitTitle)} className={'f6 fw5 ml2 ' + (caseStatus ? 'silver' : 'mid-gray')}>
+                        { closedCases.length } Closed
                       </div>
                     </div>
-                    {relevantCases.map(caseItem => (
+                    {selectedCases.map(caseItem => (
                       <li key={caseItem.id} className='h2-5 bt b--black-10'>
                         <div className='flex items-center'>
                           <Link
