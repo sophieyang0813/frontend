@@ -3,61 +3,16 @@ import { Meteor } from 'meteor/meteor'
 import { connect } from 'react-redux'
 import { createContainer } from 'meteor/react-meteor-data'
 import PropTypes from 'prop-types'
-import { Link, withRouter } from 'react-router-dom'
-import IconButton from 'material-ui/IconButton'
+import { withRouter } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
 import RaisedButton from 'material-ui/RaisedButton'
 import Cases, { openCases as filterOpenCases, closeCases as filterClosedCases, collectionName, isClosed } from '../../api/cases'
 import { push } from 'react-router-redux'
 import RootAppBar from '../components/root-app-bar'
-import { storeBreadcrumb } from '../general-actions'
-
+import { Caselist } from '../case-explorer/case-list'
 import {
-  unitIconsStyle,
-  moreIconColor
+  unitIconsStyle
 } from './case-explorer.mui-styles'
-
-class Caselist extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      caseStatus: true
-    }
-  }
-  render () {
-    // need to pass down folllowing?  const { isLoading, dispatch, match } = this.props?? 
-    const selectCases = this.state.caseStatus ? this.props.openCases : this.props.closedCases
-    return (
-      <div>
-        <button onClick={() => this.setState({caseStatus: true})}>
-          {this.props.openCases.length} open
-        </button>
-        <button onClick={() => this.setState({caseStatus: false})}>
-          {this.props.closedCases.length} closed
-        </button>
-        {selectCases.map(caseItem =>
-          <li key={caseItem.id} className='h2-5 bt b--black-10'>
-            <div className='flex items-center'>
-              <Link
-                className={
-                  'link flex-grow ellipsis ml3 pl1 ' +
-                    (isClosed(caseItem) ? 'silver strike' : 'bondi-blue')
-                }
-                to={`/case/${caseItem.id}`}
-                onClick={() => dispatch(storeBreadcrumb(match.url))}
-              >
-                {caseItem.title}
-              </Link>
-              <IconButton>
-                <FontIcon className='material-icons' color={moreIconColor}>more_horiz</FontIcon>
-              </IconButton>
-            </div>
-          </li>
-          )}
-      </div>
-    )
-  }
-}
 
 class CaseExplorer extends Component {
   constructor () {
@@ -116,8 +71,6 @@ class CaseExplorer extends Component {
             const isExpanded = this.state.expandedUnits.includes(unitTitle)
             const openCases = filterOpenCases(unitsDict[unitTitle])
             const closedCases = filterClosedCases(unitsDict[unitTitle])
-            // const caseStatus = unitsShowOpenDict[unitTitle]
-            // const selectedCases = caseStatus ? openCases : closedCases
             return (
               <div key={unitTitle}>
                 <div className='flex items-center h3 bt b--light-gray'
@@ -136,31 +89,12 @@ class CaseExplorer extends Component {
                 </div>
                 {isExpanded && (
                   <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
-                    <div className='flex pl3 pv3 bb b--very-light-gray'>
-                      <Caselist
-                        closedCases={closedCases}
-                        openCases={openCases}
-                      />
-                    </div>
-                    {/* {selectedCases.map(caseItem => (
-                      <li key={caseItem.id} className='h2-5 bt b--black-10'>
-                        <div className='flex items-center'>
-                          <Link
-                            className={
-                              'link flex-grow ellipsis ml3 pl1 ' +
-                                (isClosed(caseItem) ? 'silver strike' : 'bondi-blue')
-                            }
-                            to={`/case/${caseItem.id}`}
-                            onClick={() => dispatch(storeBreadcrumb(match.url))}
-                          >
-                            {caseItem.title}
-                          </Link>
-                          <IconButton>
-                            <FontIcon className='material-icons' color={moreIconColor}>more_horiz</FontIcon>
-                          </IconButton>
-                        </div>
-                      </li>
-                    ))} */}
+                    <Caselist
+                      closedCases={closedCases}
+                      openCases={openCases}
+                      dispatch={dispatch}
+                      match={match}
+                    />
                   </ul>
                 )}
               </div>
