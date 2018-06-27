@@ -96,15 +96,11 @@ class Unit extends Component {
     const { filteredCases } = this
     const openCasesCount = openCases(sortedCases)
     const closeCasesCount = closeCases(sortedCases)
-  
-    // const { filteredCases, closedCases, openCases } = this
-
     const rootMatch = match
 
     if (isLoading) return <Preloader />
     if (unitError) return <h1>An error occurred: {unitError.error}</h1>
     if (casesError) return <h1>An error occurred: {casesError.error}</h1>
-
     const fabDescriptors = [
       {
         color: 'var(--bondi-blue)',

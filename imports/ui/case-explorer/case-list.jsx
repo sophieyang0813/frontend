@@ -48,7 +48,7 @@ export class Caselist extends Component {
               </IconButton>
             </div>
           </li>
-          )}
+        )}
       </div>
     )
   }

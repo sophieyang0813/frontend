@@ -3,7 +3,6 @@ import { Mongo } from 'meteor/mongo'
 import { check } from 'meteor/check'
 import bugzillaApi from '../util/bugzilla-api'
 import _ from 'lodash'
-
 import publicationFactory from './base/rest-resource-factory'
 import { makeAssociationFactory, withUsers } from './base/associations-helper'
 import { emailValidator } from '../util/validators'
@@ -43,7 +42,6 @@ export const caseServerFieldMapping = {
 export const isClosed = caseItem => ['RESOLVED', 'VERIFIED', 'CLOSED'].includes(caseItem.status)
 export const openCases = caseList => caseList.filter(x => !isClosed(x))
 export const closeCases = caseList => caseList.filter(x => isClosed(x))
-
 export const caseClientFieldMapping = Object.assign(
   Object.keys(caseServerFieldMapping).reduce((all, key) => ({
     ...all,
