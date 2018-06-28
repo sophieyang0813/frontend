@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Meteor } from 'meteor/meteor'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { createContainer } from 'meteor/react-meteor-data'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
@@ -78,8 +79,20 @@ class CaseExplorer extends Component {
                   <FontIcon className='material-icons mh3' style={unitIconsStyle}>home</FontIcon>
                   <div className='flex-grow ellipsis mid-gray'>
                     {unitTitle}
-                    <div className={'f6 silver mt1'}>
-                      {unitsDict[unitTitle].length } cases
+                    <div className='flex justify-space'>
+                      <div className={'f6 silver mt1'}>
+                        {unitsDict[unitTitle].length } cases
+                      </div>
+                      <div>
+                        <Link
+                          className={'f6 link ellipsis ml3 pl1 mv1 bondi-blue'}
+                          to={{
+                            pathname: '/case/new',
+                            state: { unitTitle: unitTitle }
+                          }}>
+                          Add case
+                        </Link>
+                      </div>
                     </div>
                   </div>
                   <FontIcon className={'material-icons mr2 pr1' + (isExpanded ? ' rotate-90' : '')}
