@@ -12,7 +12,8 @@ import FontIcon from 'material-ui/FontIcon'
 import { CSSTransition } from 'react-transition-group'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import Units, { collectionName as unitsCollName, getUnitRoles } from '../../api/units'
-import Cases, { openCases, closeCases, collectionName as casesCollName } from '../../api/cases'
+import Cases, { collectionName as casesCollName } from '../../api/cases'
+import { isClosed } from '../case-explorer/case-list'
 import InnerAppBar from '../components/inner-app-bar'
 import { makeMatchingUser } from '../../api/custom-users'
 import Preloader from '../preloader/preloader'
@@ -54,16 +55,19 @@ class Unit extends Component {
   constructor () {
     super(...arguments)
     this.state = {
+      showOpenCases: true,
       sortedCases: []
     }
   }
 
   get filteredCases () {
     const { showOpenCases, sortedCases } = this.state
+    const openCases = sortedCases.filter(x => !isClosed(x))
+    const closedCases = sortedCases.filter(x => isClosed(x))
     if (showOpenCases) {
-      return openCases(sortedCases)
+      return openCases
     } else {
-      return closeCases(sortedCases)
+      return closedCases
     }
   }
 
@@ -94,8 +98,9 @@ class Unit extends Component {
     const { unitItem, isLoading, unitError, casesError, unitUsers, dispatch, match } = this.props
     const { sortedCases, showOpenCases } = this.state
     const { filteredCases } = this
-    const openCasesCount = openCases(sortedCases)
-    const closeCasesCount = closeCases(sortedCases)
+    const openCasesCount = sortedCases.filter(x => !isClosed(x))
+    const closedCasesCount = sortedCases.filter(x => isClosed(x))
+    
     const rootMatch = match
 
     if (isLoading) return <Preloader />
@@ -148,10 +153,10 @@ class Unit extends Component {
                   <div className='flex-grow bg-very-light-gray'>
                     <div className='flex pl3 pv3 bb b--very-light-gray bg-white'>
                       <div onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
-                        { openCasesCount.length } Open
+                        {openCasesCount.length} Open
                       </div>
                       <div onClick={this.handleClosedClicked} className={'f6 fw5 ml2 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
-                        { closeCasesCount.length } Closed
+                        {closedCasesCount.length} Closed
                     </div>
                     </div>
                     {filteredCases.map(({id, title, severity}) => (

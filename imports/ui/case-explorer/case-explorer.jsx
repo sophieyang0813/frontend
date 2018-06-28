@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
 import { Meteor } from 'meteor/meteor'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import { createContainer } from 'meteor/react-meteor-data'
 import PropTypes from 'prop-types'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
 import RaisedButton from 'material-ui/RaisedButton'
-import Cases, { openCases as filterOpenCases, closeCases as filterClosedCases, collectionName, isClosed } from '../../api/cases'
+import Cases, { collectionName } from '../../api/cases'
 import { push } from 'react-router-redux'
 import RootAppBar from '../components/root-app-bar'
-import { Caselist } from '../case-explorer/case-list'
+import { storeBreadcrumb } from '../general-actions'
+import { CaseList, isClosed } from '../case-explorer/case-list'
 import {
   unitIconsStyle
 } from './case-explorer.mui-styles'
@@ -27,7 +27,6 @@ class CaseExplorer extends Component {
 
   handleExpandUnit (evt, unitTitle) {
     evt.preventDefault()
-    this.setState({ caseStatus: true })
     const { expandedUnits } = this.state
     let stateMutation
     if (expandedUnits.includes(unitTitle)) {
@@ -70,8 +69,7 @@ class CaseExplorer extends Component {
         <div className='bb b--black-10 overflow-auto flex-grow'>
           {!isLoading && Object.keys(unitsDict).map(unitTitle => {
             const isExpanded = this.state.expandedUnits.includes(unitTitle)
-            const openCases = filterOpenCases(unitsDict[unitTitle])
-            const closedCases = filterClosedCases(unitsDict[unitTitle])
+            const allCases = unitsDict[unitTitle]
             return (
               <div key={unitTitle}>
                 <div className='flex items-center h3 bt b--light-gray'
@@ -102,11 +100,9 @@ class CaseExplorer extends Component {
                 </div>
                 {isExpanded && (
                   <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
-                    <Caselist
-                      closedCases={closedCases}
-                      openCases={openCases}
-                      dispatch={dispatch}
-                      match={match}
+                    <CaseList
+                      allCases={allCases}
+                      onItemClick={() => dispatch(storeBreadcrumb(match.url))}
                     />
                   </ul>
                 )}

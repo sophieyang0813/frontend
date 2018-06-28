@@ -141,6 +141,7 @@ class CaseWizard extends Component {
   }
 
   render () {
+    // working on pre-populating the unitTitle if passed down from unit/case
     // const { selectedUnit } = this.state.mandatory
     console.log(this.state.mandatory)
     const {
