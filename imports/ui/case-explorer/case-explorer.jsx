@@ -78,12 +78,12 @@ class CaseExplorer extends Component {
                   <div className='flex-grow ellipsis mid-gray'>
                     {unitTitle}
                     <div className='flex justify-space'>
-                      <div className={'f6 silver mt1'}>
+                      <div className={'f6 silver mt1 '}>
                         {unitsDict[unitTitle].length } cases
                       </div>
                       <div>
                         <Link
-                          className={'f6 link ellipsis ml3 pl1 mv1 bondi-blue'}
+                          className={'f6 link ellipsis ml3 pl1 mv1 bondi-blue fw5 '}
                           to={{
                             pathname: '/case/new',
                             state: { unitTitle: unitTitle }
@@ -93,9 +93,9 @@ class CaseExplorer extends Component {
                       </div>
                     </div>
                   </div>
-                  <FontIcon className={'material-icons mr2 pr1' + (isExpanded ? ' rotate-90' : '')}
+                  <FontIcon className={'material-icons mr1 pr1' + (isExpanded ? ' rotate-90' : '')}
                     style={unitIconsStyle}>
-                    keyboard_arrow_right
+                    {/* keyboard_arrow_right */}
                   </FontIcon>
                 </div>
                 {isExpanded && (
