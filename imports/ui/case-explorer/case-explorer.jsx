@@ -15,13 +15,30 @@ import {
   unitIconsStyle
 } from './case-explorer.mui-styles'
 
+const status = {
+  open: 0,
+  closed: 1,
+  assigned: 2
+}
+
 class CaseExplorer extends Component {
   constructor () {
     super(...arguments)
     this.state = {
       caseId: '',
       expandedUnits: [],
-      unitsDict: {}
+      unitsDict: {},
+      status: 0
+    }
+  }
+
+  handleStatusClicked (value) {
+    if (value === status.open) {
+      this.setState({ status: 0 })
+    } else if (value === status.closed) {
+      this.setState({ status: 1 })
+    } else if (value === status.assigned) {
+      this.setState({ status: 2 })
     }
   }
 
@@ -62,14 +79,22 @@ class CaseExplorer extends Component {
   }
   render () {
     const { isLoading, dispatch, match } = this.props
-    const { unitsDict } = this.state
-
+    const { unitsDict, status } = this.state
+    
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100'>
         <div className='bb b--black-10 overflow-auto flex-grow'>
+          <div className='flex pl3 pv3 bb b--very-light-gray'>
+            <div onClick={() => this.handleStatusClicked(0)} className={'f6 fw5 ' + (status === 0 ? 'mid-gray' : 'silver')}> Open </div>
+            <div onClick={() => this.handleStatusClicked(1)} className={'f6 fw5 ml4 ' + (status === 1 ? 'mid-gray' : 'silver')}> Closed </div>
+            {/* <div onClick={() => this.handleStatusClicked(2)} className={'f6 fw5 ml4 ' + (status === 2 ? 'mid-gray' : 'silver')}> Assigned To</div> */}
+          </div>
           {!isLoading && Object.keys(unitsDict).map(unitTitle => {
             const isExpanded = this.state.expandedUnits.includes(unitTitle)
             const allCases = unitsDict[unitTitle]
+            const openCases = allCases.filter(x => !isClosed(x))
+            const closedCases = allCases.filter(x => isClosed(x))
+            const counter = status === 1 ? closedCases : openCases
             return (
               <div key={unitTitle}>
                 <div className='flex items-center h3 bt b--light-gray'
@@ -79,7 +104,7 @@ class CaseExplorer extends Component {
                     {unitTitle}
                     <div className='flex justify-space'>
                       <div className={'f6 silver mt1 '}>
-                        {unitsDict[unitTitle].length } cases
+                        { counter.length } cases
                       </div>
                       <div>
                         <Link
@@ -102,6 +127,7 @@ class CaseExplorer extends Component {
                   <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
                     <CaseList
                       allCases={allCases}
+                      status={status}
                       onItemClick={() => dispatch(storeBreadcrumb(match.url))}
                     />
                   </ul>
