@@ -82,7 +82,6 @@ class CaseExplorer extends Component {
               const isExpanded = expandedUnits.includes(unitTitle)
               const allCases = unitsDict[unitTitle]
               const hasCases = allCases.filter(casesFilterFunc)
-
               if (hasCases.length > 0) {
                 all.push(
                   <div key={unitTitle}>
@@ -111,7 +110,7 @@ class CaseExplorer extends Component {
                     {isExpanded && (
                       <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
                         <CaseList
-                          selectdCases={hasCases}
+                          allCases={hasCases}
                           onItemClick={() => dispatch(storeBreadcrumb(match.url))}
                         />
                       </ul>

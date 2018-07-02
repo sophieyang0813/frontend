@@ -11,7 +11,7 @@ export const isClosed = caseItem => ['RESOLVED', 'VERIFIED', 'CLOSED'].includes(
 export function CaseList (props) {
   return (
     <div>
-      {props.selectedCases.map(caseItem =>
+      {props.allCases.map(caseItem =>
         <li key={caseItem.id} className='h2-5 bt b--black-10'>
           <div className='flex items-center'>
             <Link
