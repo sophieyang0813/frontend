@@ -15,12 +15,6 @@ import {
   unitIconsStyle
 } from './case-explorer.mui-styles'
 
-const status = {
-  open: 0,
-  closed: 1,
-  assigned: 2
-}
-
 class CaseExplorer extends Component {
   constructor () {
     super(...arguments)
@@ -28,18 +22,12 @@ class CaseExplorer extends Component {
       caseId: '',
       expandedUnits: [],
       unitsDict: {},
-      status: 0
+      showOpen: true
     }
   }
 
   handleStatusClicked (value) {
-    if (value === status.open) {
-      this.setState({ status: 0 })
-    } else if (value === status.closed) {
-      this.setState({ status: 1 })
-    } else if (value === status.assigned) {
-      this.setState({ status: 2 })
-    }
+    this.setState({ showOpen: value })
   }
 
   handleExpandUnit (evt, unitTitle) {
@@ -79,62 +67,60 @@ class CaseExplorer extends Component {
   }
   render () {
     const { isLoading, dispatch, match } = this.props
-    const { unitsDict, status, expandedUnits } = this.state
+    const { unitsDict, showOpen, expandedUnits } = this.state
+    const casesFilterFunc = showOpen ? x => !isClosed(x) : x => isClosed(x)
+
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100'>
         <div className='bb b--black-10 overflow-auto flex-grow'>
           <div className='flex pl3 pv3 bb b--very-light-gray'>
-            <div onClick={() => this.handleStatusClicked(0)} className={'f6 fw5 ' + (status === 0 ? 'mid-gray' : 'silver')}> Open </div>
-            <div onClick={() => this.handleStatusClicked(1)} className={'f6 fw5 ml4 ' + (status === 1 ? 'mid-gray' : 'silver')}> Closed </div>
-            {/* <div onClick={() => this.handleStatusClicked(2)} className={'f6 fw5 ml4 ' + (status === 2 ? 'mid-gray' : 'silver')}> Assigned To</div> */}
+            <div onClick={() => this.handleStatusClicked(true)} className={'f6 fw5 ' + (showOpen ? 'mid-gray' : 'silver')}> Open </div>
+            <div onClick={() => this.handleStatusClicked(false)} className={'f6 fw5 ml4 ' + (!showOpen ? 'mid-gray' : 'silver')}> Closed </div>
           </div>
-          {!isLoading && Object.keys(unitsDict).map(unitTitle => {
-            const isExpanded = expandedUnits.includes(unitTitle)
-            const allCases = unitsDict[unitTitle]
-            const openCases = allCases.filter(x => !isClosed(x))
-            const closedCases = allCases.filter(x => isClosed(x))
-            const caseCounter = status === 1 ? closedCases : openCases
-            if (caseCounter.length === 0) return undefined
-            return (
-              <div key={unitTitle}>
-                <div className='flex items-center h3 bt b--light-gray'
-                  onClick={evt => this.handleExpandUnit(evt, unitTitle)}>
-                  <FontIcon className='material-icons mh3' style={unitIconsStyle}>home</FontIcon>
-                  <div className='flex-grow ellipsis mid-gray'>
-                    {unitTitle}
-                    <div className='flex justify-space'>
-                      <div className={'f6 silver mt1 '}>
-                        { caseCounter.length } cases
-                      </div>
-                      <div>
-                        <Link
-                          className={'f6 link ellipsis ml3 pl1 mv1 bondi-blue fw5 '}
-                          to={{
-                            pathname: '/case/new',
-                            state: { unitTitle: unitTitle }
-                          }}>
-                          Add case
-                        </Link>
+          {!isLoading && Object.keys(unitsDict)
+            .reduce((all, unitTitle) => {
+              const isExpanded = expandedUnits.includes(unitTitle)
+              const allCases = unitsDict[unitTitle]
+              const hasCases = allCases.filter(casesFilterFunc)
+
+              if (hasCases.length > 0) {
+                all.push(
+                  <div key={unitTitle}>
+                    <div className='flex items-center h3 bt b--light-gray'
+                      onClick={evt => this.handleExpandUnit(evt, unitTitle)}>
+                      <FontIcon className='material-icons mh3' style={unitIconsStyle}>home</FontIcon>
+                      <div className='flex-grow ellipsis mid-gray mr4'>
+                        {unitTitle}
+                        <div className='flex justify-space'>
+                          <div className={'f6 silver mt1 '}>
+                            { hasCases.length } cases
+                          </div>
+                          <div>
+                            <Link
+                              className={'f6 link ellipsis ml3 pl1 mv1 bondi-blue fw5 '}
+                              to={{
+                                pathname: '/case/new',
+                                state: { unitTitle: unitTitle }
+                              }}>
+                              Add case
+                            </Link>
+                          </div>
+                        </div>
                       </div>
                     </div>
+                    {isExpanded && (
+                      <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
+                        <CaseList
+                          selectdCases={hasCases}
+                          onItemClick={() => dispatch(storeBreadcrumb(match.url))}
+                        />
+                      </ul>
+                    )}
                   </div>
-                  <FontIcon className={'material-icons mr1 pr1' + (isExpanded ? ' rotate-90' : '')}
-                    style={unitIconsStyle}>
-                    {/* keyboard_arrow_right */}
-                  </FontIcon>
-                </div>
-                {isExpanded && (
-                  <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
-                    <CaseList
-                      allCases={allCases}
-                      status={status}
-                      onItemClick={() => dispatch(storeBreadcrumb(match.url))}
-                    />
-                  </ul>
-                )}
-              </div>
-            )
-          })}
+                )
+              }
+              return all
+            }, [])}
         </div>
         {!isLoading && (
           <RaisedButton fullWidth backgroundColor='var(--bondi-blue)' onClick={() => dispatch(push('/case/new'))}>
