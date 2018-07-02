@@ -42,7 +42,7 @@ export class CaseList extends Component {
               </IconButton>
             </div>
           </li>
-          )}
+        )}
       </div>
     )
   }
