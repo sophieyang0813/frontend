@@ -55,19 +55,6 @@ class CaseWizard extends Component {
     }
   }
 
-  receivedUnitTitle = () => {
-    const { unitTitle } = this.props.location.state
-    // console.log(unitTitle)
-    this.setState({
-      mandatory: {
-        selectedUnit: unitTitle
-      }
-    })
-  }
-  componentDidMount () {
-    this.receivedUnitTitle()
-  }
-
   componentDidUpdate (prevProps, prevState) {
     if (prevState.needsNewUser !== this.state.needsNewUser && this.state.needsNewUser) {
       this.refs.scrollPane.scrollTop = this.refs.scrollPane.scrollHeight
@@ -141,8 +128,6 @@ class CaseWizard extends Component {
   }
 
   render () {
-    // working on pre-populating the unitTitle if passed down from unit/case
-    // const { selectedUnit } = this.state.mandatory
     console.log(this.state.mandatory)
     const {
       loadingUnits, loadingUserEmail, loadingFieldValues, fieldValues, units, userEmail, dispatch, error, inProgress
@@ -154,7 +139,6 @@ class CaseWizard extends Component {
     const { mandatory, optional } = inputValues
     const { selectedUnit, title, details, assignedUnitRole } = mandatory
     const { category, subCategory, priority, severity } = optional
-    // const hey = this.state.mandatory.selectedUnit
     return (
       <div className='full-height flex flex-column'>
         <InnerAppBar title='New Case' onBack={() => dispatch(goBack())} />
@@ -169,7 +153,7 @@ class CaseWizard extends Component {
               iconStyle={selectInputIconStyle}
               underlineFocusStyle={textInputUnderlineFocusStyle}
               disabled={inProgress}
-              selected value={selectedUnit}
+              value={selectedUnit}
               onChange={(evt, idx, val) => val !== selectedUnit && this.setState({
                 inputValues: Object.assign({}, inputValues, {
                   mandatory: Object.assign({}, mandatory, {
