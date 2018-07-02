@@ -24,14 +24,6 @@ export class CaseList extends Component {
     console.log(selectCases)
     return (
       <div>
-        {/* <div className='flex pl3 pv3 bb b--very-light-gray'>
-          <div onClick={() => this.setState({caseStatus: true})} className={'f6 fw5 ' + (this.state.caseStatus ? 'mid-gray' : 'silver')}>
-            {openCases.length} open
-          </div>
-          <div onClick={() => this.setState({caseStatus: false})} className={'f6 fw5 ml2 ' + (this.state.caseStatus ? 'silver' : 'mid-gray')}>
-            {closedCases.length} closed
-          </div>
-        </div> */}
         {selectCases.map(caseItem =>
           <li key={caseItem.id} className='h2-5 bt b--black-10'>
             <div className='flex items-center'>

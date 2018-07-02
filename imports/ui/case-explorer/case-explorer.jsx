@@ -21,61 +21,6 @@ const status = {
   assigned: 2
 }
 
-// class UnitList extends Component {
-//   render () {
-//     const { allCases, expanded, isLoading } = this.props
-//     const openCases = allCases.filter(x => !isClosed(x))
-//     const closedCases = allCases.filter(x => isClosed(x))
-//     const counter = status === 1 ? closedCases : openCases
-//     return (
-//       <div>
-//         {!isLoading && Object.keys(allCases).map(unitTitle => {
-//           const isExpanded = expanded.includes(unitTitle)
-//           return (
-//             <div key={unitTitle}>
-//               <div className='flex items-center h3 bt b--light-gray'
-//                 onClick={evt => this.handleExpandUnit(evt, unitTitle)}>
-//                 <FontIcon className='material-icons mh3' style={unitIconsStyle}>home</FontIcon>
-//                 <div className='flex-grow ellipsis mid-gray'>
-//                   {unitTitle}
-//                   <div className='flex justify-space'>
-//                     <div className={'f6 silver mt1 '}>
-//                       { counter.length } cases
-//                     </div>
-//                     <div>
-//                       <Link
-//                         className={'f6 link ellipsis ml3 pl1 mv1 bondi-blue fw5 '}
-//                         to={{
-//                           pathname: '/case/new',
-//                           state: { unitTitle: unitTitle }
-//                         }}>
-//                         Add case
-//                       </Link>
-//                     </div>
-//                   </div>
-//                 </div>
-//                 <FontIcon className={'material-icons mr1 pr1' + (isExpanded ? ' rotate-90' : '')}
-//                   style={unitIconsStyle}>
-//                   {/* keyboard_arrow_right */}
-//                 </FontIcon>
-//               </div>  
-//               {isExpanded && (
-//                 <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
-//                   <CaseList
-//                     allCases={allCases}
-//                     status={status}
-//                     onItemClick={() => dispatch(storeBreadcrumb(match.url))}
-//                   />
-//                 </ul>
-//               )}
-//             </div>
-//           )
-//         })}
-//       </div>
-//     )
-//   }
-//  }
-
 class CaseExplorer extends Component {
   constructor () {
     super(...arguments)
@@ -135,10 +80,6 @@ class CaseExplorer extends Component {
   render () {
     const { isLoading, dispatch, match } = this.props
     const { unitsDict, status, expandedUnits } = this.state
-    // console.log(this.state)
-    const ah = Object.keys(unitsDict).filter(unitTitle => unitsDict[unitTitle].length > 4)
-    console.log("ah", ah)
-    console.log(unitsDict)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100'>
         <div className='bb b--black-10 overflow-auto flex-grow'>
@@ -147,19 +88,13 @@ class CaseExplorer extends Component {
             <div onClick={() => this.handleStatusClicked(1)} className={'f6 fw5 ml4 ' + (status === 1 ? 'mid-gray' : 'silver')}> Closed </div>
             {/* <div onClick={() => this.handleStatusClicked(2)} className={'f6 fw5 ml4 ' + (status === 2 ? 'mid-gray' : 'silver')}> Assigned To</div> */}
           </div>
-          {/* <UnitList
-            allCases={unitsDict}
-            status={status}
-            expanded={expandedUnits}
-            isLoading={isLoading}
-          />  */}
           {!isLoading && Object.keys(unitsDict).map(unitTitle => {
             const isExpanded = this.state.expandedUnits.includes(unitTitle)
             const allCases = unitsDict[unitTitle]
             const openCases = allCases.filter(x => !isClosed(x))
             const closedCases = allCases.filter(x => isClosed(x))
-            const counter = status === 1 ? closedCases : openCases
-            console.log(unitsDict[unitTitle].length)
+            const caseCounter = status === 1 ? closedCases : openCases
+            if (caseCounter.length === 0) return undefined
             return (
               <div key={unitTitle}>
                 <div className='flex items-center h3 bt b--light-gray'
@@ -169,7 +104,7 @@ class CaseExplorer extends Component {
                     {unitTitle}
                     <div className='flex justify-space'>
                       <div className={'f6 silver mt1 '}>
-                        { counter.length } cases
+                        { caseCounter.length } cases
                       </div>
                       <div>
                         <Link
