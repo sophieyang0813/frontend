@@ -89,7 +89,7 @@ class CaseExplorer extends Component {
             {/* <div onClick={() => this.handleStatusClicked(2)} className={'f6 fw5 ml4 ' + (status === 2 ? 'mid-gray' : 'silver')}> Assigned To</div> */}
           </div>
           {!isLoading && Object.keys(unitsDict).map(unitTitle => {
-            const isExpanded = this.state.expandedUnits.includes(unitTitle)
+            const isExpanded = expandedUnits.includes(unitTitle)
             const allCases = unitsDict[unitTitle]
             const openCases = allCases.filter(x => !isClosed(x))
             const closedCases = allCases.filter(x => isClosed(x))
@@ -122,7 +122,7 @@ class CaseExplorer extends Component {
                     style={unitIconsStyle}>
                     {/* keyboard_arrow_right */}
                   </FontIcon>
-                </div>  
+                </div>
                 {isExpanded && (
                   <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
                     <CaseList
