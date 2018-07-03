@@ -14,6 +14,9 @@ import { editCaseField } from './epics/edit-case-field'
 import { forgotPass } from './epics/forgot-pass'
 import { checkPassReset } from './epics/check-pass-reset'
 import { resetPass } from './epics/reset-pass'
+import { createReport } from './epics/create-report'
+import { changeNotificationSetting } from './epics/change-notification-setting'
+import { createUnit } from './epics/create-unit'
 
 export const rootEpic = combineEpics(
   createAttachment,
@@ -30,5 +33,8 @@ export const rootEpic = combineEpics(
   editCaseField,
   forgotPass,
   checkPassReset,
-  resetPass
+  resetPass,
+  changeNotificationSetting,
+  createUnit,
+  createReport
 )

@@ -1,7 +1,9 @@
 import PendingInvitations from '../pending-invitations'
 import { invite } from '../../util/email-invite'
 import { Meteor } from 'meteor/meteor'
+
 import { reloadCaseFields } from '../cases'
+import UnitRolesData from '../unit-roles-data'
 
 export default (req, res) => {
   if (req.query.accessToken !== process.env.API_ACCESS_TOKEN) {
@@ -16,7 +18,7 @@ export default (req, res) => {
       _id: { $in: req.body },
       done: { $ne: true }
     },
-      { $set: { done: true } })
+    { $set: { done: true } })
     if (results < 1) {
       // Nothing happened, so don't send any emails
       res.send(200, results)
@@ -56,6 +58,30 @@ export default (req, res) => {
           }
         }
       )
+
+      const unitRoleMatcher = {
+        unitBzId: invitee.receivedInvites[0].unitId,
+        roleType: invitee.receivedInvites[0].role
+      }
+
+      // Updating the unit's relevant role
+      UnitRolesData.update(unitRoleMatcher, {
+        $push: {
+          members: {
+            id: invitee._id,
+            isVisible: true,
+            isDefaultInvited: false,
+            isOccupant: invitee.receivedInvites[0].isOccupant
+          }
+        }
+      })
+
+      // Updating the default assignee for the role if none is defined
+      UnitRolesData.update(Object.assign({defaultAssigneeId: -1}, unitRoleMatcher), {
+        $set: {
+          defaultAssigneeId: invitee._id
+        }
+      })
 
       // Since calling this implies that a new user has been added to the case, the case needs to be reloaded
       try {

@@ -10,6 +10,7 @@ import RootAppBar from '../components/root-app-bar'
 import Preloader from '../preloader/preloader'
 import { setDrawerState } from '../general-actions'
 import Units, { collectionName } from '../../api/units'
+import { Link } from 'react-router-dom'
 
 class UnitExplorer extends Component {
   render () {
@@ -24,7 +25,11 @@ class UnitExplorer extends Component {
             <div className='ph2 flex flex-column'>
               <h4 className='semi-dark-gray ma0 ml1 fw5 lh-title no-shrink'>ALL UNITS</h4>
               <div className='overflow-auto pb2'>
-                {unitList.map(({ id, name, description }) => (
+                {unitList.length === 0 ? (
+                  <div className='f6 i silver ba b--moon-gray mt2 pa2 tc br1'>
+                    You have no units managed with Unee-T yet
+                  </div>
+                ) : unitList.map(({ id, name, description }) => (
                   <MenuItem key={id} innerDivStyle={{padding: 0}} onClick={() => dispatch(push(`/unit/${id}`))}>
                     <div className='mt2 ba b--moon-gray br1 w-100 flex items-center pa2'>
                       <FontIcon className='material-icons' color='var(--semi-dark-gray)'>home</FontIcon>
@@ -37,13 +42,13 @@ class UnitExplorer extends Component {
                 ))}
               </div>
             </div>
-            {/* Use for linking to unit creation wizard
-            <MenuItem className='no-shrink' innerDivStyle={{padding: 0}}>
-              <div className='tc bondi-blue fw5 bt b--moon-gray'>
-                Add Unit
-              </div>
-            </MenuItem>
-            */}
+            <Link to='/unit/new' className='link'>
+              <MenuItem className='no-shrink' innerDivStyle={{padding: 0}}>
+                <div className='tc bondi-blue fw5 bt b--moon-gray'>
+                  Add Unit
+                </div>
+              </MenuItem>
+            </Link>
           </div>
         </div>
       </div>
@@ -64,6 +69,7 @@ export default connect(
   () => {
     const unitsHandle = Meteor.subscribe(`${collectionName}.forBrowsing`, {
       onStop: (error) => {
+        console.log('There is an error', error)
         unitsError = error
       }
     })

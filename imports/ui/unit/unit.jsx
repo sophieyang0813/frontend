@@ -14,7 +14,9 @@ import FloatingActionButton from 'material-ui/FloatingActionButton'
 import Units, { collectionName as unitsCollName, getUnitRoles } from '../../api/units'
 import Cases, { collectionName as casesCollName } from '../../api/cases'
 import { isClosed } from '../case-explorer/case-list'
+import { placeholderEmailMatcher } from '../../util/matchers'
 import InnerAppBar from '../components/inner-app-bar'
+// import CreateReportDialog from '../dialogs/create-report-dialog'
 import { makeMatchingUser } from '../../api/custom-users'
 import Preloader from '../preloader/preloader'
 import { infoItemMembers } from '../util/static-info-rendering'
@@ -83,6 +85,7 @@ class Unit extends Component {
     const { match, dispatch } = this.props
     dispatch(push(`${match.url}/${viewsOrder[val]}`))
   }
+
   componentWillReceiveProps (nextProps) {
     const { caseList } = this.props
     if ((!caseList && nextProps.caseList) || (caseList && caseList.length !== nextProps.caseList.length)) {
@@ -94,14 +97,15 @@ class Unit extends Component {
       })
     }
   }
+
   render () {
     const { unitItem, isLoading, unitError, casesError, unitUsers, dispatch, match } = this.props
     const { sortedCases, showOpenCases } = this.state
     const { filteredCases } = this
     const openCasesCount = sortedCases.filter(x => !isClosed(x))
     const closedCasesCount = sortedCases.filter(x => isClosed(x))
-    
     const rootMatch = match
+    const { unitId } = match.params
 
     if (isLoading) return <Preloader />
     if (unitError) return <h1>An error occurred: {unitError.error}</h1>
@@ -109,15 +113,14 @@ class Unit extends Component {
     const fabDescriptors = [
       {
         color: 'var(--bondi-blue)',
-        href: `/case/new/unit/${rootMatch.params.unitId}`,
+        href: `/case/new?unit=${unitId}`,
         icon: 'add'
-      },
-      {
-        color: 'var(--bondi-blue)',
-        href: ``,
-        icon: 'add',
-        disabled: true
       }
+      // {
+      //   color: 'var(--bondi-blue)',
+      //   href: `${rootMatch.url}/${viewsOrder[1]}/new`,
+      //   icon: 'add'
+      // }
     ]
 
     return (
@@ -127,7 +130,7 @@ class Unit extends Component {
           title={unitItem.name}
           onBack={() => dispatch(push(match.url.split('/').slice(0, -1).join('/')))}
         />
-        <Route exact path={`${match.url}/:viewName`} children={({ match }) => {
+        <Route path={`${rootMatch.url}/:viewName`} children={({ match }) => {
           const viewIdx = match ? viewsOrder.indexOf(match.params.viewName) : 0
           return (
             <div className='flex-grow flex flex-column overflow-hidden'>
@@ -150,6 +153,7 @@ class Unit extends Component {
                   index={viewIdx}
                   onChangeIndex={this.handleChange}
                 >
+
                   <div className='flex-grow bg-very-light-gray'>
                     <div className='flex pl3 pv3 bb b--very-light-gray bg-white'>
                       <div onClick={this.handleOpenClicked} className={'f6 fw5 ' + (showOpenCases ? 'mid-gray' : 'silver')}>
@@ -157,7 +161,7 @@ class Unit extends Component {
                       </div>
                       <div onClick={this.handleClosedClicked} className={'f6 fw5 ml2 ' + (showOpenCases ? 'silver' : 'mid-gray')}>
                         {closedCasesCount.length} Closed
-                    </div>
+                      </div>
                     </div>
                     {filteredCases.map(({id, title, severity}) => (
                       <div key={id} className='bb b--very-light-gray bg-white'>
@@ -191,9 +195,16 @@ class Unit extends Component {
                         </div>
                       </div>
                       <div className='mid-gray b lh-copy'>
-                        Create your first inspection report
+                        You have no inspection reports yet
                       </div>
                     </div>
+                    {/* <Route exact path={`${rootMatch.url}/${viewsOrder[1]}/new`} children={({ match }) => (
+                      <CreateReportDialog
+                        show={!!match}
+                        onDismissed={() => dispatch(goBack())}
+                        unitName={unitItem.name}
+                      />
+                    )} /> */}
                   </div>
                   <div className='flex-grow bg-very-light-gray'>
                     <div className='bg-white card-shadow-1 pa3'>
@@ -236,22 +247,26 @@ class Unit extends Component {
                       <div className='fw5 silver lh-title'>
                         PEOPLE
                       </div>
-                      {unitUsers.map(user => (
-                        <div className='mt1' key={user.login}>{userInfoItem(user)}</div>
-                      ))}
+                      {unitUsers
+                        .filter(user => (
+                          !placeholderEmailMatcher(user.login)
+                        ))
+                        .map(user => (
+                          <div className='mt1' key={user.login}>{userInfoItem(user)}</div>
+                        ))
+                      }
                     </div>
                   </div>
                 </SwipeableViews>
               </div>
 
               {fabDescriptors.map((desc, ind) => (
-                <div className='absolute bottom-1 right-1'>
+                <div key={ind} className='absolute bottom-1 right-1'>
                   <CSSTransition in={viewIdx === ind} timeout={500} classNames='zoom-effect' unmountOnExit>
                     <FloatingActionButton
                       backgroundColor={desc.color}
                       className='zoom-effect'
-                      href={desc.href}
-                      disabled={desc.disabled}
+                      onClick={() => dispatch(push(desc.href))}
                     >
                       <FontIcon className='material-icons'>{desc.icon}</FontIcon>
                     </FloatingActionButton>
