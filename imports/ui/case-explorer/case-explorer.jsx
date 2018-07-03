@@ -121,13 +121,6 @@ class CaseExplorer extends Component {
               return all
             }, [])}
         </div>
-        {!isLoading && (
-          <RaisedButton fullWidth backgroundColor='var(--bondi-blue)' onClick={() => dispatch(push('/case/new'))}>
-            <span className='white f4 b'>
-              Create New Case
-            </span>
-          </RaisedButton>
-        )}
       </div>
     )
   }
