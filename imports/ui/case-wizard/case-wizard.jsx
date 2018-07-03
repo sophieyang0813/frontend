@@ -128,7 +128,6 @@ class CaseWizard extends Component {
   }
 
   render () {
-    console.log(this.state.mandatory)
     const {
       loadingUnits, loadingUserEmail, loadingFieldValues, fieldValues, units, userEmail, dispatch, error, inProgress
     } = this.props
