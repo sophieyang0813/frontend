@@ -48,7 +48,7 @@ class CaseExplorer extends Component {
     }
     this.setState(stateMutation)
   }
-  componentWillReceiveProps ({isLoading, casesError, caseList, currentUser}) {
+  componentWillReceiveProps ({isLoading, casesError, caseList}) {
     if (!isLoading && !casesError && isLoading !== this.props.isLoading) {
       this.props.dispatchLoadingResult({caseList})
     }
@@ -90,14 +90,13 @@ class CaseExplorer extends Component {
               // const casesToRender = allCases.filter(caseItem => assignedFilterFunc(caseItem) && casesFilterFunc(caseItem))
               const casesToRender = allCases.filter((caseItem) => {
                 return (
-                    assignedToMe === false ||
+                  assignedToMe === false ||
                     caseItem.assignee === this.props.currentUser.bugzillaCreds.login
-                  ) &&
+                ) &&
                   (
                     (showOpen && !isClosed(caseItem)) ||
-                    (!showOpen && isClosed(caseItem)
+                    (!showOpen && isClosed(caseItem))
                   )
-                )
               })
               if (casesToRender.length > 0) {
                 all.push(
