@@ -21,7 +21,7 @@ class CaseExplorer extends Component {
       expandedUnits: [],
       unitsDict: {},
       showOpen: true,
-      assignedToMe: null
+      assignedToMe: false
     }
   }
 
@@ -30,9 +30,7 @@ class CaseExplorer extends Component {
   }
 
   handleAssignedClicked () {
-    const currentUser = this.props.currentUser.bugzillaCreds.login
-    const change = this.state.assignedToMe ? null : currentUser
-    this.setState({ assignedToMe: change })
+    this.setState({ assignedToMe: !this.state.assignedToMe })
   }
 
   handleExpandUnit (evt, unitTitle) {
@@ -75,7 +73,8 @@ class CaseExplorer extends Component {
   render () {
     const { isLoading, dispatch, match } = this.props
     const { unitsDict, showOpen, expandedUnits, assignedToMe } = this.state
-    const casesFilterFunc = showOpen ? x => !isClosed(x) : x => isClosed(x)
+    // const casesFilterFunc = showOpen ? x => !isClosed(x) : x => isClosed(x)
+    // const assignedFilterFunc = assignedToMe ? false : this.props.currentUser.bugzillaCreds.login
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100'>
         <div className='bb b--black-10 overflow-auto flex-grow'>
@@ -88,10 +87,19 @@ class CaseExplorer extends Component {
             .reduce((all, unitTitle) => {
               const isExpanded = expandedUnits.includes(unitTitle)
               const allCases = unitsDict[unitTitle]
-              const myCaseFilter = allCases.filter(caseItem => caseItem.assignee === assignedToMe)
-              const myCases = assignedToMe ? myCaseFilter : allCases
-              const openCaseFilter = myCases.filter(casesFilterFunc)
-              if (openCaseFilter.length > 0) {
+              // const casesToRender = allCases.filter(caseItem => assignedFilterFunc(caseItem) && casesFilterFunc(caseItem))
+              const casesToRender = allCases.filter((caseItem) => {
+                return (
+                    assignedToMe === false ||
+                    caseItem.assignee === this.props.currentUser.bugzillaCreds.login
+                  ) &&
+                  (
+                    (showOpen && !isClosed(caseItem)) ||
+                    (!showOpen && isClosed(caseItem)
+                  )
+                )
+              })
+              if (casesToRender.length > 0) {
                 all.push(
                   <div key={unitTitle}>
                     <div className='flex items-center h3 bt b--light-gray'
@@ -101,7 +109,7 @@ class CaseExplorer extends Component {
                         {unitTitle}
                         <div className='flex justify-space'>
                           <div className={'f6 silver mt1 '}>
-                            { openCaseFilter.length } cases
+                            { casesToRender.length } cases
                           </div>
                           <div>
                             <Link
@@ -119,8 +127,7 @@ class CaseExplorer extends Component {
                     {isExpanded && (
                       <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
                         <CaseList
-                          assignedToMe={assignedToMe}
-                          allCases={openCaseFilter}
+                          allCases={casesToRender}
                           onItemClick={() => dispatch(storeBreadcrumb(match.url))}
                         />
                       </ul>
