@@ -124,7 +124,7 @@ if (Meteor.isServer) {
         j_top: 'OR',
         list_id: '78',
         query_format: 'advanced',
-        include_fields: 'product,summary,id,status'
+        include_fields: 'product,summary,id,status,assigned_to'
       }
     },
     addedMatcherFactory: strQuery => {

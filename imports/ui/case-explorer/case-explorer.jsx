@@ -5,9 +5,7 @@ import { createContainer } from 'meteor/react-meteor-data'
 import PropTypes from 'prop-types'
 import { withRouter, Link } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
-import RaisedButton from 'material-ui/RaisedButton'
 import Cases, { collectionName } from '../../api/cases'
-import { push } from 'react-router-redux'
 import RootAppBar from '../components/root-app-bar'
 import { storeBreadcrumb } from '../general-actions'
 import { CaseList, isClosed } from '../case-explorer/case-list'
@@ -22,12 +20,19 @@ class CaseExplorer extends Component {
       caseId: '',
       expandedUnits: [],
       unitsDict: {},
-      showOpen: true
+      showOpen: true,
+      assignedToMe: null
     }
   }
 
   handleStatusClicked (value) {
     this.setState({ showOpen: value })
+  }
+
+  handleAssignedClicked () {
+    const currentUser = this.props.currentUser.bugzillaCreds.login
+    const change = this.state.assignedToMe ? null : currentUser
+    this.setState({ assignedToMe: change })
   }
 
   handleExpandUnit (evt, unitTitle) {
@@ -45,10 +50,11 @@ class CaseExplorer extends Component {
     }
     this.setState(stateMutation)
   }
-  componentWillReceiveProps ({isLoading, casesError, caseList}) {
+  componentWillReceiveProps ({isLoading, casesError, caseList, currentUser}) {
     if (!isLoading && !casesError && isLoading !== this.props.isLoading) {
       this.props.dispatchLoadingResult({caseList})
     }
+
     if (!isLoading && (!this.props.caseList || this.props.caseList.length !== caseList.length)) {
       const unitsDict = caseList.sort((caseA, caseB) => {
         const aVal = isClosed(caseA) ? 1 : 0
@@ -65,24 +71,27 @@ class CaseExplorer extends Component {
       })
     }
   }
+
   render () {
     const { isLoading, dispatch, match } = this.props
-    const { unitsDict, showOpen, expandedUnits } = this.state
+    const { unitsDict, showOpen, expandedUnits, assignedToMe } = this.state
     const casesFilterFunc = showOpen ? x => !isClosed(x) : x => isClosed(x)
-
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100'>
         <div className='bb b--black-10 overflow-auto flex-grow'>
           <div className='flex pl3 pv3 bb b--very-light-gray'>
             <div onClick={() => this.handleStatusClicked(true)} className={'f6 fw5 ' + (showOpen ? 'mid-gray' : 'silver')}> Open </div>
             <div onClick={() => this.handleStatusClicked(false)} className={'f6 fw5 ml4 ' + (!showOpen ? 'mid-gray' : 'silver')}> Closed </div>
+            <div onClick={() => this.handleAssignedClicked()} className={'f6 fw5 ml4 ' + (assignedToMe ? 'mid-gray' : 'silver')}> Assigned To Me</div>
           </div>
           {!isLoading && Object.keys(unitsDict)
             .reduce((all, unitTitle) => {
               const isExpanded = expandedUnits.includes(unitTitle)
               const allCases = unitsDict[unitTitle]
-              const hasCases = allCases.filter(casesFilterFunc)
-              if (hasCases.length > 0) {
+              const myCaseFilter = allCases.filter(caseItem => caseItem.assignee === assignedToMe)
+              const myCases = assignedToMe ? myCaseFilter : allCases
+              const openCaseFilter = myCases.filter(casesFilterFunc)
+              if (openCaseFilter.length > 0) {
                 all.push(
                   <div key={unitTitle}>
                     <div className='flex items-center h3 bt b--light-gray'
@@ -92,7 +101,7 @@ class CaseExplorer extends Component {
                         {unitTitle}
                         <div className='flex justify-space'>
                           <div className={'f6 silver mt1 '}>
-                            { hasCases.length } cases
+                            { openCaseFilter.length } cases
                           </div>
                           <div>
                             <Link
@@ -110,7 +119,8 @@ class CaseExplorer extends Component {
                     {isExpanded && (
                       <ul className='list bg-light-gray ma0 pl0 shadow-in-top-1'>
                         <CaseList
-                          allCases={hasCases}
+                          assignedToMe={assignedToMe}
+                          allCases={openCaseFilter}
                           onItemClick={() => dispatch(storeBreadcrumb(match.url))}
                         />
                       </ul>
@@ -121,13 +131,6 @@ class CaseExplorer extends Component {
               return all
             }, [])}
         </div>
-        {!isLoading && (
-          <RaisedButton fullWidth backgroundColor='var(--bondi-blue)' onClick={() => dispatch(push('/case/new'))}>
-            <span className='white f4 b'>
-              Create New Case
-            </span>
-          </RaisedButton>
-        )}
       </div>
     )
   }
@@ -149,9 +152,11 @@ const connectedWrapper = connect(
       casesError = error
     }
   })
+
   return {
     caseList: Cases.find().fetch(),
     isLoading: !casesHandle.ready(),
+    currentUser: Meteor.subscribe('users.myBzLogin').ready() ? Meteor.user() : null,
     casesError
   }
 }, CaseExplorer))
