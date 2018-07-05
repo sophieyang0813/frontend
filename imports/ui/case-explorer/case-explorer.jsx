@@ -7,6 +7,7 @@ import { withRouter, Link } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
 import Cases, { collectionName, isClosed } from '../../api/cases'
 import RootAppBar from '../components/root-app-bar'
+import Preloader from '../preloader/preloader'
 import { storeBreadcrumb } from '../general-actions'
 import { CaseList } from '../case-explorer/case-list'
 import {
@@ -73,8 +74,9 @@ class CaseExplorer extends Component {
   render () {
     const { isLoading, dispatch, match } = this.props
     const { unitsDict, showOpen, expandedUnits, assignedToMe } = this.state
-    // const casesFilterFunc = showOpen ? x => !isClosed(x) : x => isClosed(x)
-    // const assignedFilterFunc = assignedToMe ? false : this.props.currentUser.bugzillaCreds.login
+    if (isLoading) return <Preloader />
+    const casesFilter = showOpen ? x => !isClosed(x) : x => isClosed(x)
+    const assignedFilter = assignedToMe ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => x
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100'>
         <div className='bb b--black-10 overflow-auto flex-grow'>
@@ -87,17 +89,7 @@ class CaseExplorer extends Component {
             .reduce((all, unitTitle) => {
               const isExpanded = expandedUnits.includes(unitTitle)
               const allCases = unitsDict[unitTitle]
-              // const casesToRender = allCases.filter(caseItem => assignedFilterFunc(caseItem) && casesFilterFunc(caseItem))
-              const casesToRender = allCases.filter((caseItem) => {
-                return (
-                  assignedToMe === false ||
-                    caseItem.assignee === this.props.currentUser.bugzillaCreds.login
-                ) &&
-                  (
-                    (showOpen && !isClosed(caseItem)) ||
-                    (!showOpen && isClosed(caseItem))
-                  )
-              })
+              const casesToRender = allCases.filter(caseItem => assignedFilter(caseItem) && casesFilter(caseItem))
               if (casesToRender.length > 0) {
                 all.push(
                   <div key={unitTitle}>
