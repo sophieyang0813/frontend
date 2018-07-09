@@ -17,13 +17,12 @@ class UnitExplorer extends Component {
   render () {
     const { isLoading, unitList, dispatch } = this.props
     if (isLoading) return <Preloader />
-    const fabDescriptors = [
+    const fabDescriptor =
       {
         color: 'var(--bondi-blue)',
         href: `/unit/new`,
         icon: 'add'
       }
-    ]
 
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -61,17 +60,14 @@ class UnitExplorer extends Component {
                 ))}
               </div>
             </div>
-            {fabDescriptors.map((desc, ind) => (
-              <div key={ind} className='absolute bottom-2 right-2'>
-                <FloatingActionButton
-                  backgroundColor={desc.color}
-                  className='zoom-effect'
-                  onClick={() => dispatch(push(desc.href))}
-                >
-                  <FontIcon className='material-icons'>{desc.icon}</FontIcon>
-                </FloatingActionButton>
-              </div>
-              ))}
+            <div className='absolute bottom-2 right-2'>
+              <FloatingActionButton
+                backgroundColor={fabDescriptor.color}
+                onClick={() => dispatch(push(fabDescriptor.href))}
+              >
+                <FontIcon className='material-icons'>{fabDescriptor.icon}</FontIcon>
+              </FloatingActionButton>
+            </div>
           </div>
         </div>
       </div>
