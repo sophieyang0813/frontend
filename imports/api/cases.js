@@ -143,6 +143,7 @@ if (Meteor.isServer) {
             userIdentifier === assignee ||
             userIdentifier === creator ||
             involvedList.includes(userIdentifier)
+            )
           )
         }
       }
