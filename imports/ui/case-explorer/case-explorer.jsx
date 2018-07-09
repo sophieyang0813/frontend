@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import { withRouter, Link } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
 import Cases, { collectionName, isClosed } from '../../api/cases'
+import UnitMetaData from '../../api/unit-meta-data'
 import RootAppBar from '../components/root-app-bar'
 import Preloader from '../preloader/preloader'
 import { storeBreadcrumb } from '../general-actions'
@@ -60,9 +61,9 @@ class CaseExplorer extends Component {
         const bVal = isClosed(caseB) ? 1 : 0
         return aVal - bVal
       }).reduce((dict, caseItem) => {
-        const { selectedUnit: unitTitle } = caseItem
-        const unitCases = dict[unitTitle] = dict[unitTitle] || []
-        unitCases.push(caseItem)
+        const { selectedUnit: unitTitle, selectedUnitBzId: bzId } = caseItem
+        const unitDesc = dict[unitTitle] = dict[unitTitle] || {cases: [], bzId}
+        unitDesc.cases.push(caseItem)
         return dict
       }, {})
       this.setState({
@@ -112,6 +113,15 @@ class CaseExplorer extends Component {
                               Add case
                             </Link>
                           </div>
+                          {unitsDict[unitTitle].bzId && (
+                            <div>
+                              <Link
+                                className={'f6 link ellipsis ml3 pl1 mv1 bondi-blue fw5 '}
+                                to={`/case/new?unit=${unitsDict[unitTitle].bzId}`}>
+                                Add case
+                              </Link>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -152,7 +162,9 @@ const connectedWrapper = connect(
   })
 
   return {
-    caseList: Cases.find().fetch(),
+    caseList: Cases.find().fetch().map(caseItem => Object.assign({}, caseItem, {
+      selectedUnitBzId: (UnitMetaData.findOne({bzName: caseItem.selectedUnit}) || {}).bzId
+    })),
     isLoading: !casesHandle.ready(),
     currentUser: Meteor.subscribe('users.myBzLogin').ready() ? Meteor.user() : null,
     casesError

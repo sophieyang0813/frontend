@@ -4,7 +4,8 @@ import { check } from 'meteor/check'
 import bugzillaApi from '../util/bugzilla-api'
 import _ from 'lodash'
 import publicationFactory from './base/rest-resource-factory'
-import { makeAssociationFactory, withUsers } from './base/associations-helper'
+import { makeAssociationFactory, withUsers, withDocs } from './base/associations-helper'
+import UnitMetaData, { collectionName as unitMetaCollName } from './unit-meta-data'
 import { emailValidator } from '../util/validators'
 import
 PendingInvitations,
@@ -143,10 +144,21 @@ if (Meteor.isServer) {
             userIdentifier === creator ||
             involvedList.includes(userIdentifier)
           )
-        )
+        }
       }
-    }
-  }))
+    }),
+    withDocs({
+      cursorMaker: publishedItem => {
+        return UnitMetaData.find({
+          bzName: publishedItem.selectedUnit
+        }, {
+          bzId: 1,
+          bzName: 1
+        })
+      },
+      collectionName: unitMetaCollName
+    })
+  ))
   Meteor.publish(`${collectionName}.byUnitName`, publicationObj.publishByCustomQuery({
     uriTemplate: () => '/rest/bug',
     queryBuilder: (subHandle, unitName) => {
