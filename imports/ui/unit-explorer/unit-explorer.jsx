@@ -56,7 +56,6 @@ class UnitExplorer extends Component {
             </div>
             <div className='absolute bottom-2 right-2'>
               <FloatingActionButton
-                className='bondi-blue'
                 onClick={() => dispatch(push(`/unit/new`))}
               >
                 <FontIcon className='material-icons'>add</FontIcon>
