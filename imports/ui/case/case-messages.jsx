@@ -30,8 +30,7 @@ import {
 } from './case.mui-styles'
 
 import {
-  textInputFloatingLabelStyle,
-  grayTextInputUnderlineFocusStyle
+  whiteTextInputStyle
 } from '../components/form-controls.mui-styles'
 const messagePercentWidth = 0.6 // Corresponds with width/max-width set to the text and image message containers
 
@@ -291,9 +290,8 @@ class CaseMessages extends Component {
         <div className='flex-grow relative'>
           <TextField
             hintText='Type your response'
-            floatingLabelFixed
-            floatingLabelStyle={textInputFloatingLabelStyle}
-            underlineFocusStyle={grayTextInputUnderlineFocusStyle}
+            underlineShow={false}
+            textareaStyle={whiteTextInputStyle}
             multiLine
             fullWidth
             value={message}
