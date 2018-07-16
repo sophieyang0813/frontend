@@ -31,16 +31,8 @@ import {
 
 import {
   textInputFloatingLabelStyle,
-  textInputStyle,
-  backgroundStyle,
-  textInputUnderlineFocusStyle,
-  grayTextInputUnderlineFocusStyle,
-  whiteTextInputStyle
-  // selectInputIconStyle,
-  // controlLabelStyle
+  grayTextInputUnderlineFocusStyle
 } from '../components/form-controls.mui-styles'
-
-
 const messagePercentWidth = 0.6 // Corresponds with width/max-width set to the text and image message containers
 
 const additionalSubHeader = (label, info, onClick, lastIndex, colorName) => (
@@ -298,11 +290,9 @@ class CaseMessages extends Component {
         <inviteUserIcon />
         <div className='flex-grow relative'>
           <TextField
-            // inputStyle={backgroundStyle}
             hintText='Type your response'
             floatingLabelFixed
             floatingLabelStyle={textInputFloatingLabelStyle}
-            // inputStyle={whiteTextInputStyle}
             underlineFocusStyle={grayTextInputUnderlineFocusStyle}
             multiLine
             fullWidth
@@ -310,12 +300,7 @@ class CaseMessages extends Component {
             onChange={this.handleMessageInput.bind(this)}
             onKeyPress={event => { if (event.key === 'Enter' && message.replace(/\s/g, '').length > 0) { this.handleCreateMessage(event) } }}
             ref='messageInput'
-            // className='input-reset bg-white br-pill ba b--moon-gray lh-input h2 ph3 dib outline-0 w-100'
           />
-          {/* <input type='text' placeholder='Type your response' ref='messageInput'
-            onChange={this.handleMessageInput.bind(this)} value={message}
-            onKeyPress={event => { if (event.key === 'Enter' && message.replace(/\s/g, '').length > 0) { this.handleCreateMessage(event) } }}
-            className='input-reset bg-white br-pill ba b--moon-gray lh-input h2 ph3 dib outline-0 w-100' /> */}
         </div>
         <div className='mh2'>
           <FloatingActionButton mini zDepth={0} iconStyle={sendIconStyle}
