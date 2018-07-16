@@ -289,6 +289,7 @@ class CaseMessages extends Component {
         <inviteUserIcon />
         <div className='flex-grow relative'>
           <TextField
+            id='chatbox'
             hintText='Type your response'
             underlineShow={false}
             textareaStyle={whiteTextInputStyle}
