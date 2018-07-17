@@ -17,7 +17,7 @@ export const selectInputIconStyle = {
 
 export const whiteTextInputStyle = {
   backgroundColor: '#fff',
-  borderRadius: '20px',
+  borderRadius: '16px',
   borderColor: 'var(--moon-gray)',
   lineHeight: '1.9',
   paddingLeft: '1rem',
