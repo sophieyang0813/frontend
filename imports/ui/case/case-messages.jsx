@@ -294,10 +294,10 @@ class CaseMessages extends Component {
             underlineShow={false}
             textareaStyle={whiteTextInputStyle}
             multiLine
+            rowsMax={4}
             fullWidth
             value={message}
             onChange={this.handleMessageInput.bind(this)}
-            onKeyPress={event => { if (event.key === 'Enter' && message.replace(/\s/g, '').length > 0) { this.handleCreateMessage(event) } }}
             ref='messageInput'
           />
         </div>
