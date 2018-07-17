@@ -19,10 +19,12 @@ export const whiteTextInputStyle = {
   backgroundColor: '#fff',
   borderRadius: '20px',
   borderColor: 'var(--moon-gray)',
-  lineHeight: '1.4',
-  padding: '7px'
-}
-
-export const borderRadius = {
-  borderRadius: '100px'
+  lineHeight: '1.9',
+  paddingLeft: '1rem',
+  paddingRight: '1rem',
+  borderStyle: 'solid',
+  borderWidth: '1px',
+  display: 'inline-block',
+  outline: '0',
+  width: '100%'
 }
