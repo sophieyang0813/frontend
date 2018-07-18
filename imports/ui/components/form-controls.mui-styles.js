@@ -20,6 +20,7 @@ export const whiteTextInputStyle = {
   borderRadius: '16px',
   borderColor: 'var(--moon-gray)',
   lineHeight: '1.4',
+  marginTop: '10px',
   paddingLeft: '1rem',
   paddingRight: '1rem',
   borderStyle: 'solid',
