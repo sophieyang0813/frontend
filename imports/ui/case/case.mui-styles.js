@@ -11,6 +11,14 @@ export const attachmentButtonStyle = {
   padding: 0
 }
 
+export const attachmentButtonStyle2 = {
+  width: 36,
+  height: 36,
+  paddingBottom: '1rem',
+  marginBottom: '1rem',
+  paddingLeft: '0.5rem'
+}
+
 export const retryButtonStyle = {
   width: 40,
   height: 40,
