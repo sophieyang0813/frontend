@@ -50,8 +50,7 @@ class CaseMessages extends Component {
   constructor () {
     super(...arguments)
     this.state = {
-      message: '',
-      addMargin: 0
+      message: ''
     }
   }
 
@@ -86,18 +85,8 @@ class CaseMessages extends Component {
 
     // Clearing the input
     this.setState({
-      message: '',
-      addMargin: 0
+      message: ''
     })
-  }
-
-  addMarginFunc (event) {
-    if (this.state.addMargin < 2.25) {
-      this.setState({
-        addMargin: this.state.addMargin + 0.75
-      })
-    }
-    console.log('state changing', this.state.addMargin)
   }
 
   handleRetryUpload (evt, process) {
@@ -289,16 +278,12 @@ class CaseMessages extends Component {
 
   renderInputControls () {
     const { message } = this.state
-    let rem = []
-    if (this.state.addMargin) {
-      rem.push((this.state.addMargin).toString(), 'rem')
-    }
-    let num = rem.join('')
+
     return (
-      <div className={[styles.inputRow, 'flex items-center overflow-visible'].join(' ')}>
-        <IconButton style={attachmentButtonStyle}>
+      <div className={[styles.inputRow, 'flex items-end overflow-visible'].join(' ')}>
+        <IconButton style={attachmentButtonStyle + 'pb2'}>
           <label>
-            <ContentAdd color={colors.main} style={{ marginTop: num }} />
+            <ContentAdd color={colors.main} />
             <input type='file' className='dn' onChange={this.handleFileSelection.bind(this)} />
           </label>
         </IconButton>
@@ -314,13 +299,11 @@ class CaseMessages extends Component {
             fullWidth
             value={message}
             onChange={this.handleMessageInput.bind(this)}
-            onKeyPress={event => { if (event.key === 'Enter') { this.addMarginFunc(event) } }}
             ref='messageInput'
           />
         </div>
-        <div className='mh2'>
+        <div classNam2='mh2 pb2'>
           <FloatingActionButton mini zDepth={0} iconStyle={sendIconStyle}
-            style={{ marginTop: num }}
             onClick={this.handleCreateMessage.bind(this)}
             disabled={message === ''}>
             <FontIcon className='material-icons'>send</FontIcon>
