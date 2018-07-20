@@ -8,15 +8,8 @@ export const subheaderStyle = {
 export const attachmentButtonStyle = {
   width: 36,
   height: 36,
-  padding: 0
-}
-
-export const attachmentButtonStyle2 = {
-  width: 36,
-  height: 36,
-  paddingBottom: '1rem',
-  marginBottom: '1rem',
-  paddingLeft: '0.5rem'
+  padding: 0,
+  marginBottom: '0.3rem'
 }
 
 export const retryButtonStyle = {

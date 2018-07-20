@@ -22,7 +22,7 @@ import { Link } from 'react-router-dom'
 import {
   subheaderStyle,
   infoIconStyle,
-  attachmentButtonStyle2,
+  attachmentButtonStyle,
   retryButtonStyle,
   replayIconColor,
   sendIconStyle,
@@ -281,7 +281,7 @@ class CaseMessages extends Component {
 
     return (
       <div className={[styles.inputRow, 'flex items-end overflow-visible'].join(' ')}>
-        <IconButton style={attachmentButtonStyle2}>
+        <IconButton style={attachmentButtonStyle}>
           <label>
             <ContentAdd color={colors.main} />
             <input type='file' className='dn' onChange={this.handleFileSelection.bind(this)} />
@@ -302,7 +302,7 @@ class CaseMessages extends Component {
             ref='messageInput'
           />
         </div>
-        <div className='mh2' style={{paddingBottom: '0.75rem'}}>
+        <div className='mb2'>
           <FloatingActionButton mini zDepth={0} iconStyle={sendIconStyle}
             onClick={this.handleCreateMessage.bind(this)}
             disabled={message === ''}>
