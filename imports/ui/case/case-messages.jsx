@@ -302,7 +302,7 @@ class CaseMessages extends Component {
             ref='messageInput'
           />
         </div>
-        <div className='mb2'>
+        <div className='mb2 pb1 mr2 ml1'>
           <FloatingActionButton mini zDepth={0} iconStyle={sendIconStyle}
             onClick={this.handleCreateMessage.bind(this)}
             disabled={message === ''}>

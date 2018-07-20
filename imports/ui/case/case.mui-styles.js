@@ -9,7 +9,7 @@ export const attachmentButtonStyle = {
   width: 36,
   height: 36,
   padding: 0,
-  marginBottom: '0.3rem'
+  marginBottom: '0.6rem'
 }
 
 export const retryButtonStyle = {

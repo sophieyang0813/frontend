@@ -22,6 +22,8 @@ export const whiteTextInputStyle = {
   lineHeight: '1.5',
   paddingLeft: '1rem',
   paddingRight: '1rem',
+  paddingTop: '0.25rem',
+  paddingBottom: '0.25rem',
   borderStyle: 'solid',
   borderWidth: '1px',
   display: 'inline-block',
