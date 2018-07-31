@@ -22,6 +22,8 @@ import Preloader from '../preloader/preloader'
 import { infoItemMembers } from '../util/static-info-rendering'
 import { userInfoItem } from '../../util/user'
 import { storeBreadcrumb } from '../general-actions'
+import EditableItem from '../components/editable-item'
+import { editUnitField } from './unit.actions'
 
 const viewsOrder = ['cases', 'reports', 'overview']
 
@@ -226,7 +228,12 @@ class Unit extends Component {
                         {infoItemMembers('Unit type', unitItem.metaData.unitType)}
                       </div>
                       <div className='mt3'>
-                        {infoItemMembers('Additional description', unitItem.metaData.moreInfo || unitItem.description)}
+                        <EditableItem
+                          label='Additional description'
+                          initialValue={unitItem.metaData.moreInfo || unitItem.description}
+                          onEdit={changeSet => dispatch(editUnitField({description: changeSet}, unitId))}
+                          isMultiLine
+                        />
                       </div>
                     </div>
                     <div className='mt2 bg-white card-shadow-1 pa3'>
