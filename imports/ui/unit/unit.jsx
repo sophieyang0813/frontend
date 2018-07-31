@@ -23,7 +23,10 @@ import { infoItemMembers } from '../util/static-info-rendering'
 import { userInfoItem } from '../../util/user'
 import { storeBreadcrumb } from '../general-actions'
 import EditableItem from '../components/editable-item'
+// import EditableAutocomplete from '../components/editable-autocomplete'
 import { editUnitField } from './unit.actions'
+import AutoComplete from 'material-ui/AutoComplete'
+// import countries from 'iso-3166-1-codes'
 
 const viewsOrder = ['cases', 'reports', 'overview']
 
@@ -219,19 +222,29 @@ class Unit extends Component {
                   <div className='flex-grow bg-very-light-gray'>
                     <div className='bg-white card-shadow-1 pa3'>
                       <div>
-                        {infoItemMembers('Unit name', unitName)}
+                        <EditableItem
+                          label='Unit name'
+                          initialValue={unitName}
+                          onEdit={changeSet => dispatch(editUnitField({displayName: changeSet}, unitId))}
+                          isMultiLine
+                        />
                       </div>
                       <div className='mt3'>
                         {infoItemMembers('Unit group', unitItem.classification)}
                       </div>
                       <div className='mt3'>
-                        {infoItemMembers('Unit type', unitItem.metaData.unitType)}
+                        <EditableItem
+                          label='Unit type'
+                          initialValue={unitItem.metaData.unitType}
+                          onEdit={changeSet => dispatch(editUnitField({unitType: changeSet}, unitId))}
+                          isMultiLine
+                        />
                       </div>
                       <div className='mt3'>
                         <EditableItem
                           label='Additional description'
                           initialValue={unitItem.metaData.moreInfo || unitItem.description}
-                          onEdit={changeSet => dispatch(editUnitField({description: changeSet}, unitId))}
+                          onEdit={changeSet => dispatch(editUnitField({moreInfo: changeSet}, unitId))}
                           isMultiLine
                         />
                       </div>
@@ -241,20 +254,55 @@ class Unit extends Component {
                         ADDRESS
                       </div>
                       <div className='mt1'>
-                        {infoItemMembers('Address', unitItem.metaData.streetAddress)}
+                        <EditableItem
+                          label='Address'
+                          initialValue={unitItem.metaData.streetAddress}
+                          onEdit={changeSet => dispatch(editUnitField({streetAddress: changeSet}, unitId))}
+                          isMultiLine
+                        />
                       </div>
                       <div className='mt3'>
-                        {infoItemMembers('City', unitItem.metaData.city)}
+                        <EditableItem
+                          label='City'
+                          initialValue={unitItem.metaData.city}
+                          onEdit={changeSet => dispatch(editUnitField({city: changeSet}, unitId))}
+                          isMultiLine
+                        />
                       </div>
                       <div className='mt3'>
-                        {infoItemMembers('Country', unitItem.metaData.country)}
+                        <EditableItem
+                          label='Country'
+                          initialValue={unitItem.metaData.country}
+                          onEdit={changeSet => dispatch(editUnitField({country: changeSet}, unitId))}
+                          isMultiLine
+                        />
+                        {/* <EditableAutocomplete
+                          label='Country'
+                          dataList={countryList}
+                          initialValue={unitItem.metaData.country}
+                          handleNewRequest={this.handleNewRequest}
+                          handleUpdateInput={this.handleUpdateInput}
+                          onEdit={changeSet => dispatch(editUnitField({country: changeSet}, unitId))}
+                          searchText={this.state.searchText}                       
+                          countryValid={this.state.countryValid}                     
+                       /> */}
                       </div>
                       <div className='mt3 flex'>
                         <div className='flex-grow'>
-                          {infoItemMembers('State', unitItem.metaData.state)}
+                          <EditableItem
+                            label='State'
+                            initialValue={unitItem.metaData.state}
+                            onEdit={changeSet => dispatch(editUnitField({state: changeSet}, unitId))}
+                            isMultiLine
+                          />
                         </div>
                         <div className='flex-grow'>
-                          {infoItemMembers('Zip / Postal code', unitItem.metaData.zipCode)}
+                          <EditableItem
+                            label='Zip / Postal code'
+                            initialValue={unitItem.metaData.zipCode}
+                            onEdit={changeSet => dispatch(editUnitField({zipCode: changeSet}, unitId))}
+                            isMultiLine
+                          />
                         </div>
                       </div>
                     </div>

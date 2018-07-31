@@ -324,46 +324,16 @@ Meteor.methods({
     }
   },
   [`${collectionName}.editUnitField`] (unitId, changeSet) {
-    check(unitId, Number)
-    const editableFields = [
-      'description',
-      'address'
-    ]
-    Object.keys(changeSet).forEach(fieldName => {
-      if (!editableFields.includes(fieldName)) {
-        throw new Meteor.Error(`illegal field name ${fieldName}`)
-      }
-      const valType = typeof changeSet[fieldName]
-      if (!['number', 'string', 'boolean'].includes(valType)) {
-        throw new Meteor.Error(`illegal value type of ${valType} set to field ${fieldName}`)
-      }
-    })
+    
     if (!Meteor.userId()) {
       throw new Meteor.Error('not-authorized')
     }
 
-    if (Meteor.isClient) {
-      Units.update({id: unitId}, {
+    if (Meteor.isServer) {
+      UnitMetaData.update({bzId: unitId}, {
         $set: changeSet
       })
-    } else { // is server
-      try {
-        // Hi, Naor. the error was that user does not have permission to edit component
-        // I chose /rest/product by referring to .byIdWithUsers in unit.jsx CreateContainer  
-        const { bugzillaCreds: { apiKey } } = Meteor.users.findOne(this.userId)
-        const hello = callAPI('put', `/rest/product/${unitId}`, Object.assign({api_key: apiKey}, changeSet), false, true)
-        console.log('call API returns what?', hello)
-      } catch (e) {
-        console.error({
-          user: Meteor.userId(),
-          method: `${collectionName}.editUnitField`,
-          args: [unitId, changeSet],
-          error: e
-        })
-        throw new Meteor.Error('API error')
-      }
     }
-    // factory.handleChanged(unitId, updatedSet)
   }
 })
 
