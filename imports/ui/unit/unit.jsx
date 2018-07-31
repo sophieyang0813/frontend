@@ -25,8 +25,6 @@ import { storeBreadcrumb } from '../general-actions'
 import EditableItem from '../components/editable-item'
 // import EditableAutocomplete from '../components/editable-autocomplete'
 import { editUnitField } from './unit.actions'
-import AutoComplete from 'material-ui/AutoComplete'
-// import countries from 'iso-3166-1-codes'
 
 const viewsOrder = ['cases', 'reports', 'overview']
 
@@ -283,8 +281,8 @@ class Unit extends Component {
                           handleNewRequest={this.handleNewRequest}
                           handleUpdateInput={this.handleUpdateInput}
                           onEdit={changeSet => dispatch(editUnitField({country: changeSet}, unitId))}
-                          searchText={this.state.searchText}                       
-                          countryValid={this.state.countryValid}                     
+                          searchText={this.state.searchText}
+                          countryValid={this.state.countryValid}
                        /> */}
                       </div>
                       <div className='mt3 flex'>
