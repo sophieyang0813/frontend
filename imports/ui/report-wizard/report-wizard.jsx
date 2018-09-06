@@ -136,7 +136,7 @@ class ReportWizard extends Component {
               <div className='relative'>
                 {infoItemMembers('Report title', reportItem.title)}
                 <div className='absolute bottom-1 right-0 tl'>
-                  <FontIcon className='material-icons' onClick={() => this.setState({isEditable: true})}>create</FontIcon>
+                  <FontIcon className='material-icons' color='var(--silver)' onClick={() => this.setState({isEditable: true})}>create</FontIcon>
                 </div>
               </div>
             )}
