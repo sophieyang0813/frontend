@@ -436,7 +436,7 @@ Meteor.methods({
   },
   [`${collectionName}.editReportField`]: fieldEditMethodMaker({
     clientCollection: Reports,
-    editableFields: ['additionalComments'],
+    editableFields: ['additionalComments', 'title'],
     methodName: `${collectionName}.editReportField`,
     publicationObj
   })
