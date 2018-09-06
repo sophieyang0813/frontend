@@ -56,7 +56,6 @@ class ReportWizard extends Component {
       initDone: false
     }
   }
-
   componentDidUpdate (prevProps) {
     const { isLoading, match, reportItem, dispatch } = this.props
     if (!isLoading && prevProps.isLoading !== isLoading) {
@@ -70,6 +69,9 @@ class ReportWizard extends Component {
       if (enforcedViewMode) {
         dispatch(replace(match.url.replace(viewMode, enforcedViewMode)))
       }
+    }
+    if (prevProps.reportItem !== reportItem) {
+      this.setState({isEditable: false})
     }
   }
 
@@ -88,7 +90,7 @@ class ReportWizard extends Component {
     if (isLoading) {
       return <Preloader />
     }
-    const { isEditable } = this.state
+    const { isEditable, reportTitle } = this.state
     const isDraft = reportItem.status === REPORT_DRAFT_STATUS
     const memberIdMatcher = ({ id }) => id === user._id
     const unitDisplayName = (unitItem.metaData() && unitItem.metaData().displayName) || unitItem.name
@@ -103,7 +105,6 @@ class ReportWizard extends Component {
     } : makeMatchingUser(
       getUnitRoles(unitItem).find(desc => desc.login === user.bugzillaCreds.login)
     )
-
     return (
       <div className='full-height flex flex-column'>
         <InnerAppBar onBack={() => dispatch(goBack())} title={reportItem.title} rightIconElement={isDraft ? (
@@ -114,18 +115,23 @@ class ReportWizard extends Component {
         <div className='flex-grow bg-very-light-gray flex flex-column overflow-auto pb2'>
           <div className='bg-white card-shadow-1 pa3'>
             { isEditable ? (
-              <form onSubmit={(evt) => this.handleSubmit()}>
-                <div className='relative'>
-                  <EditableItem
-                    label='Edit title'
-                    initialValue={reportItem.title}
-                    onEdit={val => this.setState({reportTitle: val})}
-                  />
-                  <div className='absolute bottom-1 right-0 tl'>
-                    <FontIcon className='material-icons'>create</FontIcon>
+              <div>
+                <form onSubmit={this.handleSubmit}>
+                  <div className='relative'>
+                    <EditableItem
+                      label='Edit title'
+                      initialValue={reportItem.title}
+                      onEdit={val => this.setState({reportTitle: val})}
+                    />
+                    <div className='absolute right-0 tl f6 bondi-blue fw5'>
+                      <span className='silver ph2' onClick={() => this.setState({isEditable: false})}>Cancel</span>
+                      <input
+                        className={'ml2 ph2 ' + (reportTitle ? 'bondi-blue' : 'silver')}
+                        type='submit' value='Save' />
+                    </div>
                   </div>
-                </div>
-              </form>
+                </form>
+              </div>
             ) : (
               <div className='relative'>
                 {infoItemMembers('Report title', reportItem.title)}
@@ -134,7 +140,7 @@ class ReportWizard extends Component {
                 </div>
               </div>
             )}
-            <div>
+            <div className={(isEditable ? 'mt3' : '')}>
               {infoItemMembers('Unit', unitDisplayName)}
             </div>
             <div className='pt1'>
