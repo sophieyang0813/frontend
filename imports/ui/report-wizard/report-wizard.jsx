@@ -52,9 +52,11 @@ class ReportWizard extends Component {
     super(...arguments)
     this.state = {
       reportTitle: null,
+      isEditable: false,
       initDone: false
     }
   }
+
   componentDidUpdate (prevProps) {
     const { isLoading, match, reportItem, dispatch } = this.props
     if (!isLoading && prevProps.isLoading !== isLoading) {
@@ -70,6 +72,14 @@ class ReportWizard extends Component {
       }
     }
   }
+
+  handleSubmit = evt => {
+    evt.preventDefault()
+    const { reportTitle } = this.state
+    const { reportItem, dispatch } = this.props
+    dispatch(editReportField(reportItem.id, {title: reportTitle}))
+  }
+
   render () {
     const {
       unitItem, reportItem, isLoading, user, dispatch, childCases, match, attachmentUrls, attachmentUploads
@@ -78,7 +88,7 @@ class ReportWizard extends Component {
     if (isLoading) {
       return <Preloader />
     }
-
+    const { isEditable } = this.state
     const isDraft = reportItem.status === REPORT_DRAFT_STATUS
     const memberIdMatcher = ({ id }) => id === user._id
     const unitDisplayName = (unitItem.metaData() && unitItem.metaData().displayName) || unitItem.name
@@ -93,6 +103,7 @@ class ReportWizard extends Component {
     } : makeMatchingUser(
       getUnitRoles(unitItem).find(desc => desc.login === user.bugzillaCreds.login)
     )
+
     return (
       <div className='full-height flex flex-column'>
         <InnerAppBar onBack={() => dispatch(goBack())} title={reportItem.title} rightIconElement={isDraft ? (
@@ -102,9 +113,27 @@ class ReportWizard extends Component {
         ) : null} />
         <div className='flex-grow bg-very-light-gray flex flex-column overflow-auto pb2'>
           <div className='bg-white card-shadow-1 pa3'>
-            <div>
-              {infoItemMembers('Report title', reportItem.title)}
-            </div>
+            { isEditable ? (
+              <form onSubmit={(evt) => this.handleSubmit()}>
+                <div className='relative'>
+                  <EditableItem
+                    label='Edit title'
+                    initialValue={reportItem.title}
+                    onEdit={val => this.setState({reportTitle: val})}
+                  />
+                  <div className='absolute bottom-1 right-0 tl'>
+                    <FontIcon className='material-icons'>create</FontIcon>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <div className='relative'>
+                {infoItemMembers('Report title', reportItem.title)}
+                <div className='absolute bottom-1 right-0 tl'>
+                  <FontIcon className='material-icons' onClick={() => this.setState({isEditable: true})}>create</FontIcon>
+                </div>
+              </div>
+            )}
             <div>
               {infoItemMembers('Unit', unitDisplayName)}
             </div>
