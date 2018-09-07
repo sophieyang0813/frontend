@@ -17,8 +17,8 @@ const unitTypes = [
 
 export default class UnitTypeIcon extends Component {
   render () {
-    const { metaData, iconInExplorer } = this.props
-    const iconType = (metaData && metaData.unitType) || iconInExplorer
+    const { metaData, iconInExplorer, iconInReport } = this.props
+    const iconType = (metaData && metaData.unitType) || iconInExplorer || iconInReport
     const icon = unitTypes.find(type => type.categories.includes(iconType))
     let unitTypeIcon
     if (metaData === null || (metaData && metaData.unitType === null)) {
@@ -26,10 +26,14 @@ export default class UnitTypeIcon extends Component {
         <FontIcon className='material-icons' color='var(--semi-dark-gray)'>
         not_listed_location
         </FontIcon>
-    } else if (metaData === undefined) {
+    } else if (iconInReport) {
       unitTypeIcon =
-        <FontIcon className='material-icons' color='var(--semi-dark-gray)'>
-         not_listed_location
+        <FontIcon
+          className={'material-icons ' + (iconInReport ? 'mh3 ' : '')}
+          color='var(--semi-dark-gray)'
+          style={unitIconsStyle}
+        >
+          {icon.icon}
         </FontIcon>
     } else if (
       (iconInExplorer === null || iconInExplorer === undefined || iconInExplorer === 'not_listed') &&

@@ -3,24 +3,18 @@ import { connect } from 'react-redux'
 import { createContainer } from 'meteor/react-meteor-data'
 import PropTypes from 'prop-types'
 import Dialog from 'material-ui/Dialog'
-import RaisedButton from 'material-ui/RaisedButton'
-import CircularProgress from 'material-ui/CircularProgress'
+import { push } from 'react-router-redux'
 import FontIcon from 'material-ui/FontIcon'
-// import ErrorDialog from '../dialogs/error-dialog'
 import { modalTitleStyle, closeDialogButtonStyle } from './generic-dialog.mui-styles'
 import UnitTypeIcon from '../unit-explorer/unit-type-icon'
 
 class SelectUnitDialog extends Component {
-  // } 0) when clicked +, url changes to /select-unit/ 
-  // 1) receive a list of units 
-  // 2) these units are clickable 
-  // 3) create report leads to /unit/:id/report/new
 
   render () {
-    const { show, onDismissed, inProgress, units } = this.props
+    const { show, onDismissed, inProgress, units, dispatch } = this.props
     return (
       <Dialog
-        title='Select your unit'
+        title='Select the unit'
         titleStyle={modalTitleStyle}
         open={show}
       >
@@ -31,37 +25,26 @@ class SelectUnitDialog extends Component {
             <FontIcon className='material-icons' style={closeDialogButtonStyle}>close</FontIcon>
           </button>
         )}
-        <div className='overflow-hidden'> 
-          <div className='overflow-auto'>
-            {units.map(({ name, metaData }) =>
-              <div key={name}>
-                <div className='flex items-center h3 bt b--light-gray bg-white'
-                  // onClick={evt => this.handleExpandUnit(evt, name)}
-                > 
-                  <UnitTypeIcon metaData={metaData} />
-                  <div className='flex-grow ellipsis mid-gray mr4'>
-                    {name}
-                  </div>
+        <div className='overflow-scroll ba b--moon-gray mt2 pa2 tc br1 mr3 ml3'>
+          {units.map(({ name, metaData, id }) =>
+            <div key={id} onClick={() => dispatch(push(`/unit/${id}/reports/new`))}>
+              <div className='flex h3 bt b--light-gray bg-white'>
+                <UnitTypeIcon iconInReport={metaData && metaData.unitType} />
+                <div className='flex-grow mid-gray '>
+                  {name}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-        {/* <ErrorDialog show={!!error} text={error} onDismissed={() => {
-          dispatch(clearReportCreateError())
-          onDismissed()
-        }} /> */}
       </Dialog>
     )
   }
 }
 
 SelectUnitDialog.propTypes = {
-  // show: PropTypes.bool.isRequired,
-  // onDismissed: PropTypes.func.isRequired,
-  // unitName: PropTypes.string.isRequired,
-  // inProgress: PropTypes.bool.isRequired,
-  // error: PropTypes.string
+  show: PropTypes.bool.isRequired,
+  onDismissed: PropTypes.func.isRequired
 }
 
 export default connect(({ reportCreationState }) => ({
