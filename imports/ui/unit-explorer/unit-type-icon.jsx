@@ -26,6 +26,11 @@ export default class UnitTypeIcon extends Component {
         <FontIcon className='material-icons' color='var(--semi-dark-gray)'>
         not_listed_location
         </FontIcon>
+    } else if (metaData === undefined) {
+      unitTypeIcon =
+        <FontIcon className='material-icons' color='var(--semi-dark-gray)'>
+         not_listed_location
+        </FontIcon>
     } else if (
       (iconInExplorer === null || iconInExplorer === undefined || iconInExplorer === 'not_listed') &&
       metaData === undefined) {
