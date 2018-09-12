@@ -117,8 +117,8 @@ class ReportWizard extends Component {
               <div>
                 <form onSubmit={this.handleSubmit}>
                   <div className='relative'>
+                    <div className='mt1 f6 bondi-blue'>Edit title</div>
                     <EditableItem
-                      label='Edit title'
                       initialValue={reportItem.title}
                       onEdit={val => this.setState({reportTitle: val})}
                     />
@@ -143,7 +143,7 @@ class ReportWizard extends Component {
                 </div>
               </div>
             )}
-            <div className={(isEditable ? 'mt3' : '')}>
+            <div>
               {infoItemMembers('Unit', unitDisplayName)}
             </div>
             <div className='pt1'>
