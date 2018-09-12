@@ -86,7 +86,6 @@ class ReportWizard extends Component {
     const {
       unitItem, reportItem, isLoading, user, dispatch, childCases, match, attachmentUrls, attachmentUploads
     } = this.props
-
     if (isLoading) {
       return <Preloader />
     }
@@ -124,10 +123,14 @@ class ReportWizard extends Component {
                       onEdit={val => this.setState({reportTitle: val})}
                     />
                     <div className='absolute right-0 tl f6 bondi-blue fw5'>
-                      <span className='silver ph2' onClick={() => this.setState({isEditable: false})}>Cancel</span>
-                      <input
-                        className={'ml2 ph2 ' + (reportTitle ? 'bondi-blue' : 'silver')}
-                        type='submit' value='Save' />
+                      <FlatButton onClick={() => this.setState({isEditable: false})} style={{minWidth: '50px'}}>
+                        <span className='silver'> Cancel</span>
+                      </FlatButton>
+                      <FlatButton type='submit' style={{minWidth: '50px'}}>
+                        <span className={(reportTitle ? 'bondi-blue' : 'silver')} >
+                         Save
+                        </span>
+                      </FlatButton>
                     </div>
                   </div>
                 </form>
