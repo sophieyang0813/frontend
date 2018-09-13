@@ -61,6 +61,7 @@ class ReportWizard extends Component {
     const { reportItem, dispatch } = this.props
     dispatch(editReportField(reportItem.id, {title: reportTitle}))
     this.setState({isEditable: false})
+    this.setState({reportTitle: reportTitle})
   }
 
   componentDidUpdate (prevProps) {
@@ -76,6 +77,9 @@ class ReportWizard extends Component {
       if (enforcedViewMode) {
         dispatch(replace(match.url.replace(viewMode, enforcedViewMode)))
       }
+    }
+    if (!prevProps.reportItem || prevProps.reportItem.title !== this.props.reportItem.title) {
+      this.setState({reportTitle: this.prop.reportTitle})
     }
   }
 
