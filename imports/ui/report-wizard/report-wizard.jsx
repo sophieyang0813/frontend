@@ -77,10 +77,8 @@ class ReportWizard extends Component {
         dispatch(replace(match.url.replace(viewMode, enforcedViewMode)))
       }
     }
-    if (!prevProps.reportItem || prevProps.reportItem.title !== reportItem.title) {
-      if (reportItem) {
-        this.setState({reportTitle: reportItem.title})
-      }
+    if ((!prevProps.reportItem && reportItem) || (prevProps.reportItem && prevProps.reportItem.title !== reportItem.title)) {
+      this.setState({reportTitle: reportItem.title})
     }
   }
 
@@ -121,7 +119,7 @@ class ReportWizard extends Component {
                       label=''
                       name={reportItem.title}
                       key={reportItem.title}
-                      initialValue={reportItem.title}
+                      initialValue={reportTitle}
                       onEdit={val => this.setState({reportTitle: val})}
                     />
                     <div className='absolute right-0 tl f6 bondi-blue fw5'>
@@ -139,7 +137,7 @@ class ReportWizard extends Component {
               </div>
             ) : (
               <div className='relative'>
-                {infoItemMembers('Report title', reportItem.title)}
+                {infoItemMembers('Report title', reportTitle)}
                 <div className='absolute bottom-1 right-0 tl'>
                   <FontIcon className='material-icons' color='var(--silver)' onClick={() => this.setState({isEditable: true})}>create</FontIcon>
                 </div>
