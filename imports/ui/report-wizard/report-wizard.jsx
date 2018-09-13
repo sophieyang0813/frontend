@@ -113,6 +113,9 @@ class ReportWizard extends Component {
                   <div className='relative'>
                     <div className='mt1 f6 bondi-blue'>Edit title</div>
                     <EditableItem
+                      label=''
+                      name={reportItem.title}
+                      key={reportItem.title}
                       initialValue={reportItem.title}
                       onEdit={val => this.setState({reportTitle: val})}
                     />
