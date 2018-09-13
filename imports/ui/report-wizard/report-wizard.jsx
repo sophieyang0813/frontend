@@ -55,6 +55,14 @@ class ReportWizard extends Component {
       initDone: false
     }
   }
+  handleSubmit = evt => {
+    evt.preventDefault()
+    const { reportTitle } = this.state
+    const { reportItem, dispatch } = this.props
+    dispatch(editReportField(reportItem.id, {title: reportTitle}))
+    this.setState({isEditable: false})
+  }
+
   componentDidUpdate (prevProps) {
     const { isLoading, match, reportItem, dispatch } = this.props
     if (!isLoading && prevProps.isLoading !== isLoading) {
@@ -70,6 +78,7 @@ class ReportWizard extends Component {
       }
     }
   }
+
   render () {
     const {
       unitItem, reportItem, isLoading, user, dispatch, childCases, match, attachmentUrls, attachmentUploads
