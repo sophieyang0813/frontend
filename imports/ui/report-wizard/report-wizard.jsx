@@ -70,9 +70,6 @@ class ReportWizard extends Component {
         dispatch(replace(match.url.replace(viewMode, enforcedViewMode)))
       }
     }
-    if (prevProps.reportItem !== reportItem) {
-      this.setState({isEditable: false})
-    }
   }
 
   handleSubmit = evt => {
@@ -80,6 +77,7 @@ class ReportWizard extends Component {
     const { reportTitle } = this.state
     const { reportItem, dispatch } = this.props
     dispatch(editReportField(reportItem.id, {title: reportTitle}))
+    this.setState({isEditable: false})
   }
 
   render () {
