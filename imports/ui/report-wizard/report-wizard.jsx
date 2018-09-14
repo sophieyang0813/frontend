@@ -123,10 +123,10 @@ class ReportWizard extends Component {
                       onEdit={val => this.setState({reportTitle: val})}
                     />
                     <div className='absolute right-0 tl f6 bondi-blue fw5'>
-                      <FlatButton onClick={() => this.setState({isEditable: false})} style={{minWidth: '50px'}}>
+                      <FlatButton onClick={() => this.setState({isEditable: false, reportTitle: reportItem.title})} style={{minWidth: '50px'}}>
                         <span className='silver'> Cancel</span>
                       </FlatButton>
-                      <FlatButton type='submit' style={{minWidth: '50px'}}>
+                      <FlatButton type='submit' style={{minWidth: '50px'}} disabled={!reportTitle}>
                         <span className={(reportTitle ? 'bondi-blue' : 'silver')} >
                           Save
                         </span>
