@@ -6,13 +6,11 @@ import IconButton from 'material-ui/IconButton'
 import FontIcon from 'material-ui/FontIcon'
 import { UneeTIcon } from '../components/unee-t-icons'
 import TextField from 'material-ui/TextField'
-import MenuItem from 'material-ui/MenuItem'
 
 import {
   textInputStyle,
   textInputFloatingLabelStyle,
-  textInputUnderlineFocusStyle,
-  selectInputIconStyle
+  textInputUnderlineFocusStyle
 } from '../components/form-controls.mui-styles'
 
 import {
@@ -20,10 +18,6 @@ import {
   logoIconStyle,
   logoButtonStyle
 } from '../components/app-bar.mui-styles'
-
-// searchbar 1) when clicked, search text appear
-//2) when type, items are sorted (filtered)
-// 3) display item
 
 class SearchBar extends Component {
   constructor (props) {
@@ -34,11 +28,13 @@ class SearchBar extends Component {
   }
 
   handleSearch = (evt) => {
-    console.log('value', evt.target.value)
     this.setState({searchText: evt.target.value})
+    this.props.findUnit(evt.target.value)
   }
 
   render () {
+    // const { unitList } = this.props
+    // console.log('unitLIst', unitList)
     const { searchText } = this.state
     return (
       <TextField
@@ -59,22 +55,28 @@ class RootAppBar extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      searchEnabled: false
+      searchTextDisplay: false
     }
   }
   render () {
-    const { title, onIconClick, shadowless } = this.props
-    const { searchEnabled } = this.state
+    const { title, onIconClick, shadowless, findUnit, searchOff } = this.props
+    const { searchTextDisplay } = this.state
+
     return (
-      <AppBar title={searchEnabled ? <SearchBar /> : title} id={title} titleStyle={titleStyle} style={shadowless ? {boxShadow: 'none'} : undefined}
+      <AppBar
+        title={searchTextDisplay ? <SearchBar findUnit={findUnit} /> : title}
+        id={title}
+        titleStyle={titleStyle}
+        style={shadowless ? {boxShadow: 'none'} : undefined}
         iconElementLeft={
-          searchEnabled ? (
-            // <div style={{position: 'relative'}}>
+          searchTextDisplay ? (
             <IconButton>
-              <FontIcon className='material-icons' color='white'>arrow_back</FontIcon>
+              <FontIcon className='material-icons' color='white'
+                onClick={() => { this.setState({searchTextDisplay: false}); searchOff() }}
+              //  onClick={searchOff;() => this.setState({searchTextDisplay: false})}
+              >
+               arrow_back</FontIcon>
             </IconButton>
-            //  <SearchBar style={{position: 'absolute', marginLeft: '0'}}/>
-            // </div>
           ) : (
             <IconButton iconStyle={logoIconStyle} style={logoButtonStyle} onClick={onIconClick}>
               <UneeTIcon />
@@ -84,7 +86,10 @@ class RootAppBar extends Component {
         iconElementRight={
           <div>
             <IconButton>
-              <FontIcon className='material-icons' color='white' onClick={() => this.setState({searchEnabled: true})}>search</FontIcon>
+              <FontIcon className='material-icons' color='white'
+                onClick={() => title === 'My Units' && this.setState({searchTextDisplay: true})}>
+                search
+              </FontIcon>
             </IconButton>
             <IconButton>
               <FontIcon className='material-icons' color='white'>notifications</FontIcon>
