@@ -30,7 +30,7 @@ export default class UnitTypeIcon extends Component {
       (iconInExplorer === null || iconInExplorer === undefined || iconInExplorer === 'not_listed') &&
       metaData === undefined) {
       unitTypeIcon =
-        <FontIcon className={'material-icons ' + (iconInExplorer ? 'mh3 ' : '')}
+        <FontIcon className={'material-icons mh3'}
           color='var(--semi-dark-gray)'
           style={unitIconsStyle}
         >
