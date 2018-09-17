@@ -21,7 +21,8 @@ class UnitExplorer extends Component {
     super(props)
     this.state = {
       slideIndex: 0,
-      searchResult: []
+      searchResult: [],
+      searchEnabled: false
     }
   }
 
@@ -43,11 +44,11 @@ class UnitExplorer extends Component {
 
   findUnit = (searchText) => {
     if (searchText === '') {
-      this.setState({searchResult: []})
+      this.setState({searchEnabled: false})
     } else {
+      this.setState({searchEnabled: true})
       const matcher = new RegExp(searchText, 'i')
       const searchResult = this.props.unitList
-        .map((u, idx) => Object.assign(u, { origIdx: idx }))
         .filter(unit => !matcher || (unit.name && unit.name.match(matcher)))
       this.setState({
         searchResult: searchResult
@@ -56,12 +57,12 @@ class UnitExplorer extends Component {
   }
 
   searchOff = () => {
-    this.setState({searchResult: []})
+    this.setState({searchEnabled: false})
   }
 
   render () {
     const { isLoading, unitList, dispatch, currentUserId } = this.props
-    const { searchResult } = this.state
+    const { searchResult, searchEnabled } = this.state
     if (isLoading) return <Preloader />
     const activeUnits = unitList.filter(unitItem => unitItem.metaData && !unitItem.metaData.disabled)
     const disabledUnits = unitList.filter(unitItem => unitItem.metaData && unitItem.metaData.disabled)
@@ -75,7 +76,7 @@ class UnitExplorer extends Component {
           searchOff={this.searchOff}
         />
         <UnverifiedWarning />
-        {searchResult.length > 0 ? (
+        { searchEnabled ? (
           <SearchResult unitsFound={searchResult}
             handleUnitClicked={this.handleUnitClicked}
           />
