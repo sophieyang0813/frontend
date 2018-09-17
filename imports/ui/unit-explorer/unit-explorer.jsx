@@ -70,7 +70,10 @@ class UnitExplorer extends Component {
           findUnit={this.findUnit}
         />
         <UnverifiedWarning />
-        {searchResult.length > 0 ? (<SearchResult unitsFound={searchResult} />
+        {searchResult.length > 0 ? (
+          <SearchResult unitsFound={searchResult}
+            handleUnitClicked={this.handleUnitClicked}
+          />
         ) : (
           <div className='flex-grow flex flex-column overflow-hidden'>
             <Tabs
