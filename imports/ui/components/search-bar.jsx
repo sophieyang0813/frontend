@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import TextField from 'material-ui/TextField'
 import {
-  textInputStyle,
   textInputFloatingLabelStyle,
-  textInputUnderlineFocusStyle
+  textInputUnderlineFocusStyle,
+  whiteInput
 } from '../components/form-controls.mui-styles'
 
 export default class SearchBar extends Component {
@@ -23,10 +23,11 @@ export default class SearchBar extends Component {
     const { searchText } = this.state
     return (
       <TextField
-        hintText='Search'
+        hintText='Search units'
         floatingLabelShrinkStyle={textInputFloatingLabelStyle}
         underlineFocusStyle={textInputUnderlineFocusStyle}
-        inputStyle={textInputStyle}
+        inputStyle={whiteInput}
+        hintStyle={whiteInput}
         fullWidth
         value={searchText}
         onChange={(evt) => this.handleSearch(evt)}
