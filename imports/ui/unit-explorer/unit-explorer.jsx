@@ -55,6 +55,10 @@ class UnitExplorer extends Component {
     }
   }
 
+  searchOff = () => {
+    this.setState({searchResult: []})
+  }
+
   render () {
     const { isLoading, unitList, dispatch, currentUserId } = this.props
     const { searchResult } = this.state
@@ -68,6 +72,7 @@ class UnitExplorer extends Component {
           onIconClick={() => dispatch(setDrawerState(true))}
           shadowless
           findUnit={this.findUnit}
+          searchOff={this.searchOff}
         />
         <UnverifiedWarning />
         {searchResult.length > 0 ? (
