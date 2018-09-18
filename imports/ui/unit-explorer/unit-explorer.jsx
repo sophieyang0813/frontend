@@ -22,7 +22,7 @@ class UnitExplorer extends Component {
     this.state = {
       slideIndex: 0,
       searchResult: [],
-      searchOn: false
+      searchMode: false
     }
   }
 
@@ -44,9 +44,9 @@ class UnitExplorer extends Component {
 
   findUnit = (searchText) => {
     if (searchText === '') {
-      this.setState({searchOn: false})
+      this.setState({searchMode: false})
     } else {
-      this.setState({searchOn: true})
+      this.setState({searchMode: true})
       const matcher = new RegExp(searchText, 'i')
       const searchResult = this.props.unitList
         .filter(unit => !matcher || (unit.name && unit.name.match(matcher)))
@@ -56,13 +56,9 @@ class UnitExplorer extends Component {
     }
   }
 
-  searchOff = () => {
-    this.setState({searchOn: false})
-  }
-
   render () {
     const { isLoading, unitList, dispatch, currentUserId } = this.props
-    const { searchResult, searchOn } = this.state
+    const { searchResult, searchMode } = this.state
     if (isLoading) return <Preloader />
     const activeUnits = unitList.filter(unitItem => unitItem.metaData && !unitItem.metaData.disabled)
     const disabledUnits = unitList.filter(unitItem => unitItem.metaData && unitItem.metaData.disabled)
@@ -70,14 +66,13 @@ class UnitExplorer extends Component {
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar
           title='My Units'
-          onIconClick={() => dispatch(setDrawerState(true))}
+          placeholder='Search units..'
+          onQueryChanged={() => dispatch(setDrawerState(true))}
           shadowless
           findItem={this.findUnit}
-          searchOff={this.searchOff}
-          searchOn
         />
         <UnverifiedWarning />
-        { searchOn ? (
+        { searchMode ? (
           <FilteredUnits searchResult={searchResult}
             handleUnitClicked={this.handleUnitClicked}
           />
