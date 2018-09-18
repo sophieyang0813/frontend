@@ -46,11 +46,13 @@ class RootAppBar extends Component {
         }
         iconElementRight={
           <div>
-            <IconButton onClick={() => searchOn && this.setState({searchTextDisplay: true})}>
-              <FontIcon className='material-icons' color='white'>
-                search
-              </FontIcon>
-            </IconButton>
+            <span className={(searchTextDisplay ? 'dn' : '')}>
+              <IconButton onClick={() => searchOn && this.setState({searchTextDisplay: true})}>
+                <FontIcon className='material-icons' color='white'>
+                  search
+                </FontIcon>
+              </IconButton>
+            </span>
             <IconButton>
               <FontIcon className='material-icons' color='white'>notifications</FontIcon>
             </IconButton>
