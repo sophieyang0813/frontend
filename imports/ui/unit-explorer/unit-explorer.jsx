@@ -13,8 +13,8 @@ import Units, { collectionName } from '../../api/units'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import { Tabs, Tab } from 'material-ui/Tabs'
 import SwipeableViews from 'react-swipeable-views'
-import FilteredUnitsList from './filtered-units-list'
-import SearchResult from './search-result'
+import FilteredUnitsContainer from './filtered-units-container'
+import FilteredUnits from './filtered-units'
 
 class UnitExplorer extends Component {
   constructor (props) {
@@ -77,7 +77,7 @@ class UnitExplorer extends Component {
         />
         <UnverifiedWarning />
         { searchEnabled ? (
-          <SearchResult unitsFound={searchResult}
+          <FilteredUnits searchResult={searchResult}
             handleUnitClicked={this.handleUnitClicked}
           />
         ) : (
@@ -91,14 +91,14 @@ class UnitExplorer extends Component {
               <Tab label='Active' value={0} />
               <Tab label='Disabled' value={1} />
             </Tabs>
-            <div className='flex-grow flex flex-column overflow-auto'> {/* add class */}
+            <div className='flex-grow flex flex-column overflow-auto'>
               <SwipeableViews
                 index={this.state.slideIndex}
                 onChangeIndex={this.handleChange}
               >
                 {/* tab 1 */}
                 <div className='flex-grow bb b--very-light-gray bg-white pb6'>
-                  <FilteredUnitsList
+                  <FilteredUnitsContainer
                     filteredUnits={activeUnits}
                     currentUserId={currentUserId}
                     handleUnitClicked={this.handleUnitClicked}
@@ -109,7 +109,7 @@ class UnitExplorer extends Component {
                 </div>
                 {/* tab 2 */}
                 <div className='flex-grow bb b--very-light-gray bg-white pb6'>
-                  <FilteredUnitsList
+                  <FilteredUnitsContainer
                     filteredUnits={disabledUnits}
                     currentUserId={currentUserId}
                     handleUnitClicked={this.handleUnitClicked}

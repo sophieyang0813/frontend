@@ -62,7 +62,9 @@ class RootAppBar extends Component {
 
 RootAppBar.propTypes = {
   title: PropTypes.string.isRequired,
-  onIconClick: PropTypes.func
+  onIconClick: PropTypes.func,
+  findUnit: PropTypes.func,
+  searchOff: PropTypes.func
 }
 
 export default RootAppBar
