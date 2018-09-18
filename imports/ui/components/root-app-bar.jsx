@@ -21,12 +21,12 @@ class RootAppBar extends Component {
     }
   }
   render () {
-    const { title, onIconClick, shadowless, findUnit, searchOff } = this.props
+    const { title, onIconClick, shadowless, findItem, searchOn, searchOff } = this.props
     const { searchTextDisplay } = this.state
 
     return (
       <AppBar
-        title={searchTextDisplay ? <SearchBar findUnit={findUnit} /> : title}
+        title={searchTextDisplay ? <SearchBar findItem={findItem} /> : title}
         id={title}
         titleStyle={titleStyle}
         style={shadowless ? {boxShadow: 'none'} : undefined}
@@ -46,7 +46,7 @@ class RootAppBar extends Component {
         }
         iconElementRight={
           <div>
-            <IconButton onClick={() => title === 'My Units' && this.setState({searchTextDisplay: true})}>
+            <IconButton onClick={() => searchOn && this.setState({searchTextDisplay: true})}>
               <FontIcon className='material-icons' color='white'>
                 search
               </FontIcon>
@@ -61,9 +61,10 @@ class RootAppBar extends Component {
 }
 
 RootAppBar.propTypes = {
+  searchOn: PropTypes.bool,
   title: PropTypes.string.isRequired,
   onIconClick: PropTypes.func,
-  findUnit: PropTypes.func,
+  findItem: PropTypes.func,
   searchOff: PropTypes.func
 }
 

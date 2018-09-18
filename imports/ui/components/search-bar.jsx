@@ -16,7 +16,7 @@ export default class SearchBar extends Component {
 
   handleSearch = (evt) => {
     this.setState({searchText: evt.target.value})
-    this.props.findUnit(evt.target.value)
+    this.props.findItem(evt.target.value)
   }
 
   render () {
