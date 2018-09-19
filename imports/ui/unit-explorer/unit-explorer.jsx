@@ -43,7 +43,7 @@ class UnitExplorer extends Component {
     dispatch(push(`/unit/${id}`))
   }
 
-  handleSearchChanged = (searchText) => {
+  onSearchChanged = (searchText) => {
     this.setState({searchText})
     if (searchText === '') {
       this.setState({searchMode: false})
@@ -68,11 +68,11 @@ class UnitExplorer extends Component {
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar
           title='My Units'
-          placeholder='Search units..'
+          placeholder='Search units...'
           onIconClick={() => dispatch(setDrawerState(true))}
           shadowless
           searchText={searchText}
-          onSearchChanged={this.handleSearchChanged}
+          onSearchChanged={this.onSearchChanged}
         />
         <UnverifiedWarning />
         { searchMode ? (
