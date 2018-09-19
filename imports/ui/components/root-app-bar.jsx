@@ -63,7 +63,7 @@ class RootAppBar extends Component {
         }
         iconElementRight={
           <div>
-            <span className={(searchTextDisplay ? 'dn' : '')}>
+            <span className={(searchTextDisplay || title !== 'My Units' ? 'dn' : '')}>
               <IconButton onClick={() => this.setState({searchTextDisplay: true})}>
                 <FontIcon className='material-icons' color='white'>
                   search
