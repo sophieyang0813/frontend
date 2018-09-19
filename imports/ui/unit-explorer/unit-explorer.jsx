@@ -22,7 +22,8 @@ class UnitExplorer extends Component {
     this.state = {
       slideIndex: 0,
       searchResult: [],
-      searchMode: false
+      searchMode: false,
+      searchText: ''
     }
   }
 
@@ -42,7 +43,8 @@ class UnitExplorer extends Component {
     dispatch(push(`/unit/${id}`))
   }
 
-  findUnit = (searchText) => {
+  handleSearchChanged = (searchText) => {
+    this.setState({searchText})
     if (searchText === '') {
       this.setState({searchMode: false})
     } else {
@@ -58,7 +60,7 @@ class UnitExplorer extends Component {
 
   render () {
     const { isLoading, unitList, dispatch, currentUserId } = this.props
-    const { searchResult, searchMode } = this.state
+    const { searchResult, searchMode, searchText } = this.state
     if (isLoading) return <Preloader />
     const activeUnits = unitList.filter(unitItem => unitItem.metaData && !unitItem.metaData.disabled)
     const disabledUnits = unitList.filter(unitItem => unitItem.metaData && unitItem.metaData.disabled)
@@ -67,13 +69,15 @@ class UnitExplorer extends Component {
         <RootAppBar
           title='My Units'
           placeholder='Search units..'
-          onQueryChanged={() => dispatch(setDrawerState(true))}
+          onIconClick={() => dispatch(setDrawerState(true))}
           shadowless
-          findItem={this.findUnit}
+          searchText={searchText}
+          onSearchChanged={this.handleSearchChanged}
         />
         <UnverifiedWarning />
         { searchMode ? (
-          <FilteredUnits searchResult={searchResult}
+          <FilteredUnits filteredUnits={searchResult}
+            titleMode={0}
             handleUnitClicked={this.handleUnitClicked}
           />
         ) : (

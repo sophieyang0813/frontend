@@ -7,14 +7,14 @@ import { resetMenuItemDivStyle } from '../general.mui-styles'
 
 export default class FilteredUnits extends Component {
   render () {
-    const { unitsByRoles, searchResult, showAddBtn, handleUnitClicked, handleAddCaseClicked, administrate } = this.props
-    const filteredUnits = unitsByRoles || searchResult
+    const { filteredUnits, showAddBtn, handleUnitClicked, handleAddCaseClicked, titleMode } = this.props
 
     return (
       <div className='flex-grow flex flex-column overflow-auto'>
-        {(filteredUnits.length !== 0 && searchResult === undefined) && (
+        {(titleMode !== 0) && (
           <div className='bb b--black-10 bg-very-light-gray f6 fw5 mid-gray pv2 pl2'>
-            { administrate ? ('Units I Administrate') : ('Units Involved In') }
+            { titleMode === 1 && ('Units I Administrate')}
+            { titleMode === 2 && ('Units Involved In') }
           </div>)
         }
         {filteredUnits.map(({ id, name, description, metaData }) => (
@@ -43,10 +43,9 @@ export default class FilteredUnits extends Component {
 }
 
 FilteredUnits.propTypes = {
-  unitsByRoles: PropTypes.array,
-  searchResult: PropTypes.array,
+  filteredUnits: PropTypes.array.isRequired,
+  titleMode: PropTypes.number.isRequired,
   handleUnitClicked: PropTypes.func,
   handleAddCaseClicked: PropTypes.func,
-  administrate: PropTypes.bool,
   showAddBtn: PropTypes.bool
 }

@@ -16,17 +16,18 @@ export default class FilteredUnitsContainer extends Component {
           </div>
         ) : <div>
           <FilteredUnits
-            unitsByRoles={administratedUnits}
+            filteredUnits={administratedUnits}
             handleAddCaseClicked={handleAddCaseClicked}
             handleUnitClicked={handleUnitClicked}
             showAddBtn={showAddBtn}
-            administrate
+            titleMode={1}
           />
           <FilteredUnits
-            unitsByRoles={unitsInvolvedIn}
+            filteredUnits={unitsInvolvedIn}
             handleAddCaseClicked={handleAddCaseClicked}
             handleUnitClicked={handleUnitClicked}
             showAddBtn={showAddBtn}
+            titleMode={2}
           />
         </div>
         }

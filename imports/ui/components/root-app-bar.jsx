@@ -16,37 +16,6 @@ import {
   logoButtonStyle
 } from '../components/app-bar.mui-styles'
 
-class SearchBar extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      searchText: ''
-    }
-  }
-
-  handleSearch = (evt) => {
-    this.setState({searchText: evt.target.value})
-    this.props.findItem(evt.target.value)
-  }
-
-  render () {
-    const { searchText } = this.state
-    const { style, hintText } = this.props
-    return (
-      <TextField
-        hintText={hintText}
-        floatingLabelShrinkStyle={textInputFloatingLabelStyle}
-        underlineFocusStyle={textInputUnderlineFocusStyle}
-        inputStyle={style}
-        hintStyle={style}
-        fullWidth
-        value={searchText}
-        onChange={(evt) => this.handleSearch(evt)}
-      />
-    )
-  }
-}
-
 class RootAppBar extends Component {
   constructor (props) {
     super(props)
@@ -56,13 +25,23 @@ class RootAppBar extends Component {
   }
 
   render () {
-    const { title, findItem, placeholder, onQueryChanged, shadowless } = this.props
+    const { title, onSearchChanged, placeholder, onIconClick, shadowless, searchText } = this.props
     const { searchTextDisplay } = this.state
-
     return (
       <AppBar
         title={searchTextDisplay
-          ? (<SearchBar findItem={findItem} hintText={placeholder} style={whiteInput} />)
+          ? (
+            <TextField
+              hintText={placeholder}
+              floatingLabelShrinkStyle={textInputFloatingLabelStyle}
+              underlineFocusStyle={textInputUnderlineFocusStyle}
+              inputStyle={whiteInput}
+              hintStyle={whiteInput}
+              fullWidth
+              value={searchText}
+              onChange={(evt) => onSearchChanged(evt.target.value)}
+            />
+          )
           : (title)
         }
         id={title}
@@ -77,7 +56,7 @@ class RootAppBar extends Component {
                arrow_back</FontIcon>
             </IconButton>
           ) : (
-            <IconButton iconStyle={logoIconStyle} style={logoButtonStyle} onClick={onQueryChanged}>
+            <IconButton iconStyle={logoIconStyle} style={logoButtonStyle} onClick={onIconClick}>
               <UneeTIcon />
             </IconButton>
           )
@@ -103,8 +82,9 @@ class RootAppBar extends Component {
 RootAppBar.propTypes = {
   showSearch: PropTypes.bool,
   title: PropTypes.string.isRequired,
-  onQueryChanged: PropTypes.func,
-  findItem: PropTypes.func
+  onIconClick: PropTypes.func,
+  onSearchChanged: PropTypes.func,
+  searchText: PropTypes.string
 }
 
 export default RootAppBar
