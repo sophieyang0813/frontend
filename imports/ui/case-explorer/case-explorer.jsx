@@ -110,7 +110,6 @@ class CaseExplorer extends Component {
       // Creating a case grouping *array* from the unit dictionary
       return Object.keys(unitsDict).reduce((all, unitTitle) => {
         const { bzId, cases, unitType, disabled } = unitsDict[unitTitle]
-        console.log('bzId', bzId)
         // Sorting cases within a unit by the order descending order of last update
         cases.sort((a, b) => b.latestUpdate - a.latestUpdate)
         all.push({
