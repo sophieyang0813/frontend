@@ -64,7 +64,6 @@ class UnitExplorer extends Component {
     if (isLoading) return <Preloader />
     const activeUnits = unitList.filter(unitItem => unitItem.metaData && !unitItem.metaData.disabled)
     const disabledUnits = unitList.filter(unitItem => unitItem.metaData && unitItem.metaData.disabled)
-    console.log('unitList', unitList)
     return (
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar
