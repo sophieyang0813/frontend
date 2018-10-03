@@ -9,7 +9,6 @@ import Reports, { collectionName, REPORT_DRAFT_STATUS } from '../../api/reports'
 import Preloader from '../preloader/preloader'
 import { setDrawerState, storeBreadcrumb } from '../general-actions'
 import { NoItemMsg } from '../explorer-components/no-item-msg'
-// import { FilterRow } from '../explorer-components/filter-row'
 import { UnitGroupList } from '../explorer-components/unit-group-list'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import FontIcon from 'material-ui/FontIcon'
@@ -17,9 +16,6 @@ import { ReportList } from '../report-explorer/report-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import MenuItem from 'material-ui/MenuItem'
-// import { Link } from 'react-router-dom'
-// import {ReportIcon} from '../report/report-icon'
-// import moment from 'moment'
 import SelectField from 'material-ui/SelectField'
 import {
   selectInputIconStyle,
@@ -33,7 +29,6 @@ class ReportExplorer extends Component {
   constructor () {
     super(...arguments)
     this.state = {
-      myInvolvement: false,
       open: false,
       statusFilterValues: [],
       sortBy: null
