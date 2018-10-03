@@ -14,30 +14,71 @@ import UnitMetaData from '../../api/unit-meta-data'
 import RootAppBar from '../components/root-app-bar'
 import Preloader from '../preloader/preloader'
 import { NoItemMsg } from '../explorer-components/no-item-msg'
-import { FilterRow } from '../explorer-components/filter-row'
+// import { FilterRow } from '../explorer-components/filter-row'
 import { UnitGroupList } from '../explorer-components/unit-group-list'
 import { storeBreadcrumb } from '../general-actions'
 import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
+import MenuItem from 'material-ui/MenuItem'
+import SelectField from 'material-ui/SelectField'
+import {
+  selectInputIconStyle,
+  noUnderline,
+  sortBoxInputStyle,
+  selectedItemStyle
+} from '../components/form-controls.mui-styles'
 
 class CaseExplorer extends Component {
   constructor () {
     super(...arguments)
     this.state = {
       caseId: '',
-      filterStatus: true,
-      myInvolvement: false,
-      open: false
+      open: false,
+      statusFilterValues: [],
+      sortBy: null
     }
   }
-
-  handleStatusClicked = (value) => {
-    this.setState({ filterStatus: value })
+  handleFilterClicked = (event, index, statusFilterValues) => {
+    this.setState({
+      statusFilterValues: statusFilterValues
+    })
   }
 
-  handleMyInvolvementClicked = () => {
-    this.setState({ myInvolvement: !this.state.myInvolvement })
+  handleSortClicked = (event, index, value) => {
+    this.setState({
+      sortBy: value
+    })
+  }
+
+  filterMenu (statusFilterValues) {
+    const status = ['Open', 'Closed', 'Assigned To Me']
+    return status.map((name) => (
+      <MenuItem
+        key={name}
+        insetChildren
+        checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
+        value={name}
+        primaryText={name}
+      />
+    ))
+  }
+
+  sortMenu (sortBy) {
+    const labels = [
+      [SORT_BY.DATE_ASCENDING, 'Newest'],
+      [SORT_BY.DATE_DESCENDING, 'Oldest'],
+      [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
+      [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
+    ]
+    return labels.map(([sortBy, label], index) => (
+      <MenuItem
+        key={sortBy}
+        value={sortBy}
+        primaryText={label}
+      />
+    ))
   }
 
   handleOnItemClicked = () => {
@@ -81,15 +122,16 @@ class CaseExplorer extends Component {
     (a, b) => a.length === b.length
   )
   makeCaseGrouping = memoizeOne(
-    (caseList, showOpen, onlyAssigned, allNotifs, unreadNotifs) => {
-      const openFilter = showOpen ? x => !isClosed(x) : x => isClosed(x)
-      const assignedFilter = onlyAssigned ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
-
+    (caseList, statusFilterValues, sortBy, allNotifs, unreadNotifs) => {
+      const openFilter = statusFilterValues.length === 3 || (statusFilterValues.includes('Open') && statusFilterValues.includes('Closed')) ? x => true
+        : statusFilterValues.includes('Open') ? x => !isClosed(x)
+          : statusFilterValues.includes('Closed') ? x => isClosed(x) : x => true
+      const assignedFilter = statusFilterValues.includes('Assigned To Me') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
       // Building a unit dictionary to group the cases together
-      const unitsDict = caseList.reduce((dict, caseItem) => {
+      const unitsDict = caseList.sort(sorters[sortBy]).reduce((dict, caseItem) => {
         if (openFilter(caseItem) && assignedFilter(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
 
@@ -135,20 +177,41 @@ class CaseExplorer extends Component {
   )
   render () {
     const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
-    const { filterStatus, myInvolvement, open } = this.state
+    const { statusFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const caseGrouping = this.makeCaseGrouping(caseList, filterStatus, myInvolvement, allNotifications, unreadNotifications)
+    const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, sortBy, allNotifications, unreadNotifications)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
+        <div className='flex bg-very-light-gray'>
+          <SelectField
+            multiple
+            hintText='View: All Cases'
+            value={statusFilterValues}
+            onChange={this.handleFilterClicked}
+            autoWidth
+            underlineStyle={noUnderline}
+            hintStyle={sortBoxInputStyle}
+            iconStyle={selectInputIconStyle}
+            labelStyle={sortBoxInputStyle}
+            selectedMenuItemStyle={selectedItemStyle}
+          >
+            {this.filterMenu(statusFilterValues)}
+          </SelectField>
+          <SelectField
+            hintText='Sort by: Date Added'
+            value={sortBy}
+            onChange={this.handleSortClicked}
+            underlineStyle={noUnderline}
+            hintStyle={sortBoxInputStyle}
+            iconStyle={selectInputIconStyle}
+            labelStyle={sortBoxInputStyle}
+            selectedMenuItemStyle={selectedItemStyle}
+          >
+            {this.sortMenu(sortBy)}
+          </SelectField>
+        </div>
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
-          <FilterRow
-            filterStatus={filterStatus}
-            myInvolvement={myInvolvement}
-            handleMyInvolvementClicked={this.handleMyInvolvementClicked}
-            handleStatusClicked={this.handleStatusClicked}
-            filterLabels={['Open', 'Closed', 'Assigned To Me']}
-          />
           { !isLoading && caseGrouping.length
             ? <UnitGroupList
               unitGroupList={caseGrouping}
