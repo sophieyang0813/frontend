@@ -9,35 +9,60 @@ import Reports, { collectionName, REPORT_DRAFT_STATUS } from '../../api/reports'
 import Preloader from '../preloader/preloader'
 import { setDrawerState, storeBreadcrumb } from '../general-actions'
 import { NoItemMsg } from '../explorer-components/no-item-msg'
-import { FilterRow } from '../explorer-components/filter-row'
+// import { FilterRow } from '../explorer-components/filter-row'
 import { UnitGroupList } from '../explorer-components/unit-group-list'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import FontIcon from 'material-ui/FontIcon'
 import { ReportList } from '../report-explorer/report-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
+import MenuItem from 'material-ui/MenuItem'
+// import { Link } from 'react-router-dom'
+// import {ReportIcon} from '../report/report-icon'
+// import moment from 'moment'
+import SelectField from 'material-ui/SelectField'
+import {
+  selectInputIconStyle,
+  noUnderline,
+  sortBoxInputStyle,
+  selectedItemStyle
+} from '../components/form-controls.mui-styles'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
 
 class ReportExplorer extends Component {
   constructor () {
     super(...arguments)
     this.state = {
-      filterStatus: true,
       myInvolvement: false,
-      open: false
+      open: false,
+      statusFilterValues: [],
+      sortBy: null
     }
   }
 
-  handleStatusClicked = (value) => {
-    this.setState({ filterStatus: value })
+  handleFilterClicked = (event, index, statusFilterValues) => {
+    this.setState({
+      statusFilterValues: statusFilterValues
+    })
   }
 
-  handleMyInvolvementClicked = () => {
-    this.setState({ myInvolvement: !this.state.myInvolvement })
+  handleSortClicked = (event, index, value) => {
+    this.setState({
+      sortBy: value
+    })
   }
 
-  handleOnItemClicked = () => {
-    const { dispatch, match } = this.props
-    dispatch(storeBreadcrumb(match.url))
+  reportFilterMenu (statusFilterValues) {
+    const status = ['Draft', 'Finalized', 'Created By Me']
+    return status.map((name) => (
+      <MenuItem
+        key={name}
+        insetChildren
+        checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
+        value={name}
+        primaryText={name}
+      />
+    ))
   }
 
   handleOnItemClicked = () => {
@@ -50,13 +75,29 @@ class ReportExplorer extends Component {
     dispatch(push(`/unit/${unitId}/reports/new`))
   }
 
+  sortMenu (sortBy) {
+    const labels = [
+      [SORT_BY.DATE_ASCENDING, 'Newest'],
+      [SORT_BY.DATE_DESCENDING, 'Oldest'],
+      [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
+      [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
+    ]
+    return labels.map(([sortBy, label], index) => (
+      <MenuItem
+        key={sortBy}
+        value={sortBy}
+        primaryText={label}
+      />
+    ))
+  }
+
   makeReportGrouping = memoizeOne(
-    (reportList, filterStatus, myInvolvement) => {
-      const statusFilter = filterStatus
-        ? report => report.status !== REPORT_DRAFT_STATUS
-        : report => report.status === REPORT_DRAFT_STATUS
-      const creatorFilter = myInvolvement ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
-      const unitDict = reportList.reduce((dict, reportItem) => {
+    (reportList, statusFilterValues, sortBy) => {
+      const statusFilter = statusFilterValues.length === 3 || (statusFilterValues.includes('Draft') && statusFilterValues.includes('Finalized')) ? report => true
+        : statusFilterValues.includes('Draft') ? report => report.status === REPORT_DRAFT_STATUS
+          : statusFilterValues.includes('Finalized') ? report => report.status !== REPORT_DRAFT_STATUS : report => true
+      const creatorFilter = statusFilterValues.includes('Created By Me') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+      const unitDict = reportList.sort(sorters[sortBy]).reduce((dict, reportItem) => {
         if (statusFilter(reportItem) && creatorFilter(reportItem)) {
           const { selectedUnit: unitBzName, unitMetaData: metaData } = reportItem
           const unitType = metaData ? metaData.unitType : 'not_listed'
@@ -74,21 +115,42 @@ class ReportExplorer extends Component {
 
   render () {
     const { isLoading, dispatch, reportList } = this.props
-    const { filterStatus, myInvolvement, open } = this.state
+    const { statusFilterValues, open, sortBy } = this.state
     if (isLoading) return <Preloader />
-    const reportGrouping = this.makeReportGrouping(reportList, filterStatus, myInvolvement)
+    const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, sortBy)
     return (
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar title='My Reports' onIconClick={() => dispatch(setDrawerState(true))} shadowless />
         <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
+          <div className='flex bg-very-light-gray'>
+            <SelectField
+              multiple
+              hintText='View: All Reports'
+              value={statusFilterValues}
+              onChange={this.handleFilterClicked}
+              autoWidth
+              underlineStyle={noUnderline}
+              hintStyle={sortBoxInputStyle}
+              iconStyle={selectInputIconStyle}
+              labelStyle={sortBoxInputStyle}
+              selectedMenuItemStyle={selectedItemStyle}
+            >
+              {this.reportFilterMenu(statusFilterValues)}
+            </SelectField>
+            <SelectField
+              hintText='Sort by: Date Added'
+              value={sortBy}
+              onChange={this.handleSortClicked}
+              underlineStyle={noUnderline}
+              hintStyle={sortBoxInputStyle}
+              iconStyle={selectInputIconStyle}
+              labelStyle={sortBoxInputStyle}
+              selectedMenuItemStyle={selectedItemStyle}
+            >
+              {this.sortMenu(sortBy)}
+            </SelectField>
+          </div>
           <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
-            <FilterRow
-              filterStatus={filterStatus}
-              myInvolvement={myInvolvement}
-              handleMyInvolvementClicked={this.handleMyInvolvementClicked}
-              handleStatusClicked={this.handleStatusClicked}
-              filterLabels={['Finalized', 'Draft', 'Created By Me']}
-            />
             { reportGrouping.length
               ? <UnitGroupList
                 unitGroupList={reportGrouping}
