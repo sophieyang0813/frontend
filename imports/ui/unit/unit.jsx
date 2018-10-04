@@ -91,7 +91,7 @@ class Unit extends Component {
     return filteredCases
   }
 
-  handleCaseFilterClicked = (event, index, statusFilterValues) => {
+  handleFilterClicked = (event, index, statusFilterValues) => {
     this.setState({
       statusFilterValues: statusFilterValues
     })
@@ -112,11 +112,6 @@ class Unit extends Component {
       })
     }
   }
-  handleReportFilterClicked = (event, index, statusFilterValues) => {
-    this.setState({
-      statusFilterValues: statusFilterValues
-    })
-  }
 
   handleSortClicked = (event, index, value) => {
     this.setState({
@@ -124,22 +119,8 @@ class Unit extends Component {
     })
   }
 
-  reportFilterMenu (statusFilterValues) {
-    const status = ['Draft', 'Finalized', 'Created By Me']
-    return status.map((name) => (
-      <MenuItem
-        key={name}
-        insetChildren
-        checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
-        value={name}
-        primaryText={name}
-      />
-    ))
-  }
-
-  caseFilterMenu (statusFilterValues) {
-    const status = ['Open', 'Closed', 'Assigned To Me']
-    return status.map((name) => (
+  filterMenu (options, statusFilterValues) {
+    return options.map((name) => (
       <MenuItem
         key={name}
         insetChildren
@@ -267,7 +248,7 @@ class Unit extends Component {
                             multiple
                             hintText='View: All Cases'
                             value={statusFilterValues}
-                            onChange={this.handleCaseFilterClicked}
+                            onChange={this.handleFilterClicked}
                             autoWidth
                             underlineStyle={noUnderline}
                             hintStyle={sortBoxInputStyle}
@@ -275,7 +256,7 @@ class Unit extends Component {
                             labelStyle={sortBoxInputStyle}
                             selectedMenuItemStyle={selectedItemStyle}
                           >
-                            {this.caseFilterMenu(statusFilterValues)}
+                            {this.filterMenu(['Open', 'Closed', 'Assigned To Me'], statusFilterValues)}
                           </SelectField>
                           <SelectField
                             hintText='Sort by: Date Added'
@@ -314,7 +295,7 @@ class Unit extends Component {
                             multiple
                             hintText='View: All Reports'
                             value={statusFilterValues}
-                            onChange={this.handleReportFilterClicked}
+                            onChange={this.handleFilterClicked}
                             autoWidth
                             underlineStyle={noUnderline}
                             hintStyle={sortBoxInputStyle}
@@ -322,7 +303,7 @@ class Unit extends Component {
                             labelStyle={sortBoxInputStyle}
                             selectedMenuItemStyle={selectedItemStyle}
                           >
-                            {this.reportFilterMenu(statusFilterValues)}
+                            {this.filterMenu(['Draft', 'Finalized', 'Created By Me'], statusFilterValues)}
                           </SelectField>
                           <SelectField
                             hintText='Sort by: Date Added'

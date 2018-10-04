@@ -11,10 +11,17 @@ import Preloader from '../preloader/preloader'
 import { setDrawerState } from '../general-actions'
 import Units, { collectionName } from '../../api/units'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
-import { Tabs, Tab } from 'material-ui/Tabs'
-import SwipeableViews from 'react-swipeable-views'
-import FilteredUnitsContainer from './filtered-units-container'
 import FilteredUnits from './filtered-units'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
+import MenuItem from 'material-ui/MenuItem'
+import { NoItemMsg } from '../explorer-components/no-item-msg'
+import SelectField from 'material-ui/SelectField'
+import {
+  selectInputIconStyle,
+  noUnderline,
+  sortBoxInputStyle,
+  selectedItemStyle
+} from '../components/form-controls.mui-styles'
 
 class UnitExplorer extends Component {
   constructor (props) {
@@ -23,15 +30,66 @@ class UnitExplorer extends Component {
       slideIndex: 0,
       searchResult: [],
       searchMode: false,
-      searchText: ''
+      searchText: '',
+      statusFilterValues: []
     }
   }
 
-  handleChange = (value) => {
+  sortMenu (sortBy) {
+    const labels = [
+      [SORT_BY.DATE_ASCENDING, 'Newest'],
+      [SORT_BY.DATE_DESCENDING, 'Oldest'],
+      [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
+      [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
+    ]
+    return labels.map(([sortBy, label], index) => (
+      <MenuItem
+        key={sortBy}
+        value={sortBy}
+        primaryText={label}
+      />
+    ))
+  }
+
+  filterMenu (hintText, options, statusFilterValues) {
+    return (
+      <SelectField
+        multiple
+        hintText={hintText}
+        value={statusFilterValues}
+        onChange={this.handleFilterClicked}
+        autoWidth
+        underlineStyle={noUnderline}
+        hintStyle={sortBoxInputStyle}
+        iconStyle={selectInputIconStyle}
+        labelStyle={sortBoxInputStyle}
+        selectedMenuItemStyle={selectedItemStyle}
+      >
+        { options.map((name) => (
+          <MenuItem
+            key={name}
+            insetChildren
+            checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
+            value={name}
+            primaryText={name}
+          />
+        ))
+        }
+      </SelectField>
+    )
+  }
+
+  handleFilterClicked = (event, index, statusFilterValues) => {
     this.setState({
-      slideIndex: value
+      statusFilterValues: statusFilterValues
     })
-  };
+  }
+
+  handleSortClicked = (event, index, value) => {
+    this.setState({
+      sortBy: value
+    })
+  }
 
   handleAddCaseClicked = (id) => {
     const { dispatch } = this.props
@@ -58,12 +116,27 @@ class UnitExplorer extends Component {
     }
   }
 
+  get filteredUnits () {
+    const { statusFilterValues, sortBy } = this.state
+    const { unitList, currentUserId } = this.props
+    const statusFilter = statusFilterValues.length === 4 || (statusFilterValues.includes('Active') && statusFilterValues.includes('Disabled'))
+      ? unitItem => true
+      : statusFilterValues.includes('Active') ? unitItem => unitItem.metaData && !unitItem.metaData.disabled
+        : statusFilterValues.includes('Disabled') ? unitItem => unitItem.metaData && unitItem.metaData.disabled : unitItem => true
+    const roleFilter = statusFilterValues.length === 4 || (statusFilterValues.includes('Created') && statusFilterValues.includes('Involved'))
+      ? unitItem => true
+      : statusFilterValues.includes('Created') ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
+        : statusFilterValues.includes('Involved') ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
+        (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId)) : unitItem => true
+    const filteredUnits = unitList.filter(unitItem => roleFilter(unitItem) && statusFilter(unitItem)).sort(sorters[sortBy])
+    return filteredUnits
+  }
+
   render () {
-    const { isLoading, unitList, dispatch, currentUserId } = this.props
-    const { searchResult, searchMode, searchText } = this.state
+    const { filteredUnits } = this
+    const { isLoading, dispatch } = this.props
+    const { searchResult, searchMode, searchText, statusFilterValues, sortBy } = this.state
     if (isLoading) return <Preloader />
-    const activeUnits = unitList.filter(unitItem => unitItem.metaData && !unitItem.metaData.disabled)
-    const disabledUnits = unitList.filter(unitItem => unitItem.metaData && unitItem.metaData.disabled)
     return (
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar
@@ -78,45 +151,40 @@ class UnitExplorer extends Component {
         <UnverifiedWarning />
         { searchMode ? (
           <FilteredUnits filteredUnits={searchResult}
-            titleMode={0}
             handleUnitClicked={this.handleUnitClicked}
           />
         ) : (
           <div className='flex-grow flex flex-column overflow-hidden'>
-            <Tabs
-              className='no-shrink'
-              onChange={this.handleChange}
-              value={this.state.slideIndex}
-              inkBarStyle={{backgroundColor: 'white'}}
-            >
-              <Tab label='Active' value={0} />
-              <Tab label='Disabled' value={1} />
-            </Tabs>
-            <div className='flex-grow flex flex-column overflow-auto'>
-              <SwipeableViews
-                index={this.state.slideIndex}
-                onChangeIndex={this.handleChange}
+            <div className='flex bg-very-light-gray'>
+              {this.filterMenu('Status', ['Active', 'Disabled'], statusFilterValues)}
+              {this.filterMenu('My role', ['Created', 'Involved'], statusFilterValues)}
+              <SelectField
+                hintText='Sort by'
+                value={sortBy}
+                onChange={this.handleSortClicked}
+                underlineStyle={noUnderline}
+                hintStyle={sortBoxInputStyle}
+                iconStyle={selectInputIconStyle}
+                labelStyle={sortBoxInputStyle}
+                selectedMenuItemStyle={selectedItemStyle}
               >
-                {/* tab 1 */}
-                <div className='flex-grow bb b--very-light-gray bg-white pb6'>
-                  <FilteredUnitsContainer
-                    filteredUnits={activeUnits}
-                    currentUserId={currentUserId}
+                {this.sortMenu(sortBy)}
+              </SelectField>
+            </div>
+            <div className='flex-grow flex flex-column overflow-auto'>
+              <div className='flex-grow bb b--very-light-gray bg-white pb6'>
+                { filteredUnits.length === 0 ? (
+                  <NoItemMsg item={'unit'} iconType={'location_on'} />
+                ) : (
+                  <FilteredUnits
+                    filteredUnits={filteredUnits}
                     handleUnitClicked={this.handleUnitClicked}
                     handleAddCaseClicked={this.handleAddCaseClicked}
                     showAddBtn
-                    active
                   />
-                </div>
-                {/* tab 2 */}
-                <div className='flex-grow bb b--very-light-gray bg-white pb6'>
-                  <FilteredUnitsContainer
-                    filteredUnits={disabledUnits}
-                    currentUserId={currentUserId}
-                    handleUnitClicked={this.handleUnitClicked}
-                  />
-                </div>
-              </SwipeableViews>
+                )
+                }
+              </div>
             </div>
           </div>
         ) }

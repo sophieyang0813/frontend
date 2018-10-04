@@ -17,13 +17,13 @@ export const sorters = {
     return dateA - dateB
   },
   [SORT_BY.NAME_ASCENDING]: (a, b) => {
-    const nameA = a.title
-    const nameB = b.title
+    const nameA = a.title || a.name
+    const nameB = b.title || b.name
     return nameA.localeCompare(nameB)
   },
   [SORT_BY.NAME_DESCENDING]: (a, b) => {
-    const nameA = a.title
-    const nameB = b.title
+    const nameA = a.title || a.name
+    const nameB = b.title || b.name
     return nameB.localeCompare(nameA)
   }
 }

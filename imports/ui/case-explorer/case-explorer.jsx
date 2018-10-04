@@ -221,7 +221,7 @@ class CaseExplorer extends Component {
                 />)
               }
               name={'case'}
-            /> : (<NoItemMsg item={'case'} buttonOption />)
+            /> : (<NoItemMsg item={'case'} iconType={'card_travel'} buttonOption />)
           }
         </div>
         <div className='absolute right-1 bottom-2'>
