@@ -135,6 +135,7 @@ class ReportExplorer extends Component {
               iconStyle={selectInputIconStyle}
               labelStyle={sortBoxInputStyle}
               selectedMenuItemStyle={selectedItemStyle}
+              dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
             >
               {this.reportFilterMenu(statusFilterValues)}
             </SelectField>
@@ -147,6 +148,7 @@ class ReportExplorer extends Component {
               iconStyle={selectInputIconStyle}
               labelStyle={sortBoxInputStyle}
               selectedMenuItemStyle={selectedItemStyle}
+              dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
             >
               {this.sortMenu(sortBy)}
             </SelectField>

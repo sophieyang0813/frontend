@@ -76,9 +76,7 @@ export class FilterRow extends Component {
 }
 
 FilterRow.propTypes = {
-  filterStatus: PropTypes.bool,
-  myInvolvement: PropTypes.bool,
-  filterLabels: PropTypes.array,
-  handleMyInvolvementClicked: PropTypes.func.isRequired,
+  sortBy: PropTypes.number,
+  statusFilterValues: PropTypes.array,
   handleStatusClicked: PropTypes.func.isRequired
 }
