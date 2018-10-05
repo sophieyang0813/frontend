@@ -31,14 +31,13 @@ class UnitExplorer extends Component {
       searchResult: [],
       searchMode: false,
       searchText: '',
-      statusFilterValues: []
+      statusFilterValues: [],
+      roleFilterValues: []
     }
   }
 
   sortMenu (sortBy) {
     const labels = [
-      [SORT_BY.DATE_ASCENDING, 'Newest'],
-      [SORT_BY.DATE_DESCENDING, 'Oldest'],
       [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
       [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
     ]
@@ -51,25 +50,26 @@ class UnitExplorer extends Component {
     ))
   }
 
-  filterMenu (hintText, options, statusFilterValues) {
+  filterMenu (hintText, options, filterValues, handleFilterClicked) {
     return (
       <SelectField
         multiple
         hintText={hintText}
-        value={statusFilterValues}
-        onChange={this.handleFilterClicked}
+        value={filterValues}
+        onChange={handleFilterClicked}
         autoWidth
         underlineStyle={noUnderline}
         hintStyle={sortBoxInputStyle}
         iconStyle={selectInputIconStyle}
         labelStyle={sortBoxInputStyle}
         selectedMenuItemStyle={selectedItemStyle}
+        dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
       >
         { options.map((name) => (
           <MenuItem
             key={name}
             insetChildren
-            checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
+            checked={filterValues && filterValues.indexOf(name) > -1}
             value={name}
             primaryText={name}
           />
@@ -79,9 +79,15 @@ class UnitExplorer extends Component {
     )
   }
 
-  handleFilterClicked = (event, index, statusFilterValues) => {
+  handleStatusFilterClicked = (event, index, statusFilterValues) => {
     this.setState({
       statusFilterValues: statusFilterValues
+    })
+  }
+
+  handleRoleFilterClicked = (event, index, roleFilterValues) => {
+    this.setState({
+      roleFilterValues: roleFilterValues
     })
   }
 
@@ -117,16 +123,16 @@ class UnitExplorer extends Component {
   }
 
   get filteredUnits () {
-    const { statusFilterValues, sortBy } = this.state
+    const { statusFilterValues, sortBy, roleFilterValues } = this.state
     const { unitList, currentUserId } = this.props
     const statusFilter = statusFilterValues.length === 4 || (statusFilterValues.includes('Active') && statusFilterValues.includes('Disabled'))
       ? unitItem => true
       : statusFilterValues.includes('Active') ? unitItem => unitItem.metaData && !unitItem.metaData.disabled
         : statusFilterValues.includes('Disabled') ? unitItem => unitItem.metaData && unitItem.metaData.disabled : unitItem => true
-    const roleFilter = statusFilterValues.length === 4 || (statusFilterValues.includes('Created') && statusFilterValues.includes('Involved'))
+    const roleFilter = roleFilterValues.length === 2 || (roleFilterValues.includes('Created') && roleFilterValues.includes('Involved'))
       ? unitItem => true
-      : statusFilterValues.includes('Created') ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
-        : statusFilterValues.includes('Involved') ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
+      : roleFilterValues.includes('Created') ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
+        : roleFilterValues.includes('Involved') ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
         (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId)) : unitItem => true
     const filteredUnits = unitList.filter(unitItem => roleFilter(unitItem) && statusFilter(unitItem)).sort(sorters[sortBy])
     return filteredUnits
@@ -135,7 +141,7 @@ class UnitExplorer extends Component {
   render () {
     const { filteredUnits } = this
     const { isLoading, dispatch } = this.props
-    const { searchResult, searchMode, searchText, statusFilterValues, sortBy } = this.state
+    const { searchResult, searchMode, searchText, statusFilterValues, roleFilterValues, sortBy } = this.state
     if (isLoading) return <Preloader />
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -156,8 +162,8 @@ class UnitExplorer extends Component {
         ) : (
           <div className='flex-grow flex flex-column overflow-hidden'>
             <div className='flex bg-very-light-gray'>
-              {this.filterMenu('Status', ['Active', 'Disabled'], statusFilterValues)}
-              {this.filterMenu('My role', ['Created', 'Involved'], statusFilterValues)}
+              {this.filterMenu('Status', ['Active', 'Disabled'], statusFilterValues, this.handleStatusFilterClicked)}
+              {this.filterMenu('My role', ['Created', 'Involved'], roleFilterValues, this.handleRoleFilterClicked)}
               <SelectField
                 hintText='Sort by'
                 value={sortBy}
@@ -167,6 +173,7 @@ class UnitExplorer extends Component {
                 iconStyle={selectInputIconStyle}
                 labelStyle={sortBoxInputStyle}
                 selectedMenuItemStyle={selectedItemStyle}
+                dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
               >
                 {this.sortMenu(sortBy)}
               </SelectField>

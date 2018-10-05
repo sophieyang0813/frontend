@@ -117,6 +117,12 @@ class ReportExplorer extends Component {
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar title='My Reports' onIconClick={() => dispatch(setDrawerState(true))} shadowless />
         <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
+          {/* <FilterRow  - HOW TO UPDATE parent's state (i.e. statusfiltervalue) from child? passing
+          down setState function as props does not work.
+            statusFilterValues={statusFilterValues}
+            handleFilterClicked={this.handleFilterClicked}
+            sortBy={sortBy}
+          />  */}
           <div className='flex bg-very-light-gray'>
             <SelectField
               multiple
