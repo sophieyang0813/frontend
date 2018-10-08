@@ -127,8 +127,9 @@ class UnitExplorer extends Component {
     const { unitList, currentUserId } = this.props
     const statusFilter = statusFilterValues.length === 4 || (statusFilterValues.includes('Active') && statusFilterValues.includes('Disabled'))
       ? unitItem => true
-      : statusFilterValues.includes('Active') ? unitItem => unitItem.metaData && !unitItem.metaData.disabled
-        : statusFilterValues.includes('Disabled') ? unitItem => unitItem.metaData && unitItem.metaData.disabled : unitItem => true
+      : statusFilterValues.includes('Active') ? unitItem => unitItem.is_active
+        : statusFilterValues.includes('Disabled') ? unitItem => !unitItem.is_active
+          : unitItem => true
     const roleFilter = roleFilterValues.length === 2 || (roleFilterValues.includes('Created') && roleFilterValues.includes('Involved'))
       ? unitItem => true
       : roleFilterValues.includes('Created') ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
