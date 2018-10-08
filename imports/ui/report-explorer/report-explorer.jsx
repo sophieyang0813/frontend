@@ -15,15 +15,8 @@ import FontIcon from 'material-ui/FontIcon'
 import { ReportList } from '../report-explorer/report-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
-import MenuItem from 'material-ui/MenuItem'
-import SelectField from 'material-ui/SelectField'
-import {
-  selectInputIconStyle,
-  noUnderline,
-  sortBoxInputStyle,
-  selectedItemStyle
-} from '../components/form-controls.mui-styles'
-import { SORT_BY, sorters } from '../explorer-components/sort-items'
+import { FilterRow } from '../explorer-components/filter-row'
+import { sorters } from '../explorer-components/sort-items'
 
 class ReportExplorer extends Component {
   constructor () {
@@ -33,6 +26,8 @@ class ReportExplorer extends Component {
       statusFilterValues: [],
       sortBy: null
     }
+    this.handleFilterClicked = this.handleFilterClicked.bind(this)
+    this.handleSortClicked = this.handleSortClicked.bind(this)
   }
 
   handleFilterClicked = (event, index, statusFilterValues) => {
@@ -47,19 +42,6 @@ class ReportExplorer extends Component {
     })
   }
 
-  reportFilterMenu (statusFilterValues) {
-    const status = ['Draft', 'Finalized', 'Created By Me']
-    return status.map((name) => (
-      <MenuItem
-        key={name}
-        insetChildren
-        checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
-        value={name}
-        primaryText={name}
-      />
-    ))
-  }
-
   handleOnItemClicked = () => {
     const { dispatch, match } = this.props
     dispatch(storeBreadcrumb(match.url))
@@ -68,22 +50,6 @@ class ReportExplorer extends Component {
   handleOnUnitClicked = (unitId) => {
     const { dispatch } = this.props
     dispatch(push(`/unit/${unitId}/reports/new`))
-  }
-
-  sortMenu (sortBy) {
-    const labels = [
-      [SORT_BY.DATE_ASCENDING, 'Newest'],
-      [SORT_BY.DATE_DESCENDING, 'Oldest'],
-      [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
-      [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
-    ]
-    return labels.map(([sortBy, label], index) => (
-      <MenuItem
-        key={sortBy}
-        value={sortBy}
-        primaryText={label}
-      />
-    ))
   }
 
   makeReportGrouping = memoizeOne(
@@ -119,42 +85,12 @@ class ReportExplorer extends Component {
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar title='My Reports' onIconClick={() => dispatch(setDrawerState(true))} shadowless />
         <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
-          {/* <FilterRow  - HOW TO UPDATE parent's state (i.e. statusfiltervalue) from child? passing
-          down setState function as props does not work.
+          <FilterRow
             statusFilterValues={statusFilterValues}
-            handleFilterClicked={this.handleFilterClicked}
+            onFilterClicked={this.handleFilterClicked}
+            onSortClicked={this.handleSortClicked}
             sortBy={sortBy}
-          />  */}
-          <div className='flex bg-very-light-gray'>
-            <SelectField
-              multiple
-              hintText='View: All Reports'
-              value={statusFilterValues}
-              onChange={this.handleFilterClicked}
-              autoWidth
-              underlineStyle={noUnderline}
-              hintStyle={sortBoxInputStyle}
-              iconStyle={selectInputIconStyle}
-              labelStyle={sortBoxInputStyle}
-              selectedMenuItemStyle={selectedItemStyle}
-              dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
-            >
-              {this.reportFilterMenu(statusFilterValues)}
-            </SelectField>
-            <SelectField
-              hintText='Sort by: Date Added'
-              value={sortBy}
-              onChange={this.handleSortClicked}
-              underlineStyle={noUnderline}
-              hintStyle={sortBoxInputStyle}
-              iconStyle={selectInputIconStyle}
-              labelStyle={sortBoxInputStyle}
-              selectedMenuItemStyle={selectedItemStyle}
-              dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
-            >
-              {this.sortMenu(sortBy)}
-            </SelectField>
-          </div>
+          />
           <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
             { reports.length
               ? <UnitGroupList

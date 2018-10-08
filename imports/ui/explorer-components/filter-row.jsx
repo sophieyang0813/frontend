@@ -11,6 +11,20 @@ import SelectField from 'material-ui/SelectField'
 import { SORT_BY } from '../explorer-components/sort-items'
 
 export class FilterRow extends Component {
+  constructor (props) {
+    super(props)
+    this.handleFilterClicked = this.handleFilterClicked.bind(this)
+    this.handleSortClicked = this.handleSortClicked.bind(this)
+  }
+
+  handleFilterClicked (event, index, values) {
+    this.props.onFilterClicked(event, index, values)
+  }
+
+  handleSortClicked (event, index, values) {
+    this.props.onSortClicked(event, index, values)
+  }
+
   reportFilterMenu (statusFilterValues) {
     const status = ['Draft', 'Finalized', 'Created By Me']
     return status.map((name) => (
@@ -41,14 +55,14 @@ export class FilterRow extends Component {
   }
 
   render () {
-    const { handleFilterClicked, statusFilterValues, sortBy } = this.props
+    const { statusFilterValues, sortBy } = this.props
     return (
       <div className='flex bg-very-light-gray'>
         <SelectField
           multiple
           hintText='View: All Reports'
           value={statusFilterValues}
-          onChange={() => handleFilterClicked()}
+          onChange={this.handleFilterClicked}
           autoWidth
           underlineStyle={noUnderline}
           hintStyle={sortBoxInputStyle}
@@ -77,6 +91,5 @@ export class FilterRow extends Component {
 
 FilterRow.propTypes = {
   sortBy: PropTypes.number,
-  statusFilterValues: PropTypes.array,
-  handleStatusClicked: PropTypes.func.isRequired
+  statusFilterValues: PropTypes.array
 }

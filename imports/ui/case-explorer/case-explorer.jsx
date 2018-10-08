@@ -19,15 +19,8 @@ import { storeBreadcrumb } from '../general-actions'
 import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
-import { SORT_BY, sorters } from '../explorer-components/sort-items'
-import MenuItem from 'material-ui/MenuItem'
-import SelectField from 'material-ui/SelectField'
-import {
-  selectInputIconStyle,
-  noUnderline,
-  sortBoxInputStyle,
-  selectedItemStyle
-} from '../components/form-controls.mui-styles'
+import { FilterRow } from '../explorer-components/filter-row'
+import { sorters } from '../explorer-components/sort-items'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -49,35 +42,6 @@ class CaseExplorer extends Component {
     this.setState({
       sortBy: value
     })
-  }
-
-  filterMenu (statusFilterValues) {
-    const status = ['Open', 'Closed', 'Assigned To Me']
-    return status.map((name) => (
-      <MenuItem
-        key={name}
-        insetChildren
-        checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
-        value={name}
-        primaryText={name}
-      />
-    ))
-  }
-
-  sortMenu (sortBy) {
-    const labels = [
-      [SORT_BY.DATE_ASCENDING, 'Newest'],
-      [SORT_BY.DATE_DESCENDING, 'Oldest'],
-      [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
-      [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
-    ]
-    return labels.map(([sortBy, label], index) => (
-      <MenuItem
-        key={sortBy}
-        value={sortBy}
-        primaryText={label}
-      />
-    ))
   }
 
   handleOnItemClicked = () => {
@@ -183,36 +147,12 @@ class CaseExplorer extends Component {
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
-        <div className='flex bg-very-light-gray'>
-          <SelectField
-            multiple
-            hintText='View: All Cases'
-            value={statusFilterValues}
-            onChange={this.handleFilterClicked}
-            autoWidth
-            underlineStyle={noUnderline}
-            hintStyle={sortBoxInputStyle}
-            iconStyle={selectInputIconStyle}
-            labelStyle={sortBoxInputStyle}
-            selectedMenuItemStyle={selectedItemStyle}
-            dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
-          >
-            {this.filterMenu(statusFilterValues)}
-          </SelectField>
-          <SelectField
-            hintText='Sort by: Date Added'
-            value={sortBy}
-            onChange={this.handleSortClicked}
-            underlineStyle={noUnderline}
-            hintStyle={sortBoxInputStyle}
-            iconStyle={selectInputIconStyle}
-            labelStyle={sortBoxInputStyle}
-            selectedMenuItemStyle={selectedItemStyle}
-            dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
-          >
-            {this.sortMenu(sortBy)}
-          </SelectField>
-        </div>
+        <FilterRow
+          statusFilterValues={statusFilterValues}
+          onFilterClicked={this.handleFilterClicked}
+          onSortClicked={this.handleSortClicked}
+          sortBy={sortBy}
+        />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
           { !isLoading && cases.length
             ? <UnitGroupList
