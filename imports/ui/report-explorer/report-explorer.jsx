@@ -113,6 +113,8 @@ class ReportExplorer extends Component {
     const { statusFilterValues, open, sortBy } = this.state
     if (isLoading) return <Preloader />
     const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, sortBy)
+    const reports = sortBy === 2 || 3 ? reportGrouping.sort(sorters[sortBy]) : reportGrouping
+
     return (
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar title='My Reports' onIconClick={() => dispatch(setDrawerState(true))} shadowless />
@@ -154,9 +156,9 @@ class ReportExplorer extends Component {
             </SelectField>
           </div>
           <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
-            { reportGrouping.length
+            { reports.length
               ? <UnitGroupList
-                unitGroupList={reportGrouping}
+                unitGroupList={reports}
                 expandedListRenderer={({allItems}) => (
                   <ReportList
                     allReports={allItems}

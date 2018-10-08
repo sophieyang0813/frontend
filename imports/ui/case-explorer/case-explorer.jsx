@@ -179,6 +179,7 @@ class CaseExplorer extends Component {
     const { statusFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
     const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, sortBy, allNotifications, unreadNotifications)
+    const cases = sortBy === 2 || 3 ? caseGrouping.sort(sorters[sortBy]) : caseGrouping
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
@@ -213,9 +214,9 @@ class CaseExplorer extends Component {
           </SelectField>
         </div>
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
-          { !isLoading && caseGrouping.length
+          { !isLoading && cases.length
             ? <UnitGroupList
-              unitGroupList={caseGrouping}
+              unitGroupList={cases}
               expandedListRenderer={({allItems}) => (
                 <CaseList
                   allCases={allItems}
