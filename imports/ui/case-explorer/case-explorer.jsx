@@ -55,6 +55,7 @@ class CaseExplorer extends Component {
       this.props.dispatchLoadingResult({caseList})
     }
   }
+
   makeCaseUpdateTimeDict = memoizeOne(
     allNotifications => allNotifications.reduce((dict, curr) => {
       const caseIdStr = curr.caseId.toString()
@@ -134,10 +135,12 @@ class CaseExplorer extends Component {
     }
   )
   render () {
-    const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
+    const { isLoading, caseList, allNotifications, unreadNotifications, searchResult } = this.props
     const { filterStatus, myInvolvement, open } = this.state
     if (isLoading) return <Preloader />
-    const caseGrouping = this.makeCaseGrouping(caseList, filterStatus, myInvolvement, allNotifications, unreadNotifications)
+    console.log('search result', this.props)
+    const caseGrouping = searchResult ? this.makeCaseGrouping(searchResult, filterStatus, myInvolvement, allNotifications, unreadNotifications)
+      : this.makeCaseGrouping(caseList, filterStatus, myInvolvement, allNotifications, unreadNotifications)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
@@ -211,8 +214,13 @@ const connectedWrapper = connect(
   }
 }, CaseExplorer))
 
-connectedWrapper.MobileHeader = ({onIconClick}) => (
-  <RootAppBar title='Cases' onIconClick={onIconClick} />
+connectedWrapper.MobileHeader = ({onIconClick, searchText, onSearchChanged}) => (
+  <RootAppBar title='Cases'
+    onIconClick={onIconClick}
+    searchText={searchText}
+    onSearchChanged={onSearchChanged}
+    showSearch
+  />
 )
 
 connectedWrapper.MobileHeader.propTypes = {

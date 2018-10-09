@@ -22,6 +22,8 @@ import {
 import {
   emptyPaneIconStyle
 } from './case-master.mui-styles'
+import Cases, { collectionName} from '../../api/cases'
+import UnitMetaData from '../../api/unit-meta-data'
 
 const isMobileScreen = window.matchMedia('screen and (max-width: 768px)').matches
 
@@ -31,7 +33,11 @@ class CaseMaster extends Component {
     this.state = {
       componentsProps: {},
       isLoading: true,
-      isSubLoading: false
+      isSubLoading: false,
+      searchText: '',
+      searchResult: [],
+      searchMode: false
+
     }
     this.routes = [
       {
@@ -82,8 +88,24 @@ class CaseMaster extends Component {
   handleIconClick = () => {
     this.props.dispatch(setDrawerState(true))
   }
+
+  handleSearch = (searchText) => {
+    this.setState({searchText})
+    if (searchText === '') {
+      this.setState({searchMode: false})
+    } else {
+      this.setState({searchMode: true})
+      const matcher = new RegExp(searchText, 'i')
+      const searchResult = this.props.caseList
+        .filter(casi => !matcher || (casi.title && casi.title.match(matcher)))
+      this.setState({
+        searchResult: searchResult
+      })
+    }
+  }
+
   render () {
-    const { isLoading, componentsProps } = this.state
+    const { isLoading, componentsProps, searchText, searchResult } = this.state
     const { user } = this.props
     return (
       <div className='flex flex-column full-height roboto overflow-hidden'>
@@ -93,7 +115,11 @@ class CaseMaster extends Component {
           <Switch>
             {this.routes.map(({path, RouteComp, exact = false}) => (
               <Route key={path} exact={exact} path={path} render={() => (
-                <RouteComp.MobileHeader contentProps={componentsProps[path]} onIconClick={this.handleIconClick} />
+                <RouteComp.MobileHeader contentProps={componentsProps[path]}
+                  onIconClick={this.handleIconClick}
+                  searchText={searchText}
+                  onSearchChanged={this.handleSearch}
+                />
               )} />
             ))}
           </Switch>
@@ -134,11 +160,13 @@ class CaseMaster extends Component {
         ) : (
           <div className={isLoading ? 'dn' : 'flex flex-grow overflow-hidden'}>
             <div className='flex-3'>
-              <CaseExplorer dispatchLoadingResult={() => {
-                this.setState({
-                  isLoading: false
-                })
-              }} />
+              <CaseExplorer
+                searchResult={searchResult}
+                dispatchLoadingResult={() => {
+                  this.setState({
+                    isLoading: false
+                  })
+                }} />
             </div>
             <div className='flex-10 flex items-center justify-center bg-very-light-gray h-100'>
               <Route path='/case/:caseId' children={({match}) => {
@@ -176,7 +204,24 @@ class CaseMaster extends Component {
 CaseMaster.propTypes = {
   user: PropTypes.object.isRequired
 }
+// export default connect(() => ({}))(createContainer(() => ({
+//   user: Meteor.user() || {}
+// }), CaseMaster))
 
-export default connect(() => ({}))(createContainer(() => ({
-  user: Meteor.user() || {}
-}), CaseMaster))
+let casesError
+export default connect(() => ({}))(createContainer(() => { // map meteor state to props
+  const casesHandle = Meteor.subscribe(`${collectionName}.associatedWithMe`, {
+    onStop: (error) => {
+      casesError = error
+    }
+  })
+  return {
+    caseList: Cases.find().fetch().map(caseItem => Object.assign({}, caseItem, {
+      unitType: (UnitMetaData.findOne({bzName: caseItem.selectedUnit}) || {}).unitType,
+      selectedUnitBzId: (UnitMetaData.findOne({bzName: caseItem.selectedUnit}) || {}).bzId
+    })),
+    isLoading: !casesHandle.ready(),
+    user: Meteor.user() || {},
+    casesError
+  }
+}, CaseMaster))

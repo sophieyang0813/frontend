@@ -22,10 +22,15 @@ class RootAppBar extends Component {
     this.state = {
       searchTextDisplay: false
     }
+    this.handleSearch = this.handleSearch.bind(this)
+  }
+
+  handleSearch (evt) {
+    this.props.onSearchChanged(evt.target.value)
   }
 
   render () {
-    const { title, onSearchChanged, placeholder, onIconClick, shadowless, searchText, showSearch } = this.props
+    const { title, placeholder, onIconClick, shadowless, searchText, showSearch } = this.props
     const { searchTextDisplay } = this.state
     return (
       <AppBar
@@ -39,7 +44,8 @@ class RootAppBar extends Component {
               hintStyle={whiteInput}
               fullWidth
               value={searchText}
-              onChange={(evt) => onSearchChanged(evt.target.value)}
+              // onChange={(evt) => onSearchChanged(evt.target.value)}
+              onChange={this.handleSearch}
             />
           )
           : (title)
