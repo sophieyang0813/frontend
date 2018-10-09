@@ -16,7 +16,7 @@ import { ReportList } from '../report-explorer/report-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import { FilterRow } from '../explorer-components/filter-row'
-import { sorters } from '../explorer-components/sort-items'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
 
 class ReportExplorer extends Component {
   constructor () {
@@ -24,15 +24,20 @@ class ReportExplorer extends Component {
     this.state = {
       open: false,
       statusFilterValues: [],
+      roleFilterValues: [],
       sortBy: null
     }
-    this.handleFilterClicked = this.handleFilterClicked.bind(this)
-    this.handleSortClicked = this.handleSortClicked.bind(this)
   }
 
-  handleFilterClicked = (event, index, statusFilterValues) => {
+  handleStatusFilterClicked = (event, index, statusFilterValues) => {
     this.setState({
       statusFilterValues: statusFilterValues
+    })
+  }
+
+  handleRoleFilterClicked = (event, index, roleFilterValues) => {
+    this.setState({
+      roleFilterValues: roleFilterValues
     })
   }
 
@@ -76,10 +81,12 @@ class ReportExplorer extends Component {
 
   render () {
     const { isLoading, dispatch, reportList } = this.props
-    const { statusFilterValues, open, sortBy } = this.state
+    const { statusFilterValues, roleFilterValues, open, sortBy } = this.state
     if (isLoading) return <Preloader />
     const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, sortBy)
-    const reports = sortBy === 2 || 3 ? reportGrouping.sort(sorters[sortBy]) : reportGrouping
+    const defaultReportList = reportGrouping.sort(sorters[SORT_BY.NAME_ASCENDING])
+    const reports = sortBy === null ? defaultReportList
+      : sortBy === SORT_BY.NAME_ASCENDING || SORT_BY.NAME_DESCENDING ? reportGrouping.sort(sorters[sortBy]) : reportGrouping
 
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -87,9 +94,13 @@ class ReportExplorer extends Component {
         <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
           <FilterRow
             statusFilterValues={statusFilterValues}
-            onFilterClicked={this.handleFilterClicked}
+            roleFilterValues={roleFilterValues}
+            onFilterClicked={this.handleStatusFilterClicked}
+            onRoleFilterClicked={this.handleRoleFilterClicked}
             onSortClicked={this.handleSortClicked}
             sortBy={sortBy}
+            status={['Draft', 'Finalized']}
+            roles={['Created By Me']}
           />
           <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
             { reports.length

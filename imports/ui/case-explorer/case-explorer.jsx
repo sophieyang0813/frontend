@@ -20,7 +20,7 @@ import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import { FilterRow } from '../explorer-components/filter-row'
-import { sorters } from '../explorer-components/sort-items'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -29,12 +29,19 @@ class CaseExplorer extends Component {
       caseId: '',
       open: false,
       statusFilterValues: [],
+      roleFilterValues: [],
       sortBy: null
     }
   }
-  handleFilterClicked = (event, index, statusFilterValues) => {
+  handleStatusFilterClicked = (event, index, statusFilterValues) => {
     this.setState({
       statusFilterValues: statusFilterValues
+    })
+  }
+
+  handleRoleFilterClicked = (event, index, roleFilterValues) => {
+    this.setState({
+      roleFilterValues: roleFilterValues
     })
   }
 
@@ -140,18 +147,26 @@ class CaseExplorer extends Component {
   )
   render () {
     const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
-    const { statusFilterValues, sortBy, open } = this.state
+    const { statusFilterValues, roleFilterValues, sortBy, open } = this.state
+
     if (isLoading) return <Preloader />
     const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, sortBy, allNotifications, unreadNotifications)
-    const cases = sortBy === 2 || 3 ? caseGrouping.sort(sorters[sortBy]) : caseGrouping
+    const defaultCaseList = caseGrouping.sort(sorters[SORT_BY.NAME_ASCENDING])
+    const cases = sortBy === null ? defaultCaseList
+      : sortBy === SORT_BY.NAME_ASCENDING || SORT_BY.NAME_DESCENDING ? caseGrouping.sort(sorters[sortBy]) : caseGrouping
+
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
         <FilterRow
           statusFilterValues={statusFilterValues}
-          onFilterClicked={this.handleFilterClicked}
+          roleFilterValues={roleFilterValues}
+          onFilterClicked={this.handleStatusFilterClicked}
+          onRoleFilterClicked={this.handleRoleFilterClicked}
           onSortClicked={this.handleSortClicked}
           sortBy={sortBy}
+          status={['Open', 'Closed']}
+          roles={['Assigned to Me']}
         />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
           { !isLoading && cases.length

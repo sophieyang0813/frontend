@@ -15,13 +15,7 @@ import FilteredUnits from './filtered-units'
 import { SORT_BY, sorters } from '../explorer-components/sort-items'
 import MenuItem from 'material-ui/MenuItem'
 import { NoItemMsg } from '../explorer-components/no-item-msg'
-import SelectField from 'material-ui/SelectField'
-import {
-  selectInputIconStyle,
-  noUnderline,
-  sortBoxInputStyle,
-  selectedItemStyle
-} from '../components/form-controls.mui-styles'
+import { FilterRow } from '../explorer-components/filter-row'
 
 class UnitExplorer extends Component {
   constructor (props) {
@@ -48,35 +42,6 @@ class UnitExplorer extends Component {
         primaryText={label}
       />
     ))
-  }
-
-  filterMenu (hintText, options, filterValues, handleFilterClicked) {
-    return (
-      <SelectField
-        multiple
-        hintText={hintText}
-        value={filterValues}
-        onChange={handleFilterClicked}
-        autoWidth
-        underlineStyle={noUnderline}
-        hintStyle={sortBoxInputStyle}
-        iconStyle={selectInputIconStyle}
-        labelStyle={sortBoxInputStyle}
-        selectedMenuItemStyle={selectedItemStyle}
-        dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
-      >
-        { options.map((name) => (
-          <MenuItem
-            key={name}
-            insetChildren
-            checked={filterValues && filterValues.indexOf(name) > -1}
-            value={name}
-            primaryText={name}
-          />
-        ))
-        }
-      </SelectField>
-    )
   }
 
   handleStatusFilterClicked = (event, index, statusFilterValues) => {
@@ -140,9 +105,11 @@ class UnitExplorer extends Component {
   }
 
   render () {
+    const { isLoading, dispatch, unitList } = this.props
     const { filteredUnits } = this
-    const { isLoading, dispatch } = this.props
+    const defaultUnitList = unitList.filter(unitItem => unitItem.is_active).sort(sorters['2'])
     const { searchResult, searchMode, searchText, statusFilterValues, roleFilterValues, sortBy } = this.state
+    const units = statusFilterValues.length !== 0 || roleFilterValues.length !== 0 ? filteredUnits : defaultUnitList
     if (isLoading) return <Preloader />
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -162,30 +129,27 @@ class UnitExplorer extends Component {
           />
         ) : (
           <div className='flex-grow flex flex-column overflow-hidden'>
-            <div className='flex bg-very-light-gray'>
-              {this.filterMenu('Status', ['Active', 'Disabled'], statusFilterValues, this.handleStatusFilterClicked)}
-              {this.filterMenu('My role', ['Created', 'Involved'], roleFilterValues, this.handleRoleFilterClicked)}
-              <SelectField
-                hintText='Sort by'
-                value={sortBy}
-                onChange={this.handleSortClicked}
-                underlineStyle={noUnderline}
-                hintStyle={sortBoxInputStyle}
-                iconStyle={selectInputIconStyle}
-                labelStyle={sortBoxInputStyle}
-                selectedMenuItemStyle={selectedItemStyle}
-                dropDownMenuProps={{anchorOrigin: {vertical: 'bottom', horizontal: 'left'}}}
-              >
-                {this.sortMenu(sortBy)}
-              </SelectField>
-            </div>
+            <FilterRow
+              statusFilterValues={statusFilterValues}
+              roleFilterValues={roleFilterValues}
+              onFilterClicked={this.handleStatusFilterClicked}
+              onRoleFilterClicked={this.handleRoleFilterClicked}
+              onSortClicked={this.handleSortClicked}
+              sortBy={sortBy}
+              status={['Active', 'Disabled']}
+              roles={['Created', 'Involved']}
+              labels={[
+                [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
+                [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
+              ]}
+            />
             <div className='flex-grow flex flex-column overflow-auto'>
               <div className='flex-grow bb b--very-light-gray bg-white pb6'>
                 { filteredUnits.length === 0 ? (
                   <NoItemMsg item={'unit'} iconType={'location_on'} />
                 ) : (
                   <FilteredUnits
-                    filteredUnits={filteredUnits}
+                    filteredUnits={units}
                     handleUnitClicked={this.handleUnitClicked}
                     handleAddCaseClicked={this.handleAddCaseClicked}
                     showAddBtn

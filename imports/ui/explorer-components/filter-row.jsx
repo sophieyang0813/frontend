@@ -13,25 +13,29 @@ import { SORT_BY } from '../explorer-components/sort-items'
 export class FilterRow extends Component {
   constructor (props) {
     super(props)
-    this.handleFilterClicked = this.handleFilterClicked.bind(this)
+    this.handleStatusFilterClicked = this.handleStatusFilterClicked.bind(this)
+    this.handleRoleFilterClicked = this.handleRoleFilterClicked.bind(this)
     this.handleSortClicked = this.handleSortClicked.bind(this)
   }
 
-  handleFilterClicked (event, index, values) {
+  handleStatusFilterClicked (event, index, values) {
     this.props.onFilterClicked(event, index, values)
+  }
+
+  handleRoleFilterClicked (event, index, values) {
+    this.props.onRoleFilterClicked(event, index, values)
   }
 
   handleSortClicked (event, index, values) {
     this.props.onSortClicked(event, index, values)
   }
 
-  reportFilterMenu (statusFilterValues) {
-    const status = ['Draft', 'Finalized', 'Created By Me']
-    return status.map((name) => (
+  filterMenu (filterValues, menuItem) {
+    return menuItem.map((name) => (
       <MenuItem
         key={name}
         insetChildren
-        checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
+        checked={filterValues && filterValues.indexOf(name) > -1}
         value={name}
         primaryText={name}
       />
@@ -39,7 +43,7 @@ export class FilterRow extends Component {
   }
 
   sortMenu (sortBy) {
-    const labels = [
+    const labels = this.props.labels || [
       [SORT_BY.DATE_ASCENDING, 'Newest'],
       [SORT_BY.DATE_DESCENDING, 'Oldest'],
       [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
@@ -55,14 +59,14 @@ export class FilterRow extends Component {
   }
 
   render () {
-    const { statusFilterValues, sortBy } = this.props
+    const { statusFilterValues, roleFilterValues, sortBy, roles, status } = this.props
     return (
       <div className='flex bg-very-light-gray'>
         <SelectField
           multiple
-          hintText='View: All Reports'
+          hintText='Status'
           value={statusFilterValues}
-          onChange={this.handleFilterClicked}
+          onChange={this.handleStatusFilterClicked}
           autoWidth
           underlineStyle={noUnderline}
           hintStyle={sortBoxInputStyle}
@@ -70,10 +74,24 @@ export class FilterRow extends Component {
           labelStyle={sortBoxInputStyle}
           selectedMenuItemStyle={selectedItemStyle}
         >
-          {this.reportFilterMenu(statusFilterValues)}
+          {this.filterMenu(statusFilterValues, status)}
         </SelectField>
         <SelectField
-          hintText='Sort by: Date Added'
+          multiple
+          hintText='Role'
+          value={roleFilterValues}
+          onChange={this.handleRoleFilterClicked}
+          autoWidth
+          underlineStyle={noUnderline}
+          hintStyle={sortBoxInputStyle}
+          iconStyle={selectInputIconStyle}
+          labelStyle={sortBoxInputStyle}
+          selectedMenuItemStyle={selectedItemStyle}
+        >
+          {this.filterMenu(roleFilterValues, roles)}
+        </SelectField>
+        <SelectField
+          hintText='Sort by'
           value={sortBy}
           onChange={this.handleSortClicked}
           underlineStyle={noUnderline}
