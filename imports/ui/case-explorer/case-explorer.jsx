@@ -10,6 +10,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton'
 import memoizeOne from 'memoize-one'
 import Cases, { collectionName, isClosed } from '../../api/cases'
 import CaseNotifications, { collectionName as notifCollName } from '../../api/case-notifications'
+import Units, { collectionName as unitCollName } from '../../api/units'
 import UnitMetaData from '../../api/unit-meta-data'
 import RootAppBar from '../components/root-app-bar'
 import Preloader from '../preloader/preloader'
@@ -103,10 +104,10 @@ class CaseExplorer extends Component {
       // Building a unit dictionary to group the cases together
       const unitsDict = caseList.sort(sorters[sortBy]).reduce((dict, caseItem) => {
         if (openFilter(caseItem) && assignedFilter(caseItem)) { // Filtering only the cases that match the selection
-          const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
+          const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType, isActive } = caseItem
 
           // Pulling the existing or creating a new dictionary entry if none
-          const unitDesc = dict[unitTitle] = dict[unitTitle] || {cases: [], bzId, unitType}
+          const unitDesc = dict[unitTitle] = dict[unitTitle] || {cases: [], bzId, unitType, isActive}
           const caseIdStr = caseItem.id.toString()
 
           // Adding the latest update time to the case for easier sorting later
@@ -122,7 +123,7 @@ class CaseExplorer extends Component {
 
       // Creating a case grouping *array* from the unit dictionary
       return Object.keys(unitsDict).reduce((all, unitTitle) => {
-        const { bzId, cases, unitType } = unitsDict[unitTitle]
+        const { bzId, cases, unitType, isActive } = unitsDict[unitTitle]
 
         // Sorting cases within a unit by the order descending order of last update
         cases.sort((a, b) => b.latestUpdate - a.latestUpdate)
@@ -132,7 +133,8 @@ class CaseExplorer extends Component {
           items: cases,
           unitType,
           unitTitle,
-          bzId
+          bzId,
+          isActive
         })
         return all
       }, []).sort((a, b) => b.latestCaseUpdate - a.latestCaseUpdate) // Sorting by the latest case update for each
@@ -148,7 +150,6 @@ class CaseExplorer extends Component {
   render () {
     const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
     const { statusFilterValues, roleFilterValues, sortBy, open } = this.state
-
     if (isLoading) return <Preloader />
     const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, sortBy, allNotifications, unreadNotifications)
     const defaultCaseList = caseGrouping.sort(sorters[SORT_BY.NAME_ASCENDING])
@@ -207,6 +208,7 @@ CaseExplorer.propTypes = {
 }
 
 let casesError
+let unitsError
 const connectedWrapper = connect(
   () => ({}) // map redux state to props
 )(createContainer(() => { // map meteor state to props
@@ -216,18 +218,25 @@ const connectedWrapper = connect(
     }
   })
   const notifsHandle = Meteor.subscribe(`${notifCollName}.myUpdates`)
+  const unitsHandle = Meteor.subscribe(`${unitCollName}.forBrowsing`, {
+    onStop: (error) => {
+      unitsError = error
+    }
+  })
   return {
     caseList: Cases.find().fetch().map(caseItem => Object.assign({}, caseItem, {
       unitType: (UnitMetaData.findOne({bzName: caseItem.selectedUnit}) || {}).unitType,
-      selectedUnitBzId: (UnitMetaData.findOne({bzName: caseItem.selectedUnit}) || {}).bzId
+      selectedUnitBzId: (UnitMetaData.findOne({bzName: caseItem.selectedUnit}) || {}).bzId,
+      isActive: (Units.findOne({name: caseItem.selectedUnit}) || {}).is_active
     })),
     allNotifications: notifsHandle.ready() ? CaseNotifications.find().fetch() : [],
     unreadNotifications: notifsHandle.ready() ? CaseNotifications.find({
       markedAsRead: {$ne: true}
     }).fetch() : [],
-    isLoading: !casesHandle.ready() || !notifsHandle.ready(),
+    isLoading: !casesHandle.ready() || !notifsHandle.ready() || !unitsHandle.ready(),
     currentUser: Meteor.subscribe('users.myBzLogin').ready() ? Meteor.user() : null,
-    casesError
+    casesError,
+    unitsError
   }
 }, CaseExplorer))
 
