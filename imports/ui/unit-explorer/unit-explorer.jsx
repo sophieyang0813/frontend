@@ -26,7 +26,8 @@ class UnitExplorer extends Component {
       searchMode: false,
       searchText: '',
       statusFilterValues: [],
-      roleFilterValues: []
+      roleFilterValues: [],
+      sortBy: null
     }
   }
 
@@ -109,7 +110,7 @@ class UnitExplorer extends Component {
     const { filteredUnits } = this
     const defaultUnitList = unitList.filter(unitItem => unitItem.is_active).sort(sorters['2'])
     const { searchResult, searchMode, searchText, statusFilterValues, roleFilterValues, sortBy } = this.state
-    const units = statusFilterValues.length !== 0 || roleFilterValues.length !== 0 ? filteredUnits : defaultUnitList
+    const units = statusFilterValues.length !== 0 || roleFilterValues.length !== 0 || sortBy !== null ? filteredUnits : defaultUnitList
     if (isLoading) return <Preloader />
     return (
       <div className='flex flex-column flex-grow full-height'>
