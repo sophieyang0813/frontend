@@ -58,11 +58,11 @@ class ReportExplorer extends Component {
   }
 
   makeReportGrouping = memoizeOne(
-    (reportList, statusFilterValues, sortBy) => {
+    (reportList, statusFilterValues, roleFilterValues, sortBy) => {
       const statusFilter = (statusFilterValues.includes('Draft') && statusFilterValues.includes('Finalized')) ? report => true
         : statusFilterValues.includes('Draft') ? report => report.status === REPORT_DRAFT_STATUS
           : statusFilterValues.includes('Finalized') ? report => report.status !== REPORT_DRAFT_STATUS : report => true
-      const creatorFilter = statusFilterValues.includes('Created') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+      const creatorFilter = roleFilterValues.includes('Created') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
       const unitDict = reportList.sort(sorters[sortBy]).reduce((dict, reportItem) => {
         if (statusFilter(reportItem) && creatorFilter(reportItem)) {
           const { selectedUnit: unitBzName, unitMetaData: metaData } = reportItem
@@ -83,7 +83,7 @@ class ReportExplorer extends Component {
     const { isLoading, dispatch, reportList } = this.props
     const { statusFilterValues, roleFilterValues, open, sortBy } = this.state
     if (isLoading) return <Preloader />
-    const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, sortBy)
+    const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, roleFilterValues, sortBy)
     const defaultReportList = reportGrouping.sort(sorters[SORT_BY.NAME_ASCENDING])
     const reports = sortBy === null ? defaultReportList
       : sortBy === SORT_BY.NAME_ASCENDING || SORT_BY.NAME_DESCENDING ? reportGrouping.sort(sorters[sortBy]) : reportGrouping
