@@ -29,7 +29,7 @@ class CaseExplorer extends Component {
       caseId: '',
       open: false,
       statusFilterValues: null,
-      roleFilterValues: null,
+      roleFilterValues: [],
       sortBy: null
     }
   }
@@ -94,7 +94,7 @@ class CaseExplorer extends Component {
   makeCaseGrouping = memoizeOne(
     (caseList, statusFilterValues, roleFilterValues, sortBy, allNotifs, unreadNotifs) => {
       const openFilter = statusFilterValues === 'Closed' ? x => isClosed(x) : x => !isClosed(x)
-      const assignedFilter = roleFilterValues === 'Assigned' ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+      const assignedFilter = roleFilterValues.includes('Assigned') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
@@ -102,7 +102,6 @@ class CaseExplorer extends Component {
       const unitsDict = caseList.sort(sorters[sortBy]).reduce((dict, caseItem) => {
         if (openFilter(caseItem) && assignedFilter(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
-          // console.log('caseItem', caseItem)
           // Pulling the existing or creating a new dictionary entry if none
           const unitDesc = dict[unitTitle] = dict[unitTitle] || {cases: [], bzId, unitType}
           const caseIdStr = caseItem.id.toString()
@@ -148,6 +147,7 @@ class CaseExplorer extends Component {
     if (isLoading) return <Preloader />
     const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, roleFilterValues, sortBy, allNotifications, unreadNotifications)
     const cases = caseGrouping.sort(sorters[sortBy])
+    console.log('caseGrouping', caseGrouping)
 
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>

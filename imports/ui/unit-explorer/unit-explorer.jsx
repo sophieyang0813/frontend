@@ -108,7 +108,7 @@ class UnitExplorer extends Component {
   render () {
     const { isLoading, dispatch, unitList } = this.props
     const { filteredUnits } = this
-    const defaultUnitList = unitList.filter(unitItem => unitItem.is_active).sort(sorters['2'])
+    const defaultUnitList = unitList.filter(unitItem => unitItem.is_active).sort(sorters[SORT_BY.NAME_ASCENDING])
     const { searchResult, searchMode, searchText, statusFilterValues, roleFilterValues, sortBy } = this.state
     const units = statusFilterValues.length !== 0 || roleFilterValues.length !== 0 || sortBy !== null ? filteredUnits : defaultUnitList
     if (isLoading) return <Preloader />
