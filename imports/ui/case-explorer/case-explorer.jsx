@@ -20,7 +20,7 @@ import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import { FilterRow } from '../explorer-components/filter-row'
-import { SORT_BY, sorters } from '../explorer-components/sort-items'
+import { sorters } from '../explorer-components/sort-items'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -28,8 +28,8 @@ class CaseExplorer extends Component {
     this.state = {
       caseId: '',
       open: false,
-      statusFilterValues: [],
-      roleFilterValues: [],
+      statusFilterValues: null,
+      roleFilterValues: null,
       sortBy: null
     }
   }
@@ -92,11 +92,9 @@ class CaseExplorer extends Component {
     (a, b) => a.length === b.length
   )
   makeCaseGrouping = memoizeOne(
-    (caseList, statusFilterValues, sortBy, allNotifs, unreadNotifs) => {
-      const openFilter = statusFilterValues.length === 3 || (statusFilterValues.includes('Open') && statusFilterValues.includes('Closed')) ? x => true
-        : statusFilterValues.includes('Open') ? x => !isClosed(x)
-          : statusFilterValues.includes('Closed') ? x => isClosed(x) : x => true
-      const assignedFilter = statusFilterValues.includes('Assigned To Me') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+    (caseList, statusFilterValues, roleFilterValues, sortBy, allNotifs, unreadNotifs) => {
+      const openFilter = statusFilterValues === 'Closed' ? x => isClosed(x) : x => !isClosed(x)
+      const assignedFilter = roleFilterValues === 'Assigned' ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
@@ -104,7 +102,7 @@ class CaseExplorer extends Component {
       const unitsDict = caseList.sort(sorters[sortBy]).reduce((dict, caseItem) => {
         if (openFilter(caseItem) && assignedFilter(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
-
+          // console.log('caseItem', caseItem)
           // Pulling the existing or creating a new dictionary entry if none
           const unitDesc = dict[unitTitle] = dict[unitTitle] || {cases: [], bzId, unitType}
           const caseIdStr = caseItem.id.toString()
@@ -119,7 +117,6 @@ class CaseExplorer extends Component {
         }
         return dict
       }, {})
-
       // Creating a case grouping *array* from the unit dictionary
       return Object.keys(unitsDict).reduce((all, unitTitle) => {
         const { bzId, cases, unitType } = unitsDict[unitTitle]
@@ -148,12 +145,9 @@ class CaseExplorer extends Component {
   render () {
     const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
     const { statusFilterValues, roleFilterValues, sortBy, open } = this.state
-
     if (isLoading) return <Preloader />
-    const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, sortBy, allNotifications, unreadNotifications)
-    const defaultCaseList = caseGrouping.sort(sorters[SORT_BY.NAME_ASCENDING])
-    const cases = sortBy === null ? defaultCaseList
-      : sortBy === SORT_BY.NAME_ASCENDING || SORT_BY.NAME_DESCENDING ? caseGrouping.sort(sorters[sortBy]) : caseGrouping
+    const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, roleFilterValues, sortBy, allNotifications, unreadNotifications)
+    const cases = caseGrouping.sort(sorters[sortBy])
 
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
@@ -166,7 +160,7 @@ class CaseExplorer extends Component {
           onSortClicked={this.handleSortClicked}
           sortBy={sortBy}
           status={['Open', 'Closed']}
-          roles={['Assigned to Me']}
+          roles={['Assigned']}
         />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
           { !isLoading && cases.length

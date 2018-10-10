@@ -34,8 +34,8 @@ export class FilterRow extends Component {
     return menuItem.map((name) => (
       <MenuItem
         key={name}
-        insetChildren
-        checked={filterValues && filterValues.indexOf(name) > -1}
+        // insetChildren
+        // checked={filterValues && filterValues.indexOf(name) > -1}
         value={name}
         primaryText={name}
       />
@@ -63,7 +63,7 @@ export class FilterRow extends Component {
     return (
       <div className='flex bg-very-light-gray'>
         <SelectField
-          multiple
+          // multiple
           hintText='Status'
           value={statusFilterValues}
           onChange={this.handleStatusFilterClicked}
@@ -78,7 +78,7 @@ export class FilterRow extends Component {
         </SelectField>
         <SelectField
           multiple
-          hintText='Role'
+          hintText='My role'
           value={roleFilterValues}
           onChange={this.handleRoleFilterClicked}
           autoWidth
@@ -109,5 +109,5 @@ export class FilterRow extends Component {
 
 FilterRow.propTypes = {
   sortBy: PropTypes.number,
-  statusFilterValues: PropTypes.array
+  statusFilterValues: PropTypes.string
 }
