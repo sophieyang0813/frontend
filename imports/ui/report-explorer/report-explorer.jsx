@@ -59,8 +59,9 @@ class ReportExplorer extends Component {
 
   makeReportGrouping = memoizeOne(
     (reportList, statusFilterValues, sortBy) => {
-      const statusFilter = statusFilterValues === 'Draft' ? report => report.status === REPORT_DRAFT_STATUS
-        : statusFilterValues === 'Finalized' ? report => report.status !== REPORT_DRAFT_STATUS : report => true
+      const statusFilter = (statusFilterValues.includes('Draft') && statusFilterValues.includes('Finalized')) ? report => true
+        : statusFilterValues.includes('Draft') ? report => report.status === REPORT_DRAFT_STATUS
+          : statusFilterValues.includes('Finalized') ? report => report.status !== REPORT_DRAFT_STATUS : report => true
       const creatorFilter = statusFilterValues.includes('Created') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
       const unitDict = reportList.sort(sorters[sortBy]).reduce((dict, reportItem) => {
         if (statusFilter(reportItem) && creatorFilter(reportItem)) {
@@ -100,6 +101,7 @@ class ReportExplorer extends Component {
             sortBy={sortBy}
             status={['Draft', 'Finalized']}
             roles={['Created']}
+            report
           />
           <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
             { reports.length

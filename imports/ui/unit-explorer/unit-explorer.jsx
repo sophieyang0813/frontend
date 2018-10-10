@@ -108,7 +108,6 @@ class UnitExplorer extends Component {
   render () {
     const { isLoading, dispatch, unitList } = this.props
     const { filteredUnits } = this
-    console.log('filteredUnits', filteredUnits)
     const defaultUnitList = unitList.filter(unitItem => unitItem.is_active).sort(sorters['2'])
     const { searchResult, searchMode, searchText, statusFilterValues, roleFilterValues, sortBy } = this.state
     const units = statusFilterValues.length !== 0 || roleFilterValues.length !== 0 || sortBy !== null ? filteredUnits : defaultUnitList
