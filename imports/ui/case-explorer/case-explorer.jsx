@@ -20,7 +20,7 @@ import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import { FilterRow } from '../explorer-components/filter-row'
-import { sorters } from '../explorer-components/sort-items'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -146,7 +146,8 @@ class CaseExplorer extends Component {
     const { statusFilterValues, roleFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
     const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, roleFilterValues, sortBy, allNotifications, unreadNotifications)
-    const cases = caseGrouping.sort(sorters[sortBy])
+    const defaultList = caseGrouping.sort(sorters[SORT_BY.DATE_ASCENDING])
+    const cases = sortBy ? caseGrouping.sort(sorters[sortBy]) : defaultList
 
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
