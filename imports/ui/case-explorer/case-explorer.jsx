@@ -29,7 +29,7 @@ class CaseExplorer extends Component {
       caseId: '',
       open: false,
       statusFilterValues: null,
-      roleFilterValues: [],
+      roleFilterValues: null,
       sortBy: null
     }
   }
@@ -93,8 +93,11 @@ class CaseExplorer extends Component {
   )
   makeCaseGrouping = memoizeOne(
     (caseList, statusFilterValues, roleFilterValues, sortBy, allNotifs, unreadNotifs) => {
-      const openFilter = statusFilterValues === 'Closed' ? x => isClosed(x) : x => !isClosed(x)
-      const assignedFilter = roleFilterValues.includes('Assigned') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+      const openFilter = statusFilterValues === 'All' ? x => true
+        : statusFilterValues === 'Open' ? x => !isClosed(x)
+          : statusFilterValues === 'Closed' ? x => isClosed(x) : x => !isClosed(x)
+      const assignedFilter = roleFilterValues === 'All' ? x => true
+        : roleFilterValues === 'Assigned to me' ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
@@ -146,7 +149,7 @@ class CaseExplorer extends Component {
     const { statusFilterValues, roleFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
     const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, roleFilterValues, sortBy, allNotifications, unreadNotifications)
-    const defaultList = caseGrouping.sort(sorters[SORT_BY.DATE_ASCENDING])
+    const defaultList = caseGrouping.sort(sorters[SORT_BY.DATE_DESCENDING])
     const cases = sortBy ? caseGrouping.sort(sorters[sortBy]) : defaultList
 
     return (
@@ -159,8 +162,9 @@ class CaseExplorer extends Component {
           onRoleFilterClicked={this.handleRoleFilterClicked}
           onSortClicked={this.handleSortClicked}
           sortBy={sortBy}
-          status={['Open', 'Closed']}
-          roles={['Assigned']}
+          status={['All', 'Open', 'Closed']}
+          rolesPrimaryText={['All', 'Assigned to me']}
+          roles={['All', 'Assigned']}
         />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
           { !isLoading && cases.length

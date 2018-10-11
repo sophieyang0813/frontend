@@ -30,22 +30,23 @@ export class FilterRow extends Component {
     this.props.onSortClicked(event, index, values)
   }
 
-  filterMenu (filterValues, menuItem) {
-    return menuItem.map((name) => (
+  filterMenu (filterValues, menuItem, primaryText) {
+    return menuItem.map((name, index) => (
       <MenuItem
         key={name}
-        insetChildren={this.props.report}
-        checked={this.props.report && (filterValues && filterValues.indexOf(name) > -1)}
+        // insetChildren={this.props.report}
+        // checked={this.props.report && (filterValues && filterValues.indexOf(name) > -1)}
         value={name}
-        primaryText={name}
+        primaryText={(primaryText && primaryText[index]) || name}
+        label={name}
       />
     ))
   }
 
   sortMenu (sortBy) {
     const labels = this.props.labels || [
-      [SORT_BY.DATE_ASCENDING, 'Newest'],
-      [SORT_BY.DATE_DESCENDING, 'Oldest'],
+      [SORT_BY.DATE_DESCENDING, 'Newest'],
+      [SORT_BY.DATE_ASCENDING, 'Oldest'],
       [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
       [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
     ]
@@ -59,11 +60,11 @@ export class FilterRow extends Component {
   }
 
   render () {
-    const { statusFilterValues, roleFilterValues, sortBy, roles, status } = this.props
+    const { statusFilterValues, roleFilterValues, sortBy, roles, rolesPrimaryText, status } = this.props
     return (
       <div className='flex bg-very-light-gray'>
         <SelectField
-          multiple={this.props.report && true}
+          // multiple={this.props.report && true}
           hintText='Status'
           value={statusFilterValues}
           onChange={this.handleStatusFilterClicked}
@@ -77,7 +78,7 @@ export class FilterRow extends Component {
           {this.filterMenu(statusFilterValues, status)}
         </SelectField>
         <SelectField
-          multiple
+          // multiple
           hintText='My role'
           value={roleFilterValues}
           onChange={this.handleRoleFilterClicked}
@@ -88,7 +89,7 @@ export class FilterRow extends Component {
           labelStyle={sortBoxInputStyle}
           selectedMenuItemStyle={selectedItemStyle}
         >
-          {this.filterMenu(roleFilterValues, roles)}
+          {this.filterMenu(roleFilterValues, roles, rolesPrimaryText)}
         </SelectField>
         <SelectField
           hintText='Sort by'

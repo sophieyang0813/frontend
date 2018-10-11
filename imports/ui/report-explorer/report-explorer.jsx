@@ -23,8 +23,8 @@ class ReportExplorer extends Component {
     super(...arguments)
     this.state = {
       open: false,
-      statusFilterValues: [],
-      roleFilterValues: [],
+      statusFilterValues: null,
+      roleFilterValues: null,
       sortBy: null
     }
   }
@@ -59,10 +59,11 @@ class ReportExplorer extends Component {
 
   makeReportGrouping = memoizeOne(
     (reportList, statusFilterValues, roleFilterValues, sortBy) => {
-      const statusFilter = (statusFilterValues.includes('Draft') && statusFilterValues.includes('Finalized')) ? report => true
-        : statusFilterValues.includes('Draft') ? report => report.status === REPORT_DRAFT_STATUS
-          : statusFilterValues.includes('Finalized') ? report => report.status !== REPORT_DRAFT_STATUS : report => true
-      const creatorFilter = roleFilterValues.includes('Created') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+      const statusFilter = statusFilterValues === 'All' ? report => true
+        : statusFilterValues === 'Draft' ? report => report.status === REPORT_DRAFT_STATUS
+          : statusFilterValues === 'Finalized' ? report => report.status !== REPORT_DRAFT_STATUS : report => true
+      const creatorFilter = roleFilterValues === 'All' ? report => true
+        : roleFilterValues === 'Created' ? report => report.assignee === this.props.currentUser.bugzillaCreds.login : report => true
       const unitDict = reportList.sort(sorters[sortBy]).reduce((dict, reportItem) => {
         if (statusFilter(reportItem) && creatorFilter(reportItem)) {
           const { selectedUnit: unitBzName, unitMetaData: metaData } = reportItem
@@ -99,9 +100,9 @@ class ReportExplorer extends Component {
             onRoleFilterClicked={this.handleRoleFilterClicked}
             onSortClicked={this.handleSortClicked}
             sortBy={sortBy}
-            status={['Draft', 'Finalized']}
-            roles={['Created']}
-            report
+            status={['All', 'Draft', 'Finalized']}
+            roles={['All', 'Created']}
+            rolesPrimaryText={['All', 'Created by me']}
           />
           <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
             { reports.length

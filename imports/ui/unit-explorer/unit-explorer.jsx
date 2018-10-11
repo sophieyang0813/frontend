@@ -25,8 +25,8 @@ class UnitExplorer extends Component {
       searchResult: [],
       searchMode: false,
       searchText: '',
-      statusFilterValues: [],
-      roleFilterValues: [],
+      statusFilterValues: null,
+      roleFilterValues: null,
       sortBy: null
     }
   }
@@ -91,26 +91,24 @@ class UnitExplorer extends Component {
   get filteredUnits () {
     const { statusFilterValues, sortBy, roleFilterValues } = this.state
     const { unitList, currentUserId } = this.props
-    const statusFilter = statusFilterValues.length === 4 || (statusFilterValues.includes('Active') && statusFilterValues.includes('Disabled'))
-      ? unitItem => true
-      : statusFilterValues.includes('Active') ? unitItem => unitItem.is_active
-        : statusFilterValues.includes('Disabled') ? unitItem => !unitItem.is_active
-          : unitItem => true
-    const roleFilter = roleFilterValues.length === 2 || (roleFilterValues.includes('Created') && roleFilterValues.includes('Involved'))
-      ? unitItem => true
-      : roleFilterValues.includes('Created') ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
-        : roleFilterValues.includes('Involved') ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
+    const statusFilter = statusFilterValues === 'All' ? unitItem => true
+      : statusFilterValues === 'Active' ? unitItem => unitItem.is_active
+        : statusFilterValues === 'Disabled' ? unitItem => !unitItem.is_active
+          : unitItem => unitItem.is_active
+    const roleFilter = roleFilterValues === 'All' ? unitItem => true
+      : roleFilterValues === 'Created' ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
+        : roleFilterValues === 'Involved' ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
         (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId)) : unitItem => true
     const filteredUnits = unitList.filter(unitItem => roleFilter(unitItem) && statusFilter(unitItem)).sort(sorters[sortBy])
     return filteredUnits
   }
 
   render () {
-    const { isLoading, dispatch, unitList } = this.props
+    const { isLoading, dispatch } = this.props
     const { filteredUnits } = this
-    const defaultUnitList = unitList.filter(unitItem => unitItem.is_active).sort(sorters[SORT_BY.NAME_ASCENDING])
+    // const defaultUnitList = unitList.filter(unitItem => unitItem.is_active).sort(sorters[SORT_BY.NAME_ASCENDING])
     const { searchResult, searchMode, searchText, statusFilterValues, roleFilterValues, sortBy } = this.state
-    const units = statusFilterValues.length !== 0 || roleFilterValues.length !== 0 || sortBy !== null ? filteredUnits : defaultUnitList
+    // const units = statusFilterValues.length !== 0 || roleFilterValues.length !== 0 || sortBy !== null ? filteredUnits : defaultUnitList
     if (isLoading) return <Preloader />
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -137,8 +135,9 @@ class UnitExplorer extends Component {
               onRoleFilterClicked={this.handleRoleFilterClicked}
               onSortClicked={this.handleSortClicked}
               sortBy={sortBy}
-              status={['Active', 'Disabled']}
-              roles={['Created', 'Involved']}
+              status={['All', 'Active', 'Disabled']}
+              rolesPrimaryText={['All', 'Created by me', 'Involving me']}
+              roles={['All', 'Created', 'Involved']}
               labels={[
                 [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
                 [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
@@ -150,7 +149,7 @@ class UnitExplorer extends Component {
                   <NoItemMsg item={'unit'} iconType={'location_on'} />
                 ) : (
                   <FilteredUnits
-                    filteredUnits={units}
+                    filteredUnits={filteredUnits}
                     handleUnitClicked={this.handleUnitClicked}
                     handleAddCaseClicked={this.handleAddCaseClicked}
                     showAddBtn
