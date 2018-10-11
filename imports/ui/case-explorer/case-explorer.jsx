@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import memoizeOne from 'memoize-one'
-import Cases, { collectionName, isClosed } from '../../api/cases'
+import Cases, { collectionName } from '../../api/cases'
 import CaseNotifications, { collectionName as notifCollName } from '../../api/case-notifications'
 import UnitMetaData from '../../api/unit-meta-data'
 import RootAppBar from '../components/root-app-bar'
@@ -20,7 +20,7 @@ import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import { FilterRow } from '../explorer-components/filter-row'
-import { SORT_BY, sorters } from '../explorer-components/sort-items'
+import { sorters } from '../explorer-components/sort-items'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -28,15 +28,9 @@ class CaseExplorer extends Component {
     this.state = {
       caseId: '',
       open: false,
-      statusFilterValues: null,
       roleFilterValues: null,
       sortBy: null
     }
-  }
-  handleStatusFilterClicked = (event, index, statusFilterValues) => {
-    this.setState({
-      statusFilterValues: statusFilterValues
-    })
   }
 
   handleRoleFilterClicked = (event, index, roleFilterValues) => {
@@ -92,23 +86,19 @@ class CaseExplorer extends Component {
     (a, b) => a.length === b.length
   )
   makeCaseGrouping = memoizeOne(
-    (caseList, statusFilterValues, roleFilterValues, sortBy, allNotifs, unreadNotifs) => {
-      const openFilter = statusFilterValues === 'All' ? x => true
-        : statusFilterValues === 'Open' ? x => !isClosed(x)
-          : statusFilterValues === 'Closed' ? x => isClosed(x) : x => !isClosed(x)
+    (caseList, roleFilterValues, sortBy, allNotifs, unreadNotifs) => {
       const assignedFilter = roleFilterValues === 'All' ? x => true
-        : roleFilterValues === 'Assigned to me' ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+        : roleFilterValues === 'Assigned' ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
       // Building a unit dictionary to group the cases together
       const unitsDict = caseList.sort(sorters[sortBy]).reduce((dict, caseItem) => {
-        if (openFilter(caseItem) && assignedFilter(caseItem)) { // Filtering only the cases that match the selection
+        if (assignedFilter(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
           // Pulling the existing or creating a new dictionary entry if none
           const unitDesc = dict[unitTitle] = dict[unitTitle] || {cases: [], bzId, unitType}
           const caseIdStr = caseItem.id.toString()
-
           // Adding the latest update time to the case for easier sorting later
           unitDesc.cases.push(
             Object.assign({
@@ -146,24 +136,20 @@ class CaseExplorer extends Component {
   )
   render () {
     const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
-    const { statusFilterValues, roleFilterValues, sortBy, open } = this.state
+    const { roleFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const caseGrouping = this.makeCaseGrouping(caseList, statusFilterValues, roleFilterValues, sortBy, allNotifications, unreadNotifications)
-    const defaultList = caseGrouping.sort(sorters[SORT_BY.DATE_DESCENDING])
-    const cases = sortBy ? caseGrouping.sort(sorters[sortBy]) : defaultList
-
+    const caseGrouping = this.makeCaseGrouping(caseList, roleFilterValues, sortBy, allNotifications, unreadNotifications)
+    const cases = sortBy ? caseGrouping.sort(sorters[sortBy]) : caseGrouping
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
         <FilterRow
-          statusFilterValues={statusFilterValues}
           roleFilterValues={roleFilterValues}
           onFilterClicked={this.handleStatusFilterClicked}
           onRoleFilterClicked={this.handleRoleFilterClicked}
           onSortClicked={this.handleSortClicked}
           sortBy={sortBy}
-          status={['All', 'Open', 'Closed']}
-          rolesPrimaryText={['All', 'Assigned to me']}
+          rolesPrimaryText={['All', 'Assigned']}
           roles={['All', 'Assigned']}
         />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>

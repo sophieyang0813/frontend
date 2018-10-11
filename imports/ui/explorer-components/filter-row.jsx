@@ -34,8 +34,6 @@ export class FilterRow extends Component {
     return menuItem.map((name, index) => (
       <MenuItem
         key={name}
-        // insetChildren={this.props.report}
-        // checked={this.props.report && (filterValues && filterValues.indexOf(name) > -1)}
         value={name}
         primaryText={(primaryText && primaryText[index]) || name}
         label={name}
@@ -63,22 +61,22 @@ export class FilterRow extends Component {
     const { statusFilterValues, roleFilterValues, sortBy, roles, rolesPrimaryText, status } = this.props
     return (
       <div className='flex bg-very-light-gray'>
+        { status &&
+          <SelectField
+            hintText='Status'
+            value={statusFilterValues}
+            onChange={this.handleStatusFilterClicked}
+            autoWidth
+            underlineStyle={noUnderline}
+            hintStyle={sortBoxInputStyle}
+            iconStyle={selectInputIconStyle}
+            labelStyle={sortBoxInputStyle}
+            selectedMenuItemStyle={selectedItemStyle}
+          >
+            {this.filterMenu(statusFilterValues, status)}
+          </SelectField>
+        }
         <SelectField
-          // multiple={this.props.report && true}
-          hintText='Status'
-          value={statusFilterValues}
-          onChange={this.handleStatusFilterClicked}
-          autoWidth
-          underlineStyle={noUnderline}
-          hintStyle={sortBoxInputStyle}
-          iconStyle={selectInputIconStyle}
-          labelStyle={sortBoxInputStyle}
-          selectedMenuItemStyle={selectedItemStyle}
-        >
-          {this.filterMenu(statusFilterValues, status)}
-        </SelectField>
-        <SelectField
-          // multiple
           hintText='My role'
           value={roleFilterValues}
           onChange={this.handleRoleFilterClicked}
