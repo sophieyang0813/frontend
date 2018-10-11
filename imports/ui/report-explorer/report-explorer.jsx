@@ -91,7 +91,7 @@ class ReportExplorer extends Component {
 
     return (
       <div className='flex flex-column flex-grow full-height'>
-        <RootAppBar title='My Reports' onIconClick={() => dispatch(setDrawerState(true))} shadowless />
+        <RootAppBar title='Inspection Reports' onIconClick={() => dispatch(setDrawerState(true))} shadowless />
         <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
           <FilterRow
             statusFilterValues={statusFilterValues}

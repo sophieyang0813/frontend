@@ -230,7 +230,7 @@ const connectedWrapper = connect(
 }, CaseExplorer))
 
 connectedWrapper.MobileHeader = ({onIconClick}) => (
-  <RootAppBar title='Cases' onIconClick={onIconClick} />
+  <RootAppBar title='Open Cases' onIconClick={onIconClick} />
 )
 
 connectedWrapper.MobileHeader.propTypes = {
