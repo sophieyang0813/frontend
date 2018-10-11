@@ -85,9 +85,8 @@ class ReportExplorer extends Component {
     const { statusFilterValues, roleFilterValues, open, sortBy } = this.state
     if (isLoading) return <Preloader />
     const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, roleFilterValues, sortBy)
-    const defaultReportList = reportGrouping.sort(sorters[SORT_BY.NAME_ASCENDING])
-    const reports = sortBy === null ? defaultReportList
-      : sortBy === SORT_BY.NAME_ASCENDING || SORT_BY.NAME_DESCENDING ? reportGrouping.sort(sorters[sortBy]) : reportGrouping
+    const defaultList = reportGrouping.sort(sorters[SORT_BY.DATE_DESCENDING])
+    const reports = sortBy ? reportGrouping.sort(sorters[sortBy]) : defaultList
 
     return (
       <div className='flex flex-column flex-grow full-height'>
