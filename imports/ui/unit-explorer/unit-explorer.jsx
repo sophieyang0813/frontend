@@ -13,7 +13,7 @@ import Units, { collectionName } from '../../api/units'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import FilteredUnits from './filtered-units'
 import { SORT_BY, sorters } from '../explorer-components/sort-items'
-import MenuItem from 'material-ui/MenuItem'
+// import MenuItem from 'material-ui/MenuItem'
 import { NoItemMsg } from '../explorer-components/no-item-msg'
 import { FilterRow } from '../explorer-components/filter-row'
 
@@ -29,20 +29,6 @@ class UnitExplorer extends Component {
       roleFilterValues: null,
       sortBy: null
     }
-  }
-
-  sortMenu (sortBy) {
-    const labels = [
-      [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
-      [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
-    ]
-    return labels.map(([sortBy, label], index) => (
-      <MenuItem
-        key={sortBy}
-        value={sortBy}
-        primaryText={label}
-      />
-    ))
   }
 
   handleStatusFilterClicked = (event, index, statusFilterValues) => {
