@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import memoizeOne from 'memoize-one'
-import Cases, { collectionName } from '../../api/cases'
+import Cases, { collectionName, isClosed } from '../../api/cases'
 import CaseNotifications, { collectionName as notifCollName } from '../../api/case-notifications'
 import UnitMetaData from '../../api/unit-meta-data'
 import RootAppBar from '../components/root-app-bar'
@@ -93,7 +93,7 @@ class CaseExplorer extends Component {
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
       // Building a unit dictionary to group the cases together
-      const unitsDict = caseList.sort(sorters[sortBy]).reduce((dict, caseItem) => {
+      const unitsDict = caseList.sort(sorters[sortBy]).filter(caseItem => !isClosed(caseItem)).reduce((dict, caseItem) => {
         if (assignedFilter(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
           // Pulling the existing or creating a new dictionary entry if none
@@ -149,7 +149,7 @@ class CaseExplorer extends Component {
           onRoleFilterClicked={this.handleRoleFilterClicked}
           onSortClicked={this.handleSortClicked}
           sortBy={sortBy}
-          rolesPrimaryText={['All', 'Assigned']}
+          rolesPrimaryText={['All', 'Assigned to me']}
           roles={['All', 'Assigned']}
         />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
