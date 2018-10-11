@@ -139,7 +139,7 @@ class CaseExplorer extends Component {
     const { roleFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
     const caseGrouping = this.makeCaseGrouping(caseList, roleFilterValues, sortBy, allNotifications, unreadNotifications)
-    const cases = sortBy ? caseGrouping.sort(sorters[sortBy]) : caseGrouping
+    const cases = caseGrouping.sort(sorters[sortBy])
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
