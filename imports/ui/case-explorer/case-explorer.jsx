@@ -149,8 +149,7 @@ class CaseExplorer extends Component {
           onRoleFilterClicked={this.handleRoleFilterClicked}
           onSortClicked={this.handleSortClicked}
           sortBy={sortBy}
-          rolesPrimaryText={['All', 'Assigned to me']}
-          roles={['All', 'Assigned']}
+          roles={['All', 'Assigned to me']}
         />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
           { !isLoading && cases.length

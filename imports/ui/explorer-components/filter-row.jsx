@@ -4,7 +4,8 @@ import {
   selectInputIconStyle,
   noUnderline,
   sortBoxInputStyle,
-  selectedItemStyle
+  selectedItemStyle,
+  sortBoxBlueInputStyle
 } from '../components/form-controls.mui-styles'
 import MenuItem from 'material-ui/MenuItem'
 import SelectField from 'material-ui/SelectField'
@@ -30,23 +31,41 @@ export class FilterRow extends Component {
     this.props.onSortClicked(event, index, values)
   }
 
-  filterMenu (filterValues, menuItem, primaryText) {
+  filterMenu (filterValues, menuItem, label) {
     return menuItem.map((name, index) => (
       <MenuItem
         key={name}
         value={name}
-        primaryText={(primaryText && primaryText[index]) || name}
-        label={name}
+        primaryText={name}
+        label={label || name}
       />
     ))
   }
 
+  roleFilterMenu (filterValues, menuItem) {
+    return (
+      <SelectField
+        hintText='My role'
+        value={filterValues}
+        onChange={this.handleRoleFilterClicked}
+        autoWidth
+        underlineStyle={noUnderline}
+        hintStyle={sortBoxInputStyle}
+        iconStyle={selectInputIconStyle}
+        labelStyle={filterValues === 'All' ? sortBoxInputStyle : sortBoxBlueInputStyle}
+        selectedMenuItemStyle={selectedItemStyle}
+      >
+        {this.filterMenu(filterValues, menuItem, 'Role Filter')}
+      </SelectField>
+    )
+  }
+
   sortMenu (sortBy) {
     const labels = this.props.labels || [
-      [SORT_BY.DATE_DESCENDING, 'Newest'],
-      [SORT_BY.DATE_ASCENDING, 'Oldest'],
-      [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
-      [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
+      [SORT_BY.DATE_DESCENDING, 'Newest (Created) ↓'],
+      [SORT_BY.DATE_ASCENDING, 'Oldest (Created) ↑'],
+      [SORT_BY.NAME_ASCENDING, 'Name (A to Z) ↑'],
+      [SORT_BY.NAME_DESCENDING, 'Name (Z to A) ↓']
     ]
     return labels.map(([sortBy, label], index) => (
       <MenuItem
@@ -58,7 +77,7 @@ export class FilterRow extends Component {
   }
 
   render () {
-    const { statusFilterValues, roleFilterValues, sortBy, roles, rolesPrimaryText, status } = this.props
+    const { statusFilterValues, roleFilterValues, sortBy, roles, status } = this.props
     return (
       <div className='flex bg-very-light-gray'>
         { status &&
@@ -76,19 +95,7 @@ export class FilterRow extends Component {
             {this.filterMenu(statusFilterValues, status)}
           </SelectField>
         }
-        <SelectField
-          hintText='My role'
-          value={roleFilterValues}
-          onChange={this.handleRoleFilterClicked}
-          autoWidth
-          underlineStyle={noUnderline}
-          hintStyle={sortBoxInputStyle}
-          iconStyle={selectInputIconStyle}
-          labelStyle={sortBoxInputStyle}
-          selectedMenuItemStyle={selectedItemStyle}
-        >
-          {this.filterMenu(roleFilterValues, roles, rolesPrimaryText)}
-        </SelectField>
+        {this.roleFilterMenu(roleFilterValues, roles)}
         <SelectField
           hintText='Sort by'
           value={sortBy}
