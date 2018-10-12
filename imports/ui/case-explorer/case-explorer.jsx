@@ -96,9 +96,11 @@ class CaseExplorer extends Component {
       const unitsDict = caseList.sort(sorters[sortBy]).filter(caseItem => !isClosed(caseItem)).reduce((dict, caseItem) => {
         if (assignedFilter(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
+
           // Pulling the existing or creating a new dictionary entry if none
           const unitDesc = dict[unitTitle] = dict[unitTitle] || {cases: [], bzId, unitType}
           const caseIdStr = caseItem.id.toString()
+
           // Adding the latest update time to the case for easier sorting later
           unitDesc.cases.push(
             Object.assign({
@@ -112,6 +114,7 @@ class CaseExplorer extends Component {
       // Creating a case grouping *array* from the unit dictionary
       return Object.keys(unitsDict).reduce((all, unitTitle) => {
         const { bzId, cases, unitType } = unitsDict[unitTitle]
+
         // Sorting cases within a unit by the order descending order of last update
         cases.sort((a, b) => b.latestUpdate - a.latestUpdate)
         all.push({
