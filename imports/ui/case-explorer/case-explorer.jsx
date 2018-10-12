@@ -20,7 +20,7 @@ import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import { FilterRow } from '../explorer-components/filter-row'
-import { sorters } from '../explorer-components/sort-items'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -112,7 +112,6 @@ class CaseExplorer extends Component {
       // Creating a case grouping *array* from the unit dictionary
       return Object.keys(unitsDict).reduce((all, unitTitle) => {
         const { bzId, cases, unitType } = unitsDict[unitTitle]
-
         // Sorting cases within a unit by the order descending order of last update
         cases.sort((a, b) => b.latestUpdate - a.latestUpdate)
         all.push({
@@ -139,7 +138,8 @@ class CaseExplorer extends Component {
     const { roleFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
     const caseGrouping = this.makeCaseGrouping(caseList, roleFilterValues, sortBy, allNotifications, unreadNotifications)
-    const cases = caseGrouping.sort(sorters[sortBy])
+    const defaultList = caseGrouping.sort(sorters[SORT_BY.LATEST_UPDATE])
+    const cases = sortBy ? caseGrouping.sort(sorters[sortBy]) : defaultList
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
@@ -150,6 +150,14 @@ class CaseExplorer extends Component {
           onSortClicked={this.handleSortClicked}
           sortBy={sortBy}
           roles={['All', 'Assigned to me']}
+          labels={[
+            [SORT_BY.DATE_DESCENDING, 'Newest (Created) ↓'],
+            [SORT_BY.DATE_ASCENDING, 'Oldest (Created) ↑'],
+            [SORT_BY.NAME_ASCENDING, 'Name (A to Z) ↑'],
+            [SORT_BY.NAME_DESCENDING, 'Name (Z to A) ↓'],
+            [SORT_BY.LATEST_UPDATE, 'Newest (Updated) ↓'],
+            [SORT_BY.OLDEST_UPDATE, 'Oldest (Updated) ↑']
+          ]}
         />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
           { !isLoading && cases.length

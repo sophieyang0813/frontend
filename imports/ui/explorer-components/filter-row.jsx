@@ -69,7 +69,7 @@ export class FilterRow extends Component {
     ]
     return labels.map(([sortBy, label], index) => (
       <MenuItem
-        key={sortBy}
+        key={index}
         value={sortBy}
         primaryText={label}
       />
