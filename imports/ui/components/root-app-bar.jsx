@@ -15,6 +15,7 @@ import {
   logoIconStyle,
   logoButtonStyle
 } from '../components/app-bar.mui-styles'
+import { renderCurrUserAvatar } from '../util/app-bar-utils'
 
 class RootAppBar extends Component {
   constructor (props) {
@@ -30,7 +31,7 @@ class RootAppBar extends Component {
   }
 
   render () {
-    const { title, placeholder, onIconClick, shadowless, searchText, showSearch } = this.props
+    const { title, placeholder, onIconClick, shadowless, searchText, showSearch, user, cases } = this.props
     const { searchTextDisplay } = this.state
     return (
       <AppBar
@@ -68,7 +69,7 @@ class RootAppBar extends Component {
           )
         }
         iconElementRight={
-          <div>
+          <div className={cases && 'flex items-center'}>
             <span className={((!showSearch || searchTextDisplay) ? 'dn' : '')}>
               <IconButton onClick={() => this.setState({searchTextDisplay: true})}>
                 <FontIcon className='material-icons' color='white'>
@@ -79,6 +80,14 @@ class RootAppBar extends Component {
             <IconButton>
               <FontIcon className='material-icons' color='white'>notifications</FontIcon>
             </IconButton>
+            {cases &&
+            <div className={'flex items-center'}>
+              <div className='white'>Welcome, {user.profile && user.profile.name}</div>
+              <div className='ml2'>
+                {renderCurrUserAvatar(user)}
+              </div>
+            </div>
+            }
           </div>
         }
       />)

@@ -5,20 +5,13 @@ import { connect } from 'react-redux'
 import { Meteor } from 'meteor/meteor'
 import { createContainer } from 'meteor/react-meteor-data'
 import _ from 'lodash'
-import AppBar from 'material-ui/AppBar'
-import IconButton from 'material-ui/IconButton'
-import FontIcon from 'material-ui/FontIcon'
 import { UneeTIcon } from '../components/unee-t-icons'
 import { setDrawerState } from '../general-actions'
 import CaseExplorer from '../case-explorer/case-explorer'
 import Preloader from '../preloader/preloader'
 import Case from './case'
-import { renderCurrUserAvatar, renderAppBarLeft } from '../util/app-bar-utils'
 
-import {
-  titleStyle
-} from '../components/app-bar.mui-styles'
-
+import RootAppBar from '../components/root-app-bar'
 import {
   emptyPaneIconStyle
 } from './case-master.mui-styles'
@@ -123,22 +116,13 @@ class CaseMaster extends Component {
             ))}
           </Switch>
         ) : (
-          <AppBar titleStyle={titleStyle}
-            iconElementLeft={renderAppBarLeft(this.handleIconClick)}
-            iconElementRight={
-              <div className='flex items-center'>
-                <IconButton>
-                  <FontIcon className='material-icons' color='white'>search</FontIcon>
-                </IconButton>
-                <IconButton>
-                  <FontIcon className='material-icons' color='white'>notifications</FontIcon>
-                </IconButton>
-                <div className='white'>Welcome, {user.profile && user.profile.name}</div>
-                <div className='ml2'>
-                  {renderCurrUserAvatar(user)}
-                </div>
-              </div>
-            }
+          <RootAppBar title='Open Cases'
+            onIconClick={this.handleIconClick}
+            searchText={searchText}
+            onSearchChanged={this.handleSearch}
+            showSearch
+            user={user}
+            cases
           />
         )}
         {isMobileScreen ? (
@@ -160,6 +144,7 @@ class CaseMaster extends Component {
           <div className={isLoading ? 'dn' : 'flex flex-grow overflow-hidden'}>
             <div className='flex-3'>
               <CaseExplorer
+                searchResult={searchResult}
                 dispatchLoadingResult={() => {
                   this.setState({
                     isLoading: false
