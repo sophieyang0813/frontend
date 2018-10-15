@@ -9,7 +9,7 @@ import {
 } from '../components/form-controls.mui-styles'
 import MenuItem from 'material-ui/MenuItem'
 import SelectField from 'material-ui/SelectField'
-import { SORT_BY } from '../explorer-components/sort-items'
+import { labels } from '../explorer-components/sort-items'
 
 export class FilterRow extends Component {
   constructor (props) {
@@ -61,17 +61,13 @@ export class FilterRow extends Component {
   }
 
   sortMenu (sortBy) {
-    const labels = this.props.labels || [
-      [SORT_BY.DATE_DESCENDING, 'Newest (Created) ↓'],
-      [SORT_BY.DATE_ASCENDING, 'Oldest (Created) ↑'],
-      [SORT_BY.NAME_ASCENDING, 'Name (A to Z) ↑'],
-      [SORT_BY.NAME_DESCENDING, 'Name (Z to A) ↓']
-    ]
-    return labels.map(([sortBy, label], index) => (
+    const categories = this.props.labels ? this.props.labels : labels
+    return categories.map(([sortBy, label], index) => (
       <MenuItem
         key={index}
         value={sortBy}
-        primaryText={label}
+        primaryText={label.category}
+        label={label.selected}
       />
     ))
   }

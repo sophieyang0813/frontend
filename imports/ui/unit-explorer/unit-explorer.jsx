@@ -13,7 +13,6 @@ import Units, { collectionName } from '../../api/units'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import FilteredUnits from './filtered-units'
 import { SORT_BY, sorters } from '../explorer-components/sort-items'
-// import MenuItem from 'material-ui/MenuItem'
 import { NoItemMsg } from '../explorer-components/no-item-msg'
 import { FilterRow } from '../explorer-components/filter-row'
 
@@ -123,8 +122,8 @@ class UnitExplorer extends Component {
               rolesPrimaryText={['All', 'Created by me', 'Involving me']}
               roles={['All', 'Created', 'Involved']}
               labels={[
-                [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
-                [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
+                [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'A to Z ↑'}],
+                [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Z to A ↓'}]
               ]}
             />
             <div className='flex-grow flex flex-column overflow-auto'>

@@ -104,7 +104,7 @@ class CaseExplorer extends Component {
           // Adding the latest update time to the case for easier sorting later
           unitDesc.cases.push(
             Object.assign({
-              latestUpdate: caseUpdateTimeDict[caseIdStr] || 0,
+              latestUpdate: caseUpdateTimeDict[caseIdStr] || (new Date(caseItem.creation_time)).getTime(),
               unreadCounts: caseUnreadDict[caseIdStr]
             }, caseItem)
           )
@@ -154,12 +154,12 @@ class CaseExplorer extends Component {
           sortBy={sortBy}
           roles={['All', 'Assigned to me']}
           labels={[
-            [SORT_BY.DATE_DESCENDING, 'Newest (Created) ↓'],
-            [SORT_BY.DATE_ASCENDING, 'Oldest (Created) ↑'],
-            [SORT_BY.NAME_ASCENDING, 'Name (A to Z) ↑'],
-            [SORT_BY.NAME_DESCENDING, 'Name (Z to A) ↓'],
-            [SORT_BY.LATEST_UPDATE, 'Newest (Updated) ↓'],
-            [SORT_BY.OLDEST_UPDATE, 'Oldest (Updated) ↑']
+            [SORT_BY.DATE_DESCENDING, {category: 'Newest (Created)', selected: 'Created ↓'}],
+            [SORT_BY.DATE_ASCENDING, {category: 'Oldest (Created)', selected: ' Created ↑'}],
+            [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'A to Z ↑'}],
+            [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Z to A ↓'}],
+            [SORT_BY.LATEST_UPDATE, {category: 'Latest (Updated)', selected: 'Updated ↓'}],
+            [SORT_BY.OLDEST_UPDATE, {category: 'Oldest (Updated)', selected: 'Updated ↑'}]
           ]}
         />
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>

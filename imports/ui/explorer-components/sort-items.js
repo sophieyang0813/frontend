@@ -7,6 +7,13 @@ export const SORT_BY = {
   OLDEST_UPDATE: 5
 }
 
+export const labels = [
+  [SORT_BY.DATE_DESCENDING, {category: 'Newest (Created)', selected: 'Created ↓'}],
+  [SORT_BY.DATE_ASCENDING, {category: 'Oldest (Created)', selected: ' Created ↑'}],
+  [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'A to Z ↑'}],
+  [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Z to A ↓'}]
+]
+
 export const sorters = {
   [SORT_BY.DATE_DESCENDING]: (a, b) => {
     const latestCaseAunit = a.items && a.items[0].creation_time
