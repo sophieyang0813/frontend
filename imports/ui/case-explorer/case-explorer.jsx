@@ -138,7 +138,8 @@ class CaseExplorer extends Component {
     const { isLoading, caseList, allNotifications, unreadNotifications, searchResult } = this.props
     const { filterStatus, myInvolvement, open } = this.state
     if (isLoading) return <Preloader />
-    const caseGrouping = searchResult.length !== 0 ? this.makeCaseGrouping(searchResult, filterStatus, myInvolvement, allNotifications, unreadNotifications)
+    console.log('searchResult', searchResult)
+    const caseGrouping = searchResult && searchResult.length !== 0 ? this.makeCaseGrouping(searchResult, filterStatus, myInvolvement, allNotifications, unreadNotifications)
       : this.makeCaseGrouping(caseList, filterStatus, myInvolvement, allNotifications, unreadNotifications)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
