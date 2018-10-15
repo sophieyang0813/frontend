@@ -30,7 +30,6 @@ class CaseExplorer extends Component {
       myInvolvement: false,
       open: false
     }
-    this.handleSearch = this.handleSearch.bind(this)
   }
 
   handleStatusClicked = (value) => {
@@ -49,11 +48,6 @@ class CaseExplorer extends Component {
   handleOnUnitClicked = (unitId) => {
     const { dispatch } = this.props
     dispatch(push(`/case/new?unit=${unitId}`))
-  }
-
-  handleSearch (text) {
-    console.log('text case explorer', text)
-    this.props.onSearch(text)
   }
 
   componentWillReceiveProps ({isLoading, casesError, caseList}) {
