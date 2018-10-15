@@ -30,6 +30,7 @@ class CaseExplorer extends Component {
       myInvolvement: false,
       open: false
     }
+    this.handleSearch = this.handleSearch.bind(this)
   }
 
   handleStatusClicked = (value) => {
@@ -48,6 +49,11 @@ class CaseExplorer extends Component {
   handleOnUnitClicked = (unitId) => {
     const { dispatch } = this.props
     dispatch(push(`/case/new?unit=${unitId}`))
+  }
+
+  handleSearch (text) {
+    console.log('text case explorer', text)
+    this.props.onSearch(text)
   }
 
   componentWillReceiveProps ({isLoading, casesError, caseList}) {
@@ -138,8 +144,7 @@ class CaseExplorer extends Component {
     const { isLoading, caseList, allNotifications, unreadNotifications, searchResult } = this.props
     const { filterStatus, myInvolvement, open } = this.state
     if (isLoading) return <Preloader />
-    console.log('search result', this.props)
-    const caseGrouping = searchResult ? this.makeCaseGrouping(searchResult, filterStatus, myInvolvement, allNotifications, unreadNotifications)
+    const caseGrouping = searchResult.length !== 0 ? this.makeCaseGrouping(searchResult, filterStatus, myInvolvement, allNotifications, unreadNotifications)
       : this.makeCaseGrouping(caseList, filterStatus, myInvolvement, allNotifications, unreadNotifications)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
@@ -214,11 +219,12 @@ const connectedWrapper = connect(
   }
 }, CaseExplorer))
 
-connectedWrapper.MobileHeader = ({onIconClick, searchText, onSearchChanged}) => (
+connectedWrapper.MobileHeader = ({onIconClick, searchText, onSearchChanged, caseList}) => (
   <RootAppBar title='Cases'
     onIconClick={onIconClick}
     searchText={searchText}
     onSearchChanged={onSearchChanged}
+    caseList={caseList}
     showSearch
   />
 )

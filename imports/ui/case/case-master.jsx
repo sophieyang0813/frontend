@@ -37,7 +37,6 @@ class CaseMaster extends Component {
       searchText: '',
       searchResult: [],
       searchMode: false
-
     }
     this.routes = [
       {
@@ -97,7 +96,7 @@ class CaseMaster extends Component {
       this.setState({searchMode: true})
       const matcher = new RegExp(searchText, 'i')
       const searchResult = this.props.caseList
-        .filter(casi => !matcher || (casi.title && casi.title.match(matcher)))
+        .filter(x => !matcher || (x.title && x.title.match(matcher)))
       this.setState({
         searchResult: searchResult
       })
@@ -147,7 +146,7 @@ class CaseMaster extends Component {
             {this.routes.map(({path, RouteComp, exact}) => (
               <Route key={path} exact={exact} path={path} render={() => {
                 return (
-                  <RouteComp className={isLoading ? 'dn' : ''} dispatchLoadingResult={data => {
+                  <RouteComp searchResult={searchResult} className={isLoading ? 'dn' : ''} dispatchLoadingResult={data => {
                     this.setState({
                       componentsData: Object.assign(componentsProps, {[path]: data}),
                       isLoading: false
@@ -161,7 +160,6 @@ class CaseMaster extends Component {
           <div className={isLoading ? 'dn' : 'flex flex-grow overflow-hidden'}>
             <div className='flex-3'>
               <CaseExplorer
-                searchResult={searchResult}
                 dispatchLoadingResult={() => {
                   this.setState({
                     isLoading: false
@@ -204,9 +202,6 @@ class CaseMaster extends Component {
 CaseMaster.propTypes = {
   user: PropTypes.object.isRequired
 }
-// export default connect(() => ({}))(createContainer(() => ({
-//   user: Meteor.user() || {}
-// }), CaseMaster))
 
 let casesError
 export default connect(() => ({}))(createContainer(() => { // map meteor state to props
