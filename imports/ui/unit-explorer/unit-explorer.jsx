@@ -122,8 +122,8 @@ class UnitExplorer extends Component {
               rolesPrimaryText={['All', 'Created by me', 'Involving me']}
               roles={['All', 'Created', 'Involved']}
               labels={[
-                [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'A to Z ↑'}],
-                [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Z to A ↓'}]
+                [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'Name ↑'}],
+                [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Name ↓'}]
               ]}
             />
             <div className='flex-grow flex flex-column overflow-auto'>
