@@ -12,22 +12,15 @@ import SelectField from 'material-ui/SelectField'
 import { labels } from '../explorer-components/sort-items'
 
 export class FilterRow extends Component {
-  constructor (props) {
-    super(props)
-    this.handleStatusFilterClicked = this.handleStatusFilterClicked.bind(this)
-    this.handleRoleFilterClicked = this.handleRoleFilterClicked.bind(this)
-    this.handleSortClicked = this.handleSortClicked.bind(this)
-  }
-
-  handleStatusFilterClicked (event, index, values) {
+  handleStatusFilterClicked = (event, index, values) => {
     this.props.onFilterClicked(event, index, values)
   }
 
-  handleRoleFilterClicked (event, index, values) {
+  handleRoleFilterClicked = (event, index, values) => {
     this.props.onRoleFilterClicked(event, index, values)
   }
 
-  handleSortClicked (event, index, values) {
+  handleSortClicked = (event, index, values) => {
     this.props.onSortClicked(event, index, values)
   }
 

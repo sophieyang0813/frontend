@@ -8,7 +8,7 @@ export const SORT_BY = {
 }
 
 export const labels = [
-  [SORT_BY.DATE_DESCENDING, {category: 'Created - Newest', selected: 'Created ↓'}],
+  [SORT_BY.DATE_DESCENDING, {category: 'Created - Latest', selected: 'Created ↓'}],
   [SORT_BY.DATE_ASCENDING, {category: 'Created - Oldest', selected: ' Created ↑'}],
   [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'Name ↑'}],
   [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Name ↓'}]

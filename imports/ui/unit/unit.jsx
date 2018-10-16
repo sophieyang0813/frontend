@@ -133,7 +133,7 @@ class Unit extends Component {
 
   sortMenu (sortBy) {
     const labels = [
-      [SORT_BY.DATE_ASCENDING, 'Newest'],
+      [SORT_BY.DATE_ASCENDING, 'Latest'],
       [SORT_BY.DATE_DESCENDING, 'Oldest'],
       [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
       [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']

@@ -20,7 +20,7 @@ import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import { FilterRow } from '../explorer-components/filter-row'
-import { SORT_BY, unitSorters, caseSorters } from '../explorer-components/sort-items'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -87,8 +87,7 @@ class CaseExplorer extends Component {
   )
   makeCaseGrouping = memoizeOne(
     (caseList, roleFilterValues, sortBy, allNotifs, unreadNotifs) => {
-      const assignedFilter = roleFilterValues === 'All' ? x => true
-        : roleFilterValues === 'Assigned' ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+      const assignedFilter = roleFilterValues !== 'Assigned to me' ? x => true : x => x.assignee === this.props.currentUser.bugzillaCreds.login
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
@@ -111,24 +110,22 @@ class CaseExplorer extends Component {
         }
         return dict
       }, {})
-      // Creating a case grouping *array* from the unit dictionary
-      const caseBundle = Object.keys(unitsDict).reduce((all, unitTitle) => {
+      const sortType = sortBy ? sorters[sortBy] : sorters[SORT_BY.LATEST_UPDATE]
+      return Object.keys(unitsDict).reduce((all, unitTitle) => {
         const { bzId, cases, unitType } = unitsDict[unitTitle]
-
+        cases.sort((a, b) => b.latestUpdate - a.latestUpdate)
         // Sorting cases within a unit by the order descending order of last update
-        sortBy ? cases.sort(caseSorters[sortBy]) : cases.sort(caseSorters[SORT_BY.LATEST_UPDATE])
+        const sortedCases = sortBy ? cases.sort(sorters[sortBy]) : cases
         all.push({
           latestCaseUpdate: cases[0].latestUpdate, // The first case has to be latest due to the previous sort
           hasUnread: !!cases.find(caseItem => !!caseItem.unreadCounts), // true if any case has unreads
-          items: cases,
+          items: sortBy ? sortedCases : cases,
           unitType,
           unitTitle,
           bzId
         })
         return all
-      }, []) // Sorting by the latest case update for each
-      const grouping = sortBy ? caseBundle.sort(unitSorters[sortBy]) : caseBundle.sort(unitSorters[SORT_BY.LATEST_UPDATE])
-      return grouping
+      }, []).sort(sortType)
     },
     (a, b) => {
       if (a && b && Array.isArray(a)) {
@@ -154,7 +151,7 @@ class CaseExplorer extends Component {
           sortBy={sortBy}
           roles={['All', 'Assigned to me']}
           labels={[
-            [SORT_BY.DATE_DESCENDING, {category: 'Created - Newest', selected: 'Created ↓'}],
+            [SORT_BY.DATE_DESCENDING, {category: 'Created - Latest', selected: 'Created ↓'}],
             [SORT_BY.DATE_ASCENDING, {category: 'Created - Oldest', selected: ' Created ↑'}],
             [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'A to Z ↑'}],
             [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Z to A ↓'}],
