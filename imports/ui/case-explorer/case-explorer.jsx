@@ -20,7 +20,7 @@ import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
 import { FilterRow } from '../explorer-components/filter-row'
-import { SORT_BY, sorters } from '../explorer-components/sort-items'
+import { SORT_BY, unitSorters, caseSorters } from '../explorer-components/sort-items'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -93,7 +93,7 @@ class CaseExplorer extends Component {
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
       // Building a unit dictionary to group the cases together
-      const unitsDict = caseList.sort(sorters[sortBy]).filter(caseItem => !isClosed(caseItem)).reduce((dict, caseItem) => {
+      const unitsDict = caseList.filter(caseItem => !isClosed(caseItem)).reduce((dict, caseItem) => {
         if (assignedFilter(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
 
@@ -112,11 +112,11 @@ class CaseExplorer extends Component {
         return dict
       }, {})
       // Creating a case grouping *array* from the unit dictionary
-      return Object.keys(unitsDict).reduce((all, unitTitle) => {
+      const caseBundle = Object.keys(unitsDict).reduce((all, unitTitle) => {
         const { bzId, cases, unitType } = unitsDict[unitTitle]
 
         // Sorting cases within a unit by the order descending order of last update
-        cases.sort((a, b) => b.latestUpdate - a.latestUpdate)
+        sortBy ? cases.sort(caseSorters[sortBy]) : cases.sort(caseSorters[SORT_BY.LATEST_UPDATE])
         all.push({
           latestCaseUpdate: cases[0].latestUpdate, // The first case has to be latest due to the previous sort
           hasUnread: !!cases.find(caseItem => !!caseItem.unreadCounts), // true if any case has unreads
@@ -126,7 +126,9 @@ class CaseExplorer extends Component {
           bzId
         })
         return all
-      }, []).sort((a, b) => b.latestCaseUpdate - a.latestCaseUpdate) // Sorting by the latest case update for each
+      }, []) // Sorting by the latest case update for each
+      const grouping = sortBy ? caseBundle.sort(unitSorters[sortBy]) : caseBundle.sort(unitSorters[SORT_BY.LATEST_UPDATE])
+      return grouping
     },
     (a, b) => {
       if (a && b && Array.isArray(a)) {
@@ -140,9 +142,7 @@ class CaseExplorer extends Component {
     const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
     const { roleFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const caseGrouping = this.makeCaseGrouping(caseList, roleFilterValues, sortBy, allNotifications, unreadNotifications)
-    const defaultList = caseGrouping.sort(sorters[SORT_BY.LATEST_UPDATE])
-    const cases = sortBy ? caseGrouping.sort(sorters[sortBy]) : defaultList
+    const cases = this.makeCaseGrouping(caseList, roleFilterValues, sortBy, allNotifications, unreadNotifications)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />

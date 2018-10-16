@@ -14,7 +14,7 @@ export const labels = [
   [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Name ↓'}]
 ]
 
-export const sorters = {
+export const unitSorters = {
   [SORT_BY.DATE_DESCENDING]: (a, b) => {
     const latestCaseAunit = a.items && a.items[0].creation_time
     const latestCaseBunit = b.items && b.items[0].creation_time
@@ -30,23 +30,48 @@ export const sorters = {
     return dateA - dateB
   },
   [SORT_BY.NAME_ASCENDING]: (a, b) => {
-    const nameA = a.title || a.name || a.unitTitle
-    const nameB = b.title || b.name || b.unitTitle
+    const nameA = a.unitTitle
+    const nameB = b.unitTitle
     return nameA.localeCompare(nameB)
   },
   [SORT_BY.NAME_DESCENDING]: (a, b) => {
-    const nameA = a.title || a.name || a.unitTitle
-    const nameB = b.title || b.name || b.unitTitle
+    const nameA = a.unitTitle
+    const nameB = b.unitTitle
     return nameB.localeCompare(nameA)
   },
   [SORT_BY.LATEST_UPDATE]: (a, b) => {
-    const latestUpdateA = (a.items && a.items[0].latestUpdate !== 0) ? a.items[0].latestUpdate : 0
-    const latestUpdateB = (b.items && b.items[0].latestUpdate !== 0) ? b.items[0].latestUpdate : 0
+    const latestUpdateA = a.items && a.items[0].latestUpdate
+    const latestUpdateB = b.items && b.items[0].latestUpdate
     return latestUpdateB - latestUpdateA
   },
   [SORT_BY.OLDEST_UPDATE]: (a, b) => {
-    const oldestUpdateA = (a.items && a.items[0].latestUpdate !== 0) ? a.items[0].latestUpdate : 0
-    const oldestUpdateB = (b.items && b.items[0].latestUpdate !== 0) ? b.items[0].latestUpdate : 0
+    const oldestUpdateA = a.items && a.items[a.items.length - 1].latestUpdate
+    const oldestUpdateB = b.items && b.items[b.items.length - 1].latestUpdate
     return oldestUpdateA - oldestUpdateB
+  }
+}
+
+export const caseSorters = {
+  [SORT_BY.DATE_DESCENDING]: (a, b) => {
+    return b.creation_time - a.creation_time
+  },
+  [SORT_BY.DATE_ASCENDING]: (a, b) => {
+    return a.creation_time - b.creation_time
+  },
+  [SORT_BY.NAME_ASCENDING]: (a, b) => {
+    const nameA = a.title
+    const nameB = b.title
+    return nameA.localeCompare(nameB)
+  },
+  [SORT_BY.NAME_DESCENDING]: (a, b) => {
+    const nameA = a.title
+    const nameB = b.title
+    return nameB.localeCompare(nameA)
+  },
+  [SORT_BY.LATEST_UPDATE]: (a, b) => {
+    return b.latestUpdate - a.latestUpdate
+  },
+  [SORT_BY.OLDEST_UPDATE]: (a, b) => {
+    return a.latestUpdate - b.latestUpdate
   }
 }
