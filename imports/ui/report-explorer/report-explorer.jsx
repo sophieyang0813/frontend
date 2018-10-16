@@ -62,9 +62,8 @@ class ReportExplorer extends Component {
       const statusFilter = statusFilterValues === 'All' ? report => true
         : statusFilterValues === 'Draft' ? report => report.status === REPORT_DRAFT_STATUS
           : statusFilterValues === 'Finalized' ? report => report.status !== REPORT_DRAFT_STATUS : report => true
-      const creatorFilter = roleFilterValues === 'All' ? report => true
-        : roleFilterValues === 'Created' ? report => report.assignee === this.props.currentUser.bugzillaCreds.login : report => true
-      const unitDict = reportList.sort(sorters[sortBy]).reduce((dict, reportItem) => {
+      const creatorFilter = roleFilterValues !== 'Created' ? report => true : report => report.assignee === this.props.currentUser.bugzillaCreds.login
+      const unitDict = reportList.reduce((dict, reportItem) => {
         if (statusFilter(reportItem) && creatorFilter(reportItem)) {
           const { selectedUnit: unitBzName, unitMetaData: metaData } = reportItem
           const unitType = metaData ? metaData.unitType : 'not_listed'
@@ -76,7 +75,21 @@ class ReportExplorer extends Component {
         return dict
       }, {})
 
-      return Object.values(unitDict)
+      const reportBundle = Object.keys(unitDict).reduce((all, unitTitle) => {
+        const { bzId, items, unitType } = unitDict[unitTitle]
+
+        // Sorting items within a unit by the order descending order of last update
+        items.sort(sorters[sortBy])
+        all.push({
+          items: items,
+          unitType,
+          unitTitle,
+          bzId
+        })
+        return all
+      }, []) // Sorting by the latest case update for each
+      const grouping = sortBy ? reportBundle.sort(sorters[sortBy]) : reportBundle.sort(sorters[SORT_BY.DATE_DESCENDING])
+      return grouping
     }
   )
 
@@ -84,9 +97,7 @@ class ReportExplorer extends Component {
     const { isLoading, dispatch, reportList } = this.props
     const { statusFilterValues, roleFilterValues, open, sortBy } = this.state
     if (isLoading) return <Preloader />
-    const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, roleFilterValues, sortBy)
-    const defaultList = reportGrouping.sort(sorters[SORT_BY.DATE_DESCENDING])
-    const reports = sortBy ? reportGrouping.sort(sorters[sortBy]) : defaultList
+    const reports = this.makeReportGrouping(reportList, statusFilterValues, roleFilterValues, sortBy)
 
     return (
       <div className='flex flex-column flex-grow full-height'>
