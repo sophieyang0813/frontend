@@ -38,7 +38,7 @@ export function CaseList ({ allCases, onItemClick }) {
               to={`/case/${caseItem.id}`}
               onClick={onItemClick}
             >
-              {caseItem.title} {caseItem.creation_time}
+              {caseItem.title}
             </Link>
             {updateCounter('announcement', caseItem.unreadCounts && caseItem.unreadCounts.messages)}
             {updateCounter('assignment_late', caseItem.unreadCounts && caseItem.unreadCounts.updates)}
