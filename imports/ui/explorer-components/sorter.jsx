@@ -47,9 +47,5 @@ export class Sorter extends Component {
 }
 
 Sorter.propTypes = {
-  sortBy: PropTypes.number,
-  statusFilterValues: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.array
-  ])
+  sortBy: PropTypes.number
 }

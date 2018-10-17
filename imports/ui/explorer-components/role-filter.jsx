@@ -47,9 +47,6 @@ export class RoleFilter extends Component {
 }
 
 RoleFilter.propTypes = {
-  sortBy: PropTypes.number,
-  statusFilterValues: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.array
-  ])
+  roles: PropTypes.array,
+  roleFilterValues: PropTypes.string
 }

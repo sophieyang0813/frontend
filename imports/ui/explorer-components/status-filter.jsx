@@ -46,9 +46,6 @@ export class StatusFilter extends Component {
 }
 
 StatusFilter.propTypes = {
-  sortBy: PropTypes.number,
-  statusFilterValues: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.array
-  ])
+  status: PropTypes.array,
+  statusFilterValues: PropTypes.string
 }
