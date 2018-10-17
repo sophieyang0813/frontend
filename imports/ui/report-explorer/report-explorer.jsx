@@ -15,8 +15,10 @@ import FontIcon from 'material-ui/FontIcon'
 import { ReportList } from '../report-explorer/report-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
-import { FilterRow } from '../explorer-components/filter-row'
 import { SORT_BY, sorters } from '../explorer-components/sort-items'
+import { Sorter } from '../explorer-components/sorter'
+import { StatusFilter } from '../explorer-components/status-filter'
+import { RoleFilter } from '../explorer-components/role-filter'
 
 class ReportExplorer extends Component {
   constructor () {
@@ -62,7 +64,7 @@ class ReportExplorer extends Component {
       const statusFilter = statusFilterValues === 'All' ? report => true
         : statusFilterValues === 'Draft' ? report => report.status === REPORT_DRAFT_STATUS
           : statusFilterValues === 'Finalized' ? report => report.status !== REPORT_DRAFT_STATUS : report => true
-      const creatorFilter = roleFilterValues !== 'Created' ? report => true : report => report.assignee === this.props.currentUser.bugzillaCreds.login
+      const creatorFilter = roleFilterValues !== 'Created by me' ? report => true : report => report.assignee === this.props.currentUser.bugzillaCreds.login
       const unitDict = reportList.reduce((dict, reportItem) => {
         if (statusFilter(reportItem) && creatorFilter(reportItem)) {
           const { selectedUnit: unitBzName, unitMetaData: metaData } = reportItem
@@ -103,17 +105,22 @@ class ReportExplorer extends Component {
       <div className='flex flex-column flex-grow full-height'>
         <RootAppBar title='Inspection Reports' onIconClick={() => dispatch(setDrawerState(true))} shadowless />
         <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
-          <FilterRow
-            statusFilterValues={statusFilterValues}
-            roleFilterValues={roleFilterValues}
-            onFilterClicked={this.handleStatusFilterClicked}
-            onRoleFilterClicked={this.handleRoleFilterClicked}
-            onSortClicked={this.handleSortClicked}
-            sortBy={sortBy}
-            status={['All', 'Draft', 'Finalized']}
-            roles={['All', 'Created']}
-            rolesPrimaryText={['All', 'Created by me']}
-          />
+          <div className='flex bg-very-light-gray'>
+            <StatusFilter
+              statusFilterValues={statusFilterValues}
+              onFilterClicked={this.handleStatusFilterClicked}
+              status={['All', 'Draft', 'Finalized']}
+            />
+            <RoleFilter
+              roleFilterValues={roleFilterValues}
+              onRoleFilterClicked={this.handleRoleFilterClicked}
+              roles={['All', 'Created by me']}
+            />
+            <Sorter
+              onSortClicked={this.handleSortClicked}
+              sortBy={sortBy}
+            />
+          </div>
           <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
             { reports.length
               ? <UnitGroupList

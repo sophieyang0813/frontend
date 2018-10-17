@@ -14,7 +14,9 @@ import FloatingActionButton from 'material-ui/FloatingActionButton'
 import FilteredUnits from './filtered-units'
 import { SORT_BY, sorters } from '../explorer-components/sort-items'
 import { NoItemMsg } from '../explorer-components/no-item-msg'
-import { FilterRow } from '../explorer-components/filter-row'
+import { Sorter } from '../explorer-components/sorter'
+import { StatusFilter } from '../explorer-components/status-filter'
+import { RoleFilter } from '../explorer-components/role-filter'
 
 class UnitExplorer extends Component {
   constructor (props) {
@@ -111,21 +113,26 @@ class UnitExplorer extends Component {
           />
         ) : (
           <div className='flex-grow flex flex-column overflow-hidden'>
-            <FilterRow
-              statusFilterValues={statusFilterValues}
-              roleFilterValues={roleFilterValues}
-              onFilterClicked={this.handleStatusFilterClicked}
-              onRoleFilterClicked={this.handleRoleFilterClicked}
-              onSortClicked={this.handleSortClicked}
-              sortBy={sortBy}
-              status={['All', 'Active', 'Disabled']}
-              rolesPrimaryText={['All', 'Created by me', 'Involving me']}
-              roles={['All', 'Created', 'Involved']}
-              labels={[
-                [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'Name ↑'}],
-                [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Name ↓'}]
-              ]}
-            />
+            <div className='flex bg-very-light-gray'>
+              <StatusFilter
+                statusFilterValues={statusFilterValues}
+                onFilterClicked={this.handleStatusFilterClicked}
+                status={['All', 'Active', 'Disabled']}
+              />
+              <RoleFilter
+                roleFilterValues={roleFilterValues}
+                onRoleFilterClicked={this.handleRoleFilterClicked}
+                roles={['All', 'Created', 'Involved']}
+              />
+              <Sorter
+                onSortClicked={this.handleSortClicked}
+                sortBy={sortBy}
+                labels={[
+                  [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'Name ↑'}],
+                  [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Name ↓'}]
+                ]}
+              />
+            </div>
             <div className='flex-grow flex flex-column overflow-auto'>
               <div className='flex-grow bb b--very-light-gray bg-white pb6'>
                 { filteredUnits.length === 0 ? (

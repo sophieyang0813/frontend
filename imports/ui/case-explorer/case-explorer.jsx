@@ -19,8 +19,9 @@ import { storeBreadcrumb } from '../general-actions'
 import { CaseList } from '../case-explorer/case-list'
 import UnitSelectDialog from '../dialogs/unit-select-dialog'
 import { push } from 'react-router-redux'
-import { FilterRow } from '../explorer-components/filter-row'
-import { SORT_BY, sorters } from '../explorer-components/sort-items'
+import { SORT_BY, sorters, labels } from '../explorer-components/sort-items'
+import { RoleFilter } from '../explorer-components/role-filter'
+import { Sorter } from '../explorer-components/sorter'
 
 class CaseExplorer extends Component {
   constructor () {
@@ -143,22 +144,21 @@ class CaseExplorer extends Component {
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
-        <FilterRow
-          roleFilterValues={roleFilterValues}
-          onFilterClicked={this.handleStatusFilterClicked}
-          onRoleFilterClicked={this.handleRoleFilterClicked}
-          onSortClicked={this.handleSortClicked}
-          sortBy={sortBy}
-          roles={['All', 'Assigned to me']}
-          labels={[
-            [SORT_BY.DATE_DESCENDING, {category: 'Created - Latest', selected: 'Created ↓'}],
-            [SORT_BY.DATE_ASCENDING, {category: 'Created - Oldest', selected: ' Created ↑'}],
-            [SORT_BY.NAME_ASCENDING, {category: 'Name (A to Z)', selected: 'A to Z ↑'}],
-            [SORT_BY.NAME_DESCENDING, {category: 'Name (Z to A)', selected: 'Z to A ↓'}],
-            [SORT_BY.LATEST_UPDATE, {category: 'Updated - Latest', selected: 'Updated ↓'}],
-            [SORT_BY.OLDEST_UPDATE, {category: 'Updated - Oldest', selected: 'Updated ↑'}]
-          ]}
-        />
+        <div className='flex bg-very-light-gray'>
+          <RoleFilter
+            roleFilterValues={roleFilterValues}
+            onRoleFilterClicked={this.handleRoleFilterClicked}
+            roles={['All', 'Assigned to me']}
+          />
+          <Sorter
+            onSortClicked={this.handleSortClicked}
+            sortBy={sortBy}
+            labels={labels.concat([
+              [SORT_BY.LATEST_UPDATE, {category: 'Updated - Latest', selected: 'Updated ↓'}],
+              [SORT_BY.OLDEST_UPDATE, {category: 'Updated - Oldest', selected: 'Updated ↑'}]
+            ])}
+          />
+        </div>
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
           { !isLoading && cases.length
             ? <UnitGroupList
