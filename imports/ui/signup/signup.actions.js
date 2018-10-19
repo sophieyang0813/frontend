@@ -2,6 +2,7 @@
 import { Accounts } from 'meteor/accounts-base'
 import routerRedux from 'react-router-redux'
 export const SIGNUP_ERROR = 'signup_error'
+export const SIGNUP_IN_PROGRESS = 'signup_in_progress'
 
 export function submitSignupInfo (info) {
   const { push } = routerRedux
@@ -18,6 +19,9 @@ export function submitSignupInfo (info) {
           value: err
         })
       } else {
+        dispatch({
+          type: SIGNUP_IN_PROGRESS
+        })
         dispatch(push('/unit'))
       }
     })
