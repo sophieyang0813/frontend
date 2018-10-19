@@ -18,6 +18,7 @@ import {
   customBodyStyle
 } from './generic-dialog.mui-styles'
 import { Link } from 'react-router-dom'
+import { SORT_BY, sorters } from '../explorer-components/sort-items'
 
 class UnitSelectDialog extends Component {
   constructor (props) {
@@ -47,7 +48,8 @@ class UnitSelectDialog extends Component {
   render () {
     const { show, onDismissed, inProgress, unitList, onUnitClick, isLoading } = this.props
     const { searchText, searchMode, searchResult } = this.state
-    const units = searchMode ? searchResult : unitList
+    const list = unitList.sort(sorters[SORT_BY.NAME_ASCENDING])
+    const units = searchMode ? searchResult : list
     const actions =
       <div className='tc pa2 bg-bondi-blue'>
         <Link className={'white link ph3 br1 b--none pv2 lh-title dim' + (units.length === 0 ? 'dn' : '')}
