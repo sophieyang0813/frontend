@@ -48,5 +48,6 @@ export class RoleFilter extends Component {
 
 RoleFilter.propTypes = {
   roles: PropTypes.array,
-  roleFilterValues: PropTypes.string
+  roleFilterValues: PropTypes.string,
+  onRoleFilterClicked: PropTypes.func
 }

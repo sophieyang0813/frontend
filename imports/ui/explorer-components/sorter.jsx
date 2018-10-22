@@ -47,5 +47,7 @@ export class Sorter extends Component {
 }
 
 Sorter.propTypes = {
-  sortBy: PropTypes.number
+  sortBy: PropTypes.number,
+  categories: PropTypes.array,
+  onSortClicked: PropTypes.func
 }

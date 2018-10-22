@@ -47,5 +47,6 @@ export class StatusFilter extends Component {
 
 StatusFilter.propTypes = {
   status: PropTypes.array,
-  statusFilterValues: PropTypes.string
+  statusFilterValues: PropTypes.string,
+  onFilterClicked: PropTypes.func
 }

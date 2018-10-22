@@ -99,7 +99,7 @@ class ReportExplorer extends Component {
     const { isLoading, dispatch, reportList } = this.props
     const { statusFilterValues, roleFilterValues, open, sortBy } = this.state
     if (isLoading) return <Preloader />
-    const reports = this.makeReportGrouping(reportList, statusFilterValues, roleFilterValues, sortBy)
+    const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, roleFilterValues, sortBy)
 
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -122,9 +122,9 @@ class ReportExplorer extends Component {
             />
           </div>
           <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
-            { reports.length
+            { reportGrouping.length
               ? <UnitGroupList
-                unitGroupList={reports}
+                unitGroupList={reportGrouping}
                 expandedListRenderer={({allItems}) => (
                   <ReportList
                     allReports={allItems}

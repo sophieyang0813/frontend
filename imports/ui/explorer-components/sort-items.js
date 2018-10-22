@@ -18,25 +18,25 @@ export const sorters = {
   [SORT_BY.DATE_DESCENDING]: (a, b) => {
     const latestCaseAunit = a.items && a.items[0].creation_time
     const latestCaseBunit = b.items && b.items[0].creation_time
-    const dateA = Date.parse((latestCaseAunit && latestCaseAunit) || a.creation_time)
-    const dateB = Date.parse((latestCaseBunit && latestCaseBunit) || b.creation_time)
+    const dateA = Date.parse(latestCaseAunit && latestCaseAunit) || Date.parse(a.creation_time)
+    const dateB = Date.parse(latestCaseBunit && latestCaseBunit) || Date.parse(b.creation_time)
     return dateB - dateA
   },
   [SORT_BY.DATE_ASCENDING]: (a, b) => {
-    const oldestCaseAunit = a.items && a.items[a.items.length - 1].creation_time
-    const oldestCaseBunit = b.items && b.items[b.items.length - 1].creation_time
-    const dateA = Date.parse((oldestCaseAunit && oldestCaseAunit) || a.creation_time)
-    const dateB = Date.parse((oldestCaseBunit && oldestCaseBunit) || b.creation_time)
+    const oldestCaseAunit = a.items && a.items[0].creation_time
+    const oldestCaseBunit = b.items && b.items[0].creation_time
+    const dateA = Date.parse(oldestCaseAunit && oldestCaseAunit) || Date.parse(a.creation_time)
+    const dateB = Date.parse(oldestCaseBunit && oldestCaseBunit) || Date.parse(b.creation_time)
     return dateA - dateB
   },
   [SORT_BY.NAME_ASCENDING]: (a, b) => {
-    const nameA = a.unitTitle || a.title
-    const nameB = b.unitTitle || b.title
+    const nameA = a.unitTitle || a.title || a.name
+    const nameB = b.unitTitle || b.title || b.name
     return nameA.localeCompare(nameB)
   },
   [SORT_BY.NAME_DESCENDING]: (a, b) => {
-    const nameA = a.unitTitle || a.title
-    const nameB = b.unitTitle || b.title
+    const nameA = a.unitTitle || a.title || a.name
+    const nameB = b.unitTitle || b.title || b.name
     return nameB.localeCompare(nameA)
   },
   [SORT_BY.LATEST_UPDATE]: (a, b) => {
@@ -45,8 +45,8 @@ export const sorters = {
     return latestUpdateB - latestUpdateA
   },
   [SORT_BY.OLDEST_UPDATE]: (a, b) => {
-    const oldestUpdateA = (a.items && a.items[a.items.length - 1].latestUpdate) || a.latestUpdate
-    const oldestUpdateB = (b.items && b.items[b.items.length - 1].latestUpdate) || b.latestUpdate
+    const oldestUpdateA = (a.items && a.items[0].latestUpdate) || a.latestUpdate
+    const oldestUpdateB = (b.items && b.items[0].latestUpdate) || b.latestUpdate
     return oldestUpdateA - oldestUpdateB
   }
 }

@@ -114,13 +114,12 @@ class CaseExplorer extends Component {
       const sortType = sortBy ? sorters[sortBy] : sorters[SORT_BY.LATEST_UPDATE]
       return Object.keys(unitsDict).reduce((all, unitTitle) => {
         const { bzId, cases, unitType } = unitsDict[unitTitle]
-        cases.sort((a, b) => b.latestUpdate - a.latestUpdate)
         // Sorting cases within a unit by the order descending order of last update
-        const sortedCases = sortBy ? cases.sort(sorters[sortBy]) : cases
+        cases.sort(sortType)
         all.push({
           latestCaseUpdate: cases[0].latestUpdate, // The first case has to be latest due to the previous sort
           hasUnread: !!cases.find(caseItem => !!caseItem.unreadCounts), // true if any case has unreads
-          items: sortBy ? sortedCases : cases,
+          items: cases,
           unitType,
           unitTitle,
           bzId
@@ -140,7 +139,7 @@ class CaseExplorer extends Component {
     const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
     const { roleFilterValues, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const cases = this.makeCaseGrouping(caseList, roleFilterValues, sortBy, allNotifications, unreadNotifications)
+    const caseGrouping = this.makeCaseGrouping(caseList, roleFilterValues, sortBy, allNotifications, unreadNotifications)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
@@ -160,9 +159,9 @@ class CaseExplorer extends Component {
           />
         </div>
         <div className='bb b--black-10 overflow-auto flex-grow flex flex-column bg-very-light-gray pb6'>
-          { !isLoading && cases.length
+          { !isLoading && caseGrouping.length
             ? <UnitGroupList
-              unitGroupList={cases}
+              unitGroupList={caseGrouping}
               expandedListRenderer={({allItems}) => (
                 <CaseList
                   allCases={allItems}
