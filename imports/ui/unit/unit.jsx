@@ -25,14 +25,10 @@ import { userInfoItem } from '../../util/user'
 import { storeBreadcrumb } from '../general-actions'
 import CaseMenuItem from '../components/case-menu-item'
 import {ReportIcon} from '../report/report-icon'
-import SelectField from 'material-ui/SelectField'
-import { SORT_BY, sorters } from '../explorer-components/sort-items'
-import {
-  selectInputIconStyle,
-  noUnderline,
-  sortBoxInputStyle,
-  selectedItemStyle
-} from '../components/form-controls.mui-styles'
+import { SORT_BY, sorters, labels } from '../explorer-components/sort-items'
+import { Sorter } from '../explorer-components/sorter'
+import { StatusFilter } from '../explorer-components/status-filter'
+import { RoleFilter } from '../explorer-components/role-filter'
 
 import {
   menuItemDivStyle
@@ -75,25 +71,36 @@ class Unit extends Component {
     super(...arguments)
     this.state = {
       sortedCases: [],
-      statusFilterValues: [],
+      selectedStatusFilter: null,
+      selectedRoleFilter: null,
       sortBy: null
     }
   }
 
   get filteredCases () {
-    const { sortedCases, statusFilterValues, sortBy } = this.state
-    const statusFilter = statusFilterValues.length === 3 || (statusFilterValues.includes('Open') && statusFilterValues.includes('Closed'))
-      ? x => true
-      : statusFilterValues.includes('Open') ? x => !isClosed(x)
-        : statusFilterValues.includes('Closed') ? x => isClosed(x) : x => true
-    const assignedFilter = statusFilterValues.includes('Created By Me') ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
+    const { sortedCases, selectedStatusFilter, selectedRoleFilter, sortBy } = this.state
+    const statusFilter = selectedStatusFilter === 'Open' ? x => !isClosed(x)
+      : selectedStatusFilter === 'Closed' ? x => isClosed(x) : x => true
+    const assignedFilter = selectedRoleFilter === 'Created By Me' ? x => x.assignee === this.props.currentUser.bugzillaCreds.login : x => true
     const filteredCases = sortedCases.filter(caseItem => assignedFilter(caseItem) && statusFilter(caseItem)).sort(sorters[sortBy])
     return filteredCases
   }
 
-  handleFilterClicked = (event, index, statusFilterValues) => {
+  handleStatusFilterClicked = (event, index, selectedStatusFilter) => {
     this.setState({
-      statusFilterValues: statusFilterValues
+      selectedStatusFilter: selectedStatusFilter
+    })
+  }
+
+  handleRoleFilterClicked = (event, index, selectedRoleFilter) => {
+    this.setState({
+      selectedRoleFilter: selectedRoleFilter
+    })
+  }
+
+  handleSortClicked = (event, index, value) => {
+    this.setState({
+      sortBy: value
     })
   }
 
@@ -113,48 +120,22 @@ class Unit extends Component {
     }
   }
 
-  handleSortClicked = (event, index, value) => {
-    this.setState({
-      sortBy: value
-    })
-  }
-
-  filterMenu (options, statusFilterValues) {
-    return options.map((name) => (
-      <MenuItem
-        key={name}
-        insetChildren
-        checked={statusFilterValues && statusFilterValues.indexOf(name) > -1}
-        value={name}
-        primaryText={name}
-      />
-    ))
-  }
-
-  sortMenu (sortBy) {
-    const labels = [
-      [SORT_BY.DATE_ASCENDING, 'Latest'],
-      [SORT_BY.DATE_DESCENDING, 'Oldest'],
-      [SORT_BY.NAME_ASCENDING, 'Name (A to Z)'],
-      [SORT_BY.NAME_DESCENDING, 'Name (Z to A)']
-    ]
-    return labels.map(([sortBy, label], index) => (
-      <MenuItem
-        key={sortBy}
-        value={sortBy}
-        primaryText={label}
-      />
-    ))
-  }
-
-  filteredReportItems () {
+  filteredReports () {
     const { reportList, currentUser } = this.props
-    const { statusFilterValues, sortBy } = this.state
-    const statusFilter = statusFilterValues.length === 3 || (statusFilterValues.includes('Draft') && statusFilterValues.includes('Finalized')) ? report => true
-      : statusFilterValues.includes('Draft') ? report => report.status === REPORT_DRAFT_STATUS
-        : statusFilterValues.includes('Finalized') ? report => report.status !== REPORT_DRAFT_STATUS : report => true
-    const creatorFilter = statusFilterValues.includes('Created By Me') ? report => report.assignee === currentUser.bugzillaCreds.login : report => true
-    const filteredReports = reportList.filter(reportItem => creatorFilter(reportItem) && statusFilter(reportItem))
+    const { selectedStatusFilter, selectedRoleFilter, sortBy } = this.state
+    switch (selectedStatusFilter) {
+      case 'All':
+        reportList.filter(report => true)
+        break
+      case 'Draft':
+        reportList.filter(report => report.status === REPORT_DRAFT_STATUS)
+        break
+      case 'Finalized':
+        reportList.filter(report => report.status !== REPORT_DRAFT_STATUS)
+        break
+    }
+    const creatorFilter = selectedRoleFilter === 'Created By Me' ? report => report.assignee === currentUser.bugzillaCreds.login : report => true
+    const filteredReports = reportList.filter(reportItem => creatorFilter(reportItem))
       .sort(sorters[sortBy])
     return filteredReports.map(({ id, title, status, creation_time: date }) => {
       const isFinalized = status !== REPORT_DRAFT_STATUS
@@ -183,7 +164,7 @@ class Unit extends Component {
     const {
       unitItem, isLoading, unitError, casesError, unitUsers, caseList, reportList, reportsError, dispatch, match
     } = this.props
-    const { sortedCases, statusFilterValues, sortBy } = this.state
+    const { sortedCases, selectedStatusFilter, selectedRoleFilter, sortBy } = this.state
     const { filteredCases } = this
     const rootMatch = match
     const { unitId } = match.params
@@ -243,33 +224,25 @@ class Unit extends Component {
                   <div className='flex-grow bg-very-light-gray'>
                     { caseList.length ? (
                       <div>
-                        <div className='flex flex-grow'>
-                          <SelectField
-                            multiple
-                            hintText='View: All Cases'
-                            value={statusFilterValues}
-                            onChange={this.handleFilterClicked}
-                            autoWidth
-                            underlineStyle={noUnderline}
-                            hintStyle={sortBoxInputStyle}
-                            iconStyle={selectInputIconStyle}
-                            labelStyle={sortBoxInputStyle}
-                            selectedMenuItemStyle={selectedItemStyle}
-                          >
-                            {this.filterMenu(['Open', 'Closed', 'Assigned To Me'], statusFilterValues)}
-                          </SelectField>
-                          <SelectField
-                            hintText='Sort by: Date Added'
-                            value={sortBy}
-                            onChange={this.handleSortClicked}
-                            underlineStyle={noUnderline}
-                            hintStyle={sortBoxInputStyle}
-                            iconStyle={selectInputIconStyle}
-                            labelStyle={sortBoxInputStyle}
-                            selectedMenuItemStyle={selectedItemStyle}
-                          >
-                            {this.sortMenu(sortBy)}
-                          </SelectField>
+                        <div className='flex bg-very-light-gray'>
+                          <StatusFilter
+                            selectedStatusFilter={selectedStatusFilter}
+                            onFilterClicked={this.handleStatusFilterClicked}
+                            status={['All', 'Open', 'Closed']}
+                          />
+                          <RoleFilter
+                            selectedRoleFilter={selectedRoleFilter}
+                            onRoleFilterClicked={this.handleRoleFilterClicked}
+                            roles={['All', 'Assigned to me']}
+                          />
+                          <Sorter
+                            onSortClicked={this.handleSortClicked}
+                            sortBy={sortBy}
+                            labels={labels.concat([
+                              [SORT_BY.LATEST_UPDATE, {category: 'Updated - Latest', selected: 'Updated ↓'}],
+                              [SORT_BY.OLDEST_UPDATE, {category: 'Updated - Oldest', selected: 'Updated ↑'}]
+                            ])}
+                          />
                         </div>
                         { filteredCases.map(caseItem => (
                           <CaseMenuItem
@@ -284,41 +257,28 @@ class Unit extends Component {
                         ))
                         }
                       </div>
-                    ) : (<NoItem item='case' iconType='card_travel' />)
-                    }
+                    ) : (<NoItem item='case' iconType='card_travel' />) }
                   </div>
                   <div className='flex-grow bg-very-light-gray'>
                     {reportList.length ? (
                       <div>
-                        <div className='flex flex-grow'>
-                          <SelectField
-                            multiple
-                            hintText='View: All Reports'
-                            value={statusFilterValues}
-                            onChange={this.handleFilterClicked}
-                            autoWidth
-                            underlineStyle={noUnderline}
-                            hintStyle={sortBoxInputStyle}
-                            iconStyle={selectInputIconStyle}
-                            labelStyle={sortBoxInputStyle}
-                            selectedMenuItemStyle={selectedItemStyle}
-                          >
-                            {this.filterMenu(['Draft', 'Finalized', 'Created By Me'], statusFilterValues)}
-                          </SelectField>
-                          <SelectField
-                            hintText='Sort by: Date Added'
-                            value={sortBy}
-                            onChange={this.handleSortClicked}
-                            underlineStyle={noUnderline}
-                            hintStyle={sortBoxInputStyle}
-                            iconStyle={selectInputIconStyle}
-                            labelStyle={sortBoxInputStyle}
-                            selectedMenuItemStyle={selectedItemStyle}
-                          >
-                            {this.sortMenu(sortBy)}
-                          </SelectField>
+                        <div className='flex bg-very-light-gray'>
+                          <StatusFilter
+                            selectedStatusFilter={selectedStatusFilter}
+                            onFilterClicked={this.handleStatusFilterClicked}
+                            status={['All', 'Draft', 'Finalized']}
+                          />
+                          <RoleFilter
+                            selectedRoleFilter={selectedRoleFilter}
+                            onRoleFilterClicked={this.handleRoleFilterClicked}
+                            roles={['All', 'Created by me']}
+                          />
+                          <Sorter
+                            onSortClicked={this.handleSortClicked}
+                            sortBy={sortBy}
+                          />
                         </div>
-                        {this.filteredReportItems()}
+                        {this.filteredReports()}
                       </div>
                     ) : (
                       <NoItem item='inspection report' iconType='content_paste' />
