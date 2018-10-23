@@ -27,20 +27,20 @@ export class RoleFilter extends Component {
   }
 
   render () {
-    const { roleFilterValues, roles } = this.props
+    const { selectedRoleFilter, roles } = this.props
     return (
       <SelectField
         hintText='My role'
-        value={roleFilterValues}
+        value={selectedRoleFilter}
         onChange={this.handleRoleFilterClicked}
         autoWidth
         underlineStyle={noUnderline}
         hintStyle={sortBoxInputStyle}
         iconStyle={selectInputIconStyle}
-        labelStyle={roleFilterValues === 'All' ? sortBoxInputStyle : sortBoxBlueInputStyle}
+        labelStyle={selectedRoleFilter === 'All' ? sortBoxInputStyle : sortBoxBlueInputStyle}
         selectedMenuItemStyle={selectedItemStyle}
       >
-        {this.filterMenu(roleFilterValues, roles, 'Role Filter')}
+        {this.filterMenu(selectedRoleFilter, roles, 'Role Filter')}
       </SelectField>
     )
   }
@@ -48,6 +48,6 @@ export class RoleFilter extends Component {
 
 RoleFilter.propTypes = {
   roles: PropTypes.array,
-  roleFilterValues: PropTypes.string,
+  selectedRoleFilter: PropTypes.string,
   onRoleFilterClicked: PropTypes.func
 }

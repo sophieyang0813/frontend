@@ -25,21 +25,21 @@ class ReportExplorer extends Component {
     super(...arguments)
     this.state = {
       open: false,
-      statusFilterValues: null,
-      roleFilterValues: null,
+      selectedStatusFilter: null,
+      selectedRoleFilter: null,
       sortBy: null
     }
   }
 
-  handleStatusFilterClicked = (event, index, statusFilterValues) => {
+  handleStatusFilterClicked = (event, index, selectedStatusFilter) => {
     this.setState({
-      statusFilterValues: statusFilterValues
+      selectedStatusFilter: selectedStatusFilter
     })
   }
 
-  handleRoleFilterClicked = (event, index, roleFilterValues) => {
+  handleRoleFilterClicked = (event, index, selectedRoleFilter) => {
     this.setState({
-      roleFilterValues: roleFilterValues
+      selectedRoleFilter: selectedRoleFilter
     })
   }
 
@@ -60,13 +60,21 @@ class ReportExplorer extends Component {
   }
 
   makeReportGrouping = memoizeOne(
-    (reportList, statusFilterValues, roleFilterValues, sortBy) => {
-      const statusFilter = statusFilterValues === 'All' ? report => true
-        : statusFilterValues === 'Draft' ? report => report.status === REPORT_DRAFT_STATUS
-          : statusFilterValues === 'Finalized' ? report => report.status !== REPORT_DRAFT_STATUS : report => true
-      const creatorFilter = roleFilterValues !== 'Created by me' ? report => true : report => report.assignee === this.props.currentUser.bugzillaCreds.login
+    (reportList, selectedStatusFilter, selectedRoleFilter, sortBy) => {
+      switch (selectedStatusFilter) {
+        case 'All':
+          reportList = reportList.filter(report => true)
+          break
+        case 'Draft':
+          reportList = reportList.filter(report => report.status === REPORT_DRAFT_STATUS)
+          break
+        case 'Finalized':
+          reportList = reportList.filter(report => report.status !== REPORT_DRAFT_STATUS)
+          break
+      }
+      const creatorFilter = selectedRoleFilter !== 'Created by me' ? report => true : report => report.assignee === this.props.currentUser.bugzillaCreds.login
       const unitDict = reportList.reduce((dict, reportItem) => {
-        if (statusFilter(reportItem) && creatorFilter(reportItem)) {
+        if (creatorFilter(reportItem)) {
           const { selectedUnit: unitBzName, unitMetaData: metaData } = reportItem
           const unitType = metaData ? metaData.unitType : 'not_listed'
           const bzId = metaData ? metaData.bzId : 'not_listed'
@@ -97,9 +105,9 @@ class ReportExplorer extends Component {
 
   render () {
     const { isLoading, dispatch, reportList } = this.props
-    const { statusFilterValues, roleFilterValues, open, sortBy } = this.state
+    const { selectedStatusFilter, selectedRoleFilter, open, sortBy } = this.state
     if (isLoading) return <Preloader />
-    const reportGrouping = this.makeReportGrouping(reportList, statusFilterValues, roleFilterValues, sortBy)
+    const reportGrouping = this.makeReportGrouping(reportList, selectedStatusFilter, selectedRoleFilter, sortBy)
 
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -107,12 +115,12 @@ class ReportExplorer extends Component {
         <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
           <div className='flex bg-very-light-gray'>
             <StatusFilter
-              statusFilterValues={statusFilterValues}
+              selectedStatusFilter={selectedStatusFilter}
               onFilterClicked={this.handleStatusFilterClicked}
               status={['All', 'Draft', 'Finalized']}
             />
             <RoleFilter
-              roleFilterValues={roleFilterValues}
+              selectedRoleFilter={selectedRoleFilter}
               onRoleFilterClicked={this.handleRoleFilterClicked}
               roles={['All', 'Created by me']}
             />

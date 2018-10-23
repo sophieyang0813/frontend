@@ -26,21 +26,21 @@ class UnitExplorer extends Component {
       searchResult: [],
       searchMode: false,
       searchText: '',
-      statusFilterValues: null,
-      roleFilterValues: null,
+      selectedStatusFilter: null,
+      selectedRoleFilter: null,
       sortBy: null
     }
   }
 
-  handleStatusFilterClicked = (event, index, statusFilterValues) => {
+  handleStatusFilterClicked = (event, index, selectedStatusFilter) => {
     this.setState({
-      statusFilterValues: statusFilterValues
+      selectedStatusFilter: selectedStatusFilter
     })
   }
 
-  handleRoleFilterClicked = (event, index, roleFilterValues) => {
+  handleRoleFilterClicked = (event, index, selectedRoleFilter) => {
     this.setState({
-      roleFilterValues: roleFilterValues
+      selectedRoleFilter: selectedRoleFilter
     })
   }
 
@@ -76,15 +76,15 @@ class UnitExplorer extends Component {
   }
 
   get filteredUnits () {
-    const { statusFilterValues, sortBy, roleFilterValues } = this.state
+    const { selectedStatusFilter, sortBy, selectedRoleFilter } = this.state
     const { unitList, currentUserId } = this.props
-    const statusFilter = statusFilterValues === 'All' ? unitItem => true
-      : statusFilterValues === 'Active' ? unitItem => unitItem.is_active
-        : statusFilterValues === 'Disabled' ? unitItem => !unitItem.is_active
+    const statusFilter = selectedStatusFilter === 'All' ? unitItem => true
+      : selectedStatusFilter === 'Active' ? unitItem => unitItem.is_active
+        : selectedStatusFilter === 'Disabled' ? unitItem => !unitItem.is_active
           : unitItem => unitItem.is_active
-    const roleFilter = roleFilterValues === 'All' ? unitItem => true
-      : roleFilterValues === 'Created' ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
-        : roleFilterValues === 'Involved' ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
+    const roleFilter = selectedRoleFilter === 'All' ? unitItem => true
+      : selectedRoleFilter === 'Created' ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
+        : selectedRoleFilter === 'Involved' ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
         (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId)) : unitItem => true
     const filteredUnits = unitList.filter(unitItem => roleFilter(unitItem) && statusFilter(unitItem)).sort(sorters[sortBy])
     return filteredUnits
@@ -93,7 +93,7 @@ class UnitExplorer extends Component {
   render () {
     const { isLoading, dispatch } = this.props
     const { filteredUnits } = this
-    const { searchResult, searchMode, searchText, statusFilterValues, roleFilterValues, sortBy } = this.state
+    const { searchResult, searchMode, searchText, selectedStatusFilter, selectedRoleFilter, sortBy } = this.state
     if (isLoading) return <Preloader />
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -115,12 +115,12 @@ class UnitExplorer extends Component {
           <div className='flex-grow flex flex-column overflow-hidden'>
             <div className='flex bg-very-light-gray'>
               <StatusFilter
-                statusFilterValues={statusFilterValues}
+                selectedStatusFilter={selectedStatusFilter}
                 onFilterClicked={this.handleStatusFilterClicked}
                 status={['All', 'Active', 'Disabled']}
               />
               <RoleFilter
-                roleFilterValues={roleFilterValues}
+                selectedRoleFilter={selectedRoleFilter}
                 onRoleFilterClicked={this.handleRoleFilterClicked}
                 roles={['All', 'Created', 'Involved']}
               />

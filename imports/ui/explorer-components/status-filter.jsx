@@ -26,11 +26,11 @@ export class StatusFilter extends Component {
   }
 
   render () {
-    const { statusFilterValues, status } = this.props
+    const { selectedStatusFilter, status } = this.props
     return (
       <SelectField
         hintText='Status'
-        value={statusFilterValues}
+        value={selectedStatusFilter}
         onChange={this.handleStatusFilterClicked}
         autoWidth
         underlineStyle={noUnderline}
@@ -39,7 +39,7 @@ export class StatusFilter extends Component {
         labelStyle={sortBoxInputStyle}
         selectedMenuItemStyle={selectedItemStyle}
       >
-        {this.filterMenu(statusFilterValues, status)}
+        {this.filterMenu(selectedStatusFilter, status)}
       </SelectField>
     )
   }
@@ -47,6 +47,6 @@ export class StatusFilter extends Component {
 
 StatusFilter.propTypes = {
   status: PropTypes.array,
-  statusFilterValues: PropTypes.string,
+  selectedStatusFilter: PropTypes.string,
   onFilterClicked: PropTypes.func
 }

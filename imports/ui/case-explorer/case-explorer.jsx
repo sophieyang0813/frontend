@@ -29,14 +29,14 @@ class CaseExplorer extends Component {
     this.state = {
       caseId: '',
       open: false,
-      roleFilterValues: null,
+      selectedRoleFilter: null,
       sortBy: null
     }
   }
 
-  handleRoleFilterClicked = (event, index, roleFilterValues) => {
+  handleRoleFilterClicked = (event, index, selectedRoleFilter) => {
     this.setState({
-      roleFilterValues: roleFilterValues
+      selectedRoleFilter: selectedRoleFilter
     })
   }
 
@@ -87,16 +87,15 @@ class CaseExplorer extends Component {
     (a, b) => a.length === b.length
   )
   makeCaseGrouping = memoizeOne(
-    (caseList, roleFilterValues, sortBy, allNotifs, unreadNotifs) => {
-      const assignedFilter = roleFilterValues !== 'Assigned to me' ? x => true : x => x.assignee === this.props.currentUser.bugzillaCreds.login
+    (caseList, selectedRoleFilter, sortBy, allNotifs, unreadNotifs) => {
+      const assignedFilter = selectedRoleFilter !== 'Assigned to me' ? x => true : x => x.assignee === this.props.currentUser.bugzillaCreds.login
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
       // Building a unit dictionary to group the cases together
-      const unitsDict = caseList.filter(caseItem => !isClosed(caseItem)).reduce((dict, caseItem) => {
-        if (assignedFilter(caseItem)) { // Filtering only the cases that match the selection
+      const unitsDict = caseList.reduce((dict, caseItem) => {
+        if (assignedFilter(caseItem) && !isClosed(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
-
           // Pulling the existing or creating a new dictionary entry if none
           const unitDesc = dict[unitTitle] = dict[unitTitle] || {cases: [], bzId, unitType}
           const caseIdStr = caseItem.id.toString()
@@ -137,15 +136,15 @@ class CaseExplorer extends Component {
   )
   render () {
     const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
-    const { roleFilterValues, sortBy, open } = this.state
+    const { selectedRoleFilter, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const caseGrouping = this.makeCaseGrouping(caseList, roleFilterValues, sortBy, allNotifications, unreadNotifications)
+    const caseGrouping = this.makeCaseGrouping(caseList, selectedRoleFilter, sortBy, allNotifications, unreadNotifications)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
         <div className='flex bg-very-light-gray'>
           <RoleFilter
-            roleFilterValues={roleFilterValues}
+            selectedRoleFilter={selectedRoleFilter}
             onRoleFilterClicked={this.handleRoleFilterClicked}
             roles={['All', 'Assigned to me']}
           />
