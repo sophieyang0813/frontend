@@ -77,32 +77,36 @@ class UnitExplorer extends Component {
 
   get filteredUnits () {
     const { selectedStatusFilter, sortBy, selectedRoleFilter } = this.state
-    const { currentUserId, unitList } = this.props
-    var units
+    const { unitList, currentUserId } = this.props
+    let statusFilter
     switch (selectedStatusFilter) {
       case 'All':
-        units = (units || unitList).filter(unitItem => true)
+        statusFilter = unitItem => true
         break
       case 'Active':
-        units = (units || unitList).filter(unitItem => unitItem.is_active)
+        statusFilter = unitItem => unitItem.is_active
         break
       case 'Disabled':
-        units = (units || unitList).filter(unitItem => !unitItem.is_active)
+        statusFilter = unitItem => !unitItem.is_active
         break
+      default:
+        statusFilter = unitItem => unitItem.is_active
     }
+    let roleFilter
     switch (selectedRoleFilter) {
       case 'All':
-        units = (units || unitList).filter(unitItem => true)
+        roleFilter = unitItem => true
         break
       case 'Created':
-        units = (units || unitList).filter(unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId)
+        roleFilter = unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
         break
       case 'Involved':
-        units = (units || unitList).filter(unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
-        (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId)))
+        roleFilter = unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) || (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId))
         break
+      default:
+        roleFilter = unitItem => true
     }
-    const filteredUnits = (units || unitList).sort(sorters[sortBy])
+    const filteredUnits = unitList.filter(unitItem => roleFilter(unitItem) && statusFilter(unitItem)).sort(sorters[sortBy])
     return filteredUnits
   }
 
