@@ -78,14 +78,34 @@ class UnitExplorer extends Component {
   get filteredUnits () {
     const { selectedStatusFilter, sortBy, selectedRoleFilter } = this.state
     const { unitList, currentUserId } = this.props
-    const statusFilter = selectedStatusFilter === 'All' ? unitItem => true
-      : selectedStatusFilter === 'Active' ? unitItem => unitItem.is_active
-        : selectedStatusFilter === 'Disabled' ? unitItem => !unitItem.is_active
-          : unitItem => unitItem.is_active
-    const roleFilter = selectedRoleFilter === 'All' ? unitItem => true
-      : selectedRoleFilter === 'Created' ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
-        : selectedRoleFilter === 'Involved' ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
-        (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId)) : unitItem => true
+    let statusFilter
+    switch (selectedStatusFilter) {
+      case 'All':
+        statusFilter = unitItem => true
+        break
+      case 'Active':
+        statusFilter = unitItem => unitItem.is_active
+        break
+      case 'Disabled':
+        statusFilter = unitItem => !unitItem.is_active
+        break
+      default:
+        statusFilter = unitItem => unitItem.is_active
+    }
+    let roleFilter
+    switch (selectedRoleFilter) {
+      case 'All':
+        roleFilter = unitItem => true
+        break
+      case 'Created':
+        roleFilter = unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
+        break
+      case 'Involved':
+        roleFilter = unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) || (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId))
+        break
+      default:
+       roleFilter = unitItem => true
+    }
     const filteredUnits = unitList.filter(unitItem => roleFilter(unitItem) && statusFilter(unitItem)).sort(sorters[sortBy])
     return filteredUnits
   }
