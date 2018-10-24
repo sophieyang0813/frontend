@@ -77,16 +77,32 @@ class UnitExplorer extends Component {
 
   get filteredUnits () {
     const { selectedStatusFilter, sortBy, selectedRoleFilter } = this.state
-    const { unitList, currentUserId } = this.props
-    const statusFilter = selectedStatusFilter === 'All' ? unitItem => true
-      : selectedStatusFilter === 'Active' ? unitItem => unitItem.is_active
-        : selectedStatusFilter === 'Disabled' ? unitItem => !unitItem.is_active
-          : unitItem => unitItem.is_active
-    const roleFilter = selectedRoleFilter === 'All' ? unitItem => true
-      : selectedRoleFilter === 'Created' ? unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId
-        : selectedRoleFilter === 'Involved' ? unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
-        (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId)) : unitItem => true
-    const filteredUnits = unitList.filter(unitItem => roleFilter(unitItem) && statusFilter(unitItem)).sort(sorters[sortBy])
+    const { currentUserId, unitList } = this.props
+    var units
+    switch (selectedStatusFilter) {
+      case 'All':
+        units = (units || unitList).filter(unitItem => true)
+        break
+      case 'Active':
+        units = (units || unitList).filter(unitItem => unitItem.is_active)
+        break
+      case 'Disabled':
+        units = (units || unitList).filter(unitItem => !unitItem.is_active)
+        break
+    }
+    switch (selectedRoleFilter) {
+      case 'All':
+        units = (units || unitList).filter(unitItem => true)
+        break
+      case 'Created':
+        units = (units || unitList).filter(unitItem => unitItem.metaData && unitItem.metaData.ownerIds && unitItem.metaData.ownerIds[0] === currentUserId)
+        break
+      case 'Involved':
+        units = (units || unitList).filter(unitItem => ((unitItem.metaData && !unitItem.metaData.ownerIds) ||
+        (unitItem.metaData && !unitItem.metaData.ownerIds && !unitItem.metaData.ownerIds[0] === currentUserId)))
+        break
+    }
+    const filteredUnits = (units || unitList).sort(sorters[sortBy])
     return filteredUnits
   }
 
