@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+// @flow
+import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { createContainer } from 'meteor/react-meteor-data'
 import { connect } from 'react-redux'
@@ -11,13 +12,41 @@ import LoginLayout from '../layouts/login-layout'
 import { emailValidator } from '../../util/validators'
 import CircularProgress from 'material-ui/CircularProgress'
 
-export class SignupPage extends Component {
+type Props = {
+  dispatch: (info: {}) => void,
+  userCreationState: {|
+    inProgress: boolean,
+    error: string
+  |}
+ }
+
+type State = {
+  termsAgreement: boolean,
+  info: {
+    password: string,
+    emailAddress: string
+  },
+  errorTexts: {}
+}
+
+type Inputs = Array<{
+  label: string,
+  identifier: string,
+  placeholder: string,
+  type: string,
+  onChange: (evt: { target: {}}) => void
+}>
+
+export class SignupPage extends React.Component<Props, State> {
+  inputs: Inputs
+
   constructor () {
     super(...arguments)
     this.state = {
       termsAgreement: false,
       info: {
-        password: ''
+        password: '',
+        emailAddress: ''
       },
       errorTexts: {}
     }
@@ -28,7 +57,7 @@ export class SignupPage extends Component {
         identifier: 'emailAddress',
         placeholder: 'Your email address',
         type: 'email',
-        onChange: evt => {
+        onChange: (evt) => {
           const { value } = evt.target
           const { info, errorTexts } = this.state
           this.setState({
@@ -44,11 +73,11 @@ export class SignupPage extends Component {
     this.inputs.forEach(({ identifier }) => { this.state.info[identifier] = '' })
   }
 
-  makeInfoChange = infoMod => this.setState({
+  makeInfoChange = (infoMod: {}) => this.setState({
     info: Object.assign({}, this.state.info, infoMod)
   })
 
-  handleSubmit = (event) => {
+  handleSubmit = (event: SyntheticEvent<>) => {
     // Stopping default form behavior
     event.preventDefault()
     if (!this.isFormValid()) return
@@ -62,6 +91,7 @@ export class SignupPage extends Component {
       return all
     }, {})
     const { submitSignupInfo } = actions
+    console.log('this.props.dispatch', this.props.dispatch)
     this.props.dispatch(submitSignupInfo(signupInfo))
   }
 
