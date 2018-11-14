@@ -91,7 +91,6 @@ export class SignupPage extends React.Component<Props, State> {
       return all
     }, {})
     const { submitSignupInfo } = actions
-    console.log('this.props.dispatch', this.props.dispatch)
     this.props.dispatch(submitSignupInfo(signupInfo))
   }
 
