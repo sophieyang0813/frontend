@@ -77,7 +77,7 @@ export class SignupPage extends React.Component<Props, State> {
     info: Object.assign({}, this.state.info, infoMod)
   })
 
-  handleSubmit = (event: SyntheticEvent<>) => {
+  handleSubmit = (event) => {
     // Stopping default form behavior
     event.preventDefault()
     if (!this.isFormValid()) return
