@@ -1,4 +1,5 @@
 // @flow
+/* global SyntheticInputEvent, HTMLInputElement */
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { createContainer } from 'meteor/react-meteor-data'

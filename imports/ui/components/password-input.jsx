@@ -1,4 +1,5 @@
 // @flow
+/* global SyntheticInputEvent, HTMLInputElement */
 import * as React from 'react'
 import Checkbox from 'material-ui/Checkbox'
 import FontIcon from 'material-ui/FontIcon'

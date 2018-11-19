@@ -15,10 +15,6 @@
     "parser": "babel-eslint",
     "plugins": [
       "flowtype"
-    ],
-    "globals": [
-      "SyntheticInputEvent",
-      "HTMLInputElement"
     ]
   },
   "dependencies": {
