@@ -8,7 +8,7 @@ type Props = {
   inpRef?: (el: React.Node) => void,
   label?: string,
   value?: string,
-  onChange: (val: string) => void
+  onChange: (evt: SyntheticInputEvent<HTMLInputElement>) => void
 }
 type State = {
   showPass: boolean

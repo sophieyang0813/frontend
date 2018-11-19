@@ -7,17 +7,17 @@ import RaisedButton from 'material-ui/RaisedButton'
 import Checkbox from 'material-ui/Checkbox'
 import InputRow from '../components/input-row'
 import PasswordInput from '../components/password-input'
-import actions from './signup.actions'
+import { submitSignupInfo } from './signup.actions'
 import LoginLayout from '../layouts/login-layout'
 import { emailValidator } from '../../util/validators'
 import CircularProgress from 'material-ui/CircularProgress'
 
 type Props = {
-  dispatch: (info: {}) => void,
-  userCreationState: {|
+  dispatch: (action: {}) => void,
+  userCreationState: {
     inProgress: boolean,
     error: string
-  |}
+  }
  }
 
 type State = {
@@ -34,7 +34,7 @@ type Inputs = Array<{
   identifier: string,
   placeholder: string,
   type: string,
-  onChange: (evt: { target: {}}) => void
+  onChange: (evt: SyntheticInputEvent<HTMLInputElement>) => void
 }>
 
 export class SignupPage extends React.Component<Props, State> {
@@ -77,20 +77,19 @@ export class SignupPage extends React.Component<Props, State> {
     info: Object.assign({}, this.state.info, infoMod)
   })
 
-  handleSubmit = (event) => {
+  handleSubmit = (event: SyntheticInputEvent<HTMLInputElement>) => {
     // Stopping default form behavior
     event.preventDefault()
     if (!this.isFormValid()) return
 
     const { info } = this.state
     // Copying all the input values and trimming them
-    const signupInfo = Object.keys(info).reduce((all, curr) => {
+    const signupInfo: Object = Object.keys(info).reduce((all, curr) => {
       if (info[curr]) {
         all[curr] = info[curr].trim()
       }
       return all
     }, {})
-    const { submitSignupInfo } = actions
     this.props.dispatch(submitSignupInfo(signupInfo))
   }
 

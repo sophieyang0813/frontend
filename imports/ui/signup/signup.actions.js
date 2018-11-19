@@ -5,9 +5,9 @@ import routerRedux from 'react-router-redux'
 export const SIGNUP_ERROR = 'signup_error'
 export const SIGNUP_IN_PROGRESS = 'signup_in_progress'
 
-type Action =
-  | { type: typeof SIGNUP_ERROR }
-  | { type: typeof SIGNUP_IN_PROGRESS, value: {} };
+type Action = {
+  type: string
+}
 
  type Info = {
     password: string,
@@ -17,9 +17,9 @@ type Action =
 type Dispatch = (action: Action) => any;
 type ThunkAction = (dispatch: Dispatch) => any
 
-export default function submitSignupInfo (info: Info): ThunkAction {
+export function submitSignupInfo (info: Info): ThunkAction {
   const { push } = routerRedux
-  return (dispatch) => {
+  return (dispatch: Dispatch) => {
     dispatch({
       type: SIGNUP_IN_PROGRESS
     })
