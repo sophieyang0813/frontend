@@ -158,7 +158,6 @@ class CaseExplorer extends Component {
       allNotifs: allNotifications,
       unreadNotifs: unreadNotifications
     })
-    console.log('caseGrouping', caseGrouping)
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
