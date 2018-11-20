@@ -147,7 +147,7 @@ export class SignupPage extends React.Component<Props, State> {
           <div className='mt3 tr'>
             <RaisedButton label={!userCreationState.inProgress && 'submit'} labelColor='#ffffff' backgroundColor='var(--bondi-blue)' type='submit'
               style={{ boxShadow: 'none' }}
-              disabled={!this.isFormValid()}>
+              disabled={!this.isFormValid() || userCreationState.inProgress}>
               {userCreationState.inProgress && (
                 <div className='absolute top-0 right-0 bottom-0 left-0'>
                   <CircularProgress color='#ffffff' size={30} />
