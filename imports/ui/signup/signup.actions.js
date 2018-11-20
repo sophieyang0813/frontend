@@ -4,6 +4,7 @@ import { Accounts } from 'meteor/accounts-base'
 import routerRedux from 'react-router-redux'
 export const SIGNUP_ERROR = 'signup_error'
 export const SIGNUP_IN_PROGRESS = 'signup_in_progress'
+export const SIGNUP_SUCCESS = 'signup_success'
 
 type Action = {
   type: string
@@ -35,6 +36,9 @@ export function submitSignupInfo (info: Info): ThunkAction {
           value: err
         })
       } else {
+        dispatch({
+          type: SIGNUP_SUCCESS
+        })
         dispatch(push('/unit'))
       }
     })
