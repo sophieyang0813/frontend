@@ -43,8 +43,13 @@ export const caseServerFieldMapping = {
 }
 
 export const REPORT_KEYWORD = 'inspection_report'
+export const REPORT_ROOM_KEYWORD = 'room'
+export const REPORT_ITEM_KEYWORD = 'item'
 
-export const isClosed = caseItem => ['RESOLVED', 'VERIFIED', 'CLOSED'].includes(caseItem.status)
+const REPORT_EL_TYPES = [REPORT_KEYWORD, REPORT_ITEM_KEYWORD, REPORT_ROOM_KEYWORD]
+
+const CLOSED_STATUS_TYPES = ['RESOLVED', 'VERIFIED', 'CLOSED']
+export const isClosed = caseItem => CLOSED_STATUS_TYPES.includes(caseItem.status)
 
 export const caseClientFieldMapping = Object.assign(
   Object.keys(caseServerFieldMapping).reduce((all, key) => ({
@@ -57,7 +62,7 @@ export const caseClientFieldMapping = Object.assign(
 )
 
 export const getCaseUsers = (() => {
-  const normalizeUser = ({real_name: realName, email, name}) => ({
+  const normalizeUser = ({ real_name: realName, email, name }) => ({
     login: name,
     name: realName,
     email
@@ -121,7 +126,7 @@ export const associatedCasesQueryExps = userIdentifier => [
   }
 ]
 
-const denormalizeUser = ({login, name, email}) => ({
+const denormalizeUser = ({ login, name, email }) => ({
   name: login,
   real_name: name,
   email
@@ -131,6 +136,46 @@ const transformCaseForClient = bug => Object.keys(bug).reduce((all, key) => ({
   ...all,
   [caseClientFieldMapping[key] || key]: bug[key]
 }), {})
+
+export const toggleParticipants = (loginNames, isAdd, caseId, clientCollection, reloadFunc, errorLogParams) => {
+  const { callAPI } = bugzillaApi
+  const currUser = Meteor.users.findOne({ _id: Meteor.userId() })
+
+  if (Meteor.isClient) {
+    const opType = isAdd ? '$push' : '$pull'
+    loginNames.forEach(email => {
+      clientCollection.update({ id: caseId }, {
+        [opType]: {
+          involvedList: email
+        },
+        [opType]: {
+          involvedListDetail: { name: email }
+        }
+      })
+    })
+  } else {
+    const { apiKey } = currUser.bugzillaCreds
+    const opType = isAdd ? 'add' : 'remove'
+    const payload = {
+      api_key: apiKey,
+      cc: {
+        [opType]: loginNames
+      }
+    }
+    try {
+      callAPI('put', `/rest/bug/${caseId}`, payload, false, true)
+
+      reloadFunc()
+      loginNames.forEach(email => console.log(`${email} was ${isAdd ? '' : 'un'}subscribed to BZ case ${caseId}`))
+    } catch (e) {
+      console.error({
+        ...errorLogParams,
+        error: e
+      })
+      throw new Meteor.Error(`API Error: ${e.response.data.message}`)
+    }
+  }
+}
 
 // Exported for testing purposes
 export const factoryOptions = {
@@ -166,30 +211,41 @@ if (Meteor.isServer) {
   const noReportsExp = {
     field: 'keywords',
     operator: 'nowords',
-    value: REPORT_KEYWORD
+    value: REPORT_EL_TYPES.join(',')
+  }
+  const openOnlyExp = {
+    field: 'bug_status',
+    operator: 'nowords',
+    value: CLOSED_STATUS_TYPES.join(',')
   }
 
   // TODO: Add tests for this
   Meteor.publish(`${collectionName}.associatedWithMe`, associationFactory(
     publicationObj.publishByCustomQuery({
       uriTemplate: () => '/rest/bug',
-      queryBuilder: subHandle => {
+      queryBuilder: (subHandle, options = {}) => {
         if (!subHandle.userId) {
           return {}
         }
+        const { showOpenOnly } = options
         const currUser = Meteor.users.findOne(subHandle.userId)
         const { login: userIdentifier } = currUser.bugzillaCreds
+        const queryExpressions = [
+          noReportsExp,
+          ...associatedCasesQueryExps(userIdentifier)
+        ]
+        if (showOpenOnly) {
+          queryExpressions.push(openOnlyExp)
+        }
         return caseQueryBuilder(
-          [
-            noReportsExp,
-            ...associatedCasesQueryExps(userIdentifier)
-          ],
+          queryExpressions,
           [
             'product',
             'summary',
             'id',
             'status',
-            'assigned_to'
+            'assigned_to',
+            'creation_time'
           ]
         )
       },
@@ -198,7 +254,7 @@ if (Meteor.isServer) {
         return caseItem => {
           const { assignee, creator, involvedList, keywords } = transformCaseForClient(caseItem)
           return (
-            !(keywords && keywords.includes(REPORT_KEYWORD)) && (
+            !(keywords && REPORT_EL_TYPES.some(type => keywords.includes(type))) && (
               userIdentifier === assignee ||
               userIdentifier === creator ||
               involvedList.includes(userIdentifier)
@@ -253,7 +309,7 @@ if (Meteor.isServer) {
       return caseItem => {
         const { selectedUnit, assignee, creator, involvedList, keywords } = transformCaseForClient(caseItem)
         return (
-          selectedUnit === unitName && !(keywords && keywords.includes(REPORT_KEYWORD)) && (
+          selectedUnit === unitName && !(keywords && REPORT_EL_TYPES.some(type => keywords.includes(type))) && (
             userIdentifier === assignee ||
             userIdentifier === creator ||
             involvedList.includes(userIdentifier)
@@ -281,20 +337,20 @@ export const fieldEditMethodMaker = ({ editableFields, methodName, publicationOb
     }
 
     if (Meteor.isClient) {
-      Cases.update({id: caseId}, {
+      Cases.update({ id: caseId }, {
         $set: changeSet
       })
     } else { // is server
       const { callAPI } = bugzillaApi
-      const { bugzillaCreds: { apiKey } } = Meteor.users.findOne({_id: Meteor.userId()})
+      const { bugzillaCreds: { apiKey } } = Meteor.users.findOne({ _id: Meteor.userId() })
       try {
         const normalizedSet = Object.keys(changeSet).reduce((all, key) => {
           all[caseServerFieldMapping[key]] = changeSet[key]
           return all
         }, {})
-        callAPI('put', `/rest/bug/${caseId}`, Object.assign({api_key: apiKey}, normalizedSet), false, true)
+        callAPI('put', `/rest/bug/${caseId}`, Object.assign({ api_key: apiKey }, normalizedSet), false, true)
         const { data: { bugs: [caseItem] } } = callAPI(
-          'get', `/rest/bug/${caseId}`, {api_key: apiKey}, false, true
+          'get', `/rest/bug/${caseId}`, { api_key: apiKey }, false, true
         )
         const updatedSet = Object.keys(changeSet).reduce((all, key) => {
           all[key] = caseItem[caseServerFieldMapping[key]]
@@ -334,45 +390,18 @@ Meteor.methods({
       throw new Meteor.Error('not-authorized')
     }
 
-    const { callAPI } = bugzillaApi
-    const currUser = Meteor.users.findOne({_id: Meteor.userId()})
-
-    if (Meteor.isClient) {
-      const opType = isAdd ? '$push' : '$pull'
-      loginNames.forEach(email => {
-        Cases.update({id: caseId}, {
-          [opType]: {
-            involvedList: email
-          },
-          [opType]: {
-            involvedListDetail: {name: email}
-          }
-        })
-      })
-    } else {
-      const { apiKey } = currUser.bugzillaCreds
-      const opType = isAdd ? 'add' : 'remove'
-      const payload = {
-        api_key: apiKey,
-        cc: {
-          [opType]: loginNames
-        }
+    toggleParticipants(
+      loginNames,
+      isAdd,
+      caseId,
+      Cases,
+      () => reloadCaseFields(caseId, ['involvedList', 'involvedListDetail']),
+      {
+        user: Meteor.userId(),
+        method: `${collectionName}.toggleParticipant`,
+        args: [loginNames, caseId, isAdd]
       }
-      try {
-        callAPI('put', `/rest/bug/${caseId}`, payload, false, true)
-
-        reloadCaseFields(caseId, ['involvedList', 'involvedListDetail'])
-        loginNames.forEach(email => console.log(`${email} was ${isAdd ? '' : 'un'}subscribed to case ${caseId}`))
-      } catch (e) {
-        console.error({
-          user: Meteor.userId(),
-          method: `${collectionName}.toggleParticipant`,
-          args: [loginNames, caseId, isAdd],
-          error: e
-        })
-        throw new Meteor.Error(`API Error: ${e.response.data.message}`)
-      }
-    }
+    )
   },
   [`${collectionName}.insert`] (params, { newUserEmail, newUserIsOccupant, parentReportId }) {
     if (!Meteor.userId()) {
@@ -464,7 +493,7 @@ Meteor.methods({
           newUserEmail, params.assignedUnitRole, newUserIsOccupant, newCaseId, unitItem.id, TYPE_ASSIGNED
         )
       }
-      return {newCaseId}
+      return { newCaseId }
     }
   },
   [`${collectionName}.changeAssignee`] (user, caseId) {
@@ -476,7 +505,7 @@ Meteor.methods({
       throw new Meteor.Error('not-authorized')
     }
 
-    const assigneeUser = Meteor.users.findOne({'bugzillaCreds.login': user.login})
+    const assigneeUser = Meteor.users.findOne({ 'bugzillaCreds.login': user.login })
 
     unassignPending(caseId)
 
@@ -506,7 +535,7 @@ Meteor.methods({
       })
     } else {
       if (Meteor.isClient) {
-        Cases.update({id: caseId}, {
+        Cases.update({ id: caseId }, {
           $set: {
             assigneeDetail: denormalizeUser(user),
             assignee: user.login
@@ -514,7 +543,7 @@ Meteor.methods({
         })
       } else { // is server
         const { callAPI } = bugzillaApi
-        const { bugzillaCreds: { apiKey } } = Meteor.users.findOne({_id: Meteor.userId()})
+        const { bugzillaCreds: { apiKey } } = Meteor.users.findOne({ _id: Meteor.userId() })
         try {
           callAPI('put', `/rest/bug/${caseId}`, {
             [caseServerFieldMapping.assignee]: user.login,
