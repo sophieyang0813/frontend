@@ -7,16 +7,14 @@ import { createContainer } from 'meteor/react-meteor-data'
 import _ from 'lodash'
 import { UneeTIcon } from '../components/unee-t-icons'
 import { setDrawerState } from '../general-actions'
+import { updateSearch } from './case-search.actions'
 import CaseExplorer from '../case-explorer/case-explorer'
 import Preloader from '../preloader/preloader'
 import Case from './case'
-
 import RootAppBar from '../components/root-app-bar'
 import {
   emptyPaneIconStyle
 } from './case-master.mui-styles'
-import Cases, { collectionName} from '../../api/cases'
-import UnitMetaData from '../../api/unit-meta-data'
 
 const isMobileScreen = window.matchMedia('screen and (max-width: 768px)').matches
 
@@ -82,23 +80,24 @@ class CaseMaster extends Component {
   }
 
   handleSearch = (searchText) => {
-    this.setState({searchText})
+    this.setState({ searchText: searchText })
+    console.log('searchText', searchText)
     if (searchText === '') {
-      this.setState({searchMode: false})
+      this.setState({ searchMode: false })
     } else {
-      this.setState({searchMode: true})
+      this.setState({ searchMode: true })
       const matcher = new RegExp(searchText, 'i')
-      const searchResult = this.props.caseList
+      const searchResult = this.state.componentsProps['/case'].caseList
         .filter(x => !matcher || (x.title && x.title.match(matcher)))
-      this.setState({
-        searchResult: searchResult
-      })
+      this.props.dispatch(updateSearch(searchText, searchResult))
+      console.log('master search')
     }
   }
 
   render () {
-    const { isLoading, componentsProps, searchText, searchResult } = this.state
+    const { isLoading, componentsProps, searchText, searchResult, caseSearchState } = this.state
     const { user } = this.props
+    console.log('this props casemasters', this.props.caseSearchState)
     return (
       <div className='flex flex-column full-height roboto overflow-hidden'>
         {isLoading ? (
@@ -113,7 +112,15 @@ class CaseMaster extends Component {
                   onSearchChanged={this.handleSearch}
                 />
               )} />
-            ))}
+            ))}   
+            {/* for case explore & cases, givce mobileheader ; what is compnentsProps path? */}
+          {/* how is routecomp.mobileheader connected to connectedwrapper in case-explorer? why is it useful to connect connectedWrapper to mobileheader? */}
+            {/* a. connectedwrapper: why use connected and createContainer? they just seem to fetch lots of data? how is this relevant to mobile header?  */}
+            {/* know what createcontainer & connect do; explain how they are connected in your words; before asking */}
+
+          {/* when is contentProps used? how does componentsProps know the case list? */}
+          {/* how does switch work? it overrides it current locatio nmatches;  */}
+          {/* why pass contentProps when not using it?  */}
           </Switch>
         ) : (
           <RootAppBar title='Open Cases'
@@ -144,7 +151,8 @@ class CaseMaster extends Component {
           <div className={isLoading ? 'dn' : 'flex flex-grow overflow-hidden'}>
             <div className='flex-3'>
               <CaseExplorer
-                searchResult={searchResult}
+                searchText={searchText}
+                // searchResult={caseSearchState}
                 dispatchLoadingResult={() => {
                   this.setState({
                     isLoading: false
@@ -188,20 +196,9 @@ CaseMaster.propTypes = {
   user: PropTypes.object.isRequired
 }
 
-let casesError
-export default connect(() => ({}))(createContainer(() => { // map meteor state to props
-  const casesHandle = Meteor.subscribe(`${collectionName}.associatedWithMe`, {
-    onStop: (error) => {
-      casesError = error
-    }
-  })
-  return {
-    caseList: Cases.find().fetch().map(caseItem => Object.assign({}, caseItem, {
-      unitType: (UnitMetaData.findOne({bzName: caseItem.selectedUnit}) || {}).unitType,
-      selectedUnitBzId: (UnitMetaData.findOne({bzName: caseItem.selectedUnit}) || {}).bzId
-    })),
-    isLoading: !casesHandle.ready(),
-    user: Meteor.user() || {},
-    casesError
-  }
-}, CaseMaster))
+export default connect(
+  ({ caseSearchState }) => ({ caseSearchState
+  }) // map redux state to props
+)(createContainer(() => ({
+  user: Meteor.user() || {}
+}), CaseMaster))

@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import memoizeOne from 'memoize-one'
-import Cases, { collectionName, isClosed } from '../../api/cases'
+import Cases, { collectionName, isClosed } from '../../api/caseList'
 import CaseNotifications, { collectionName as notifCollName } from '../../api/case-notifications'
 import UnitMetaData from '../../api/unit-meta-data'
 import RootAppBar from '../components/root-app-bar'
@@ -93,7 +93,6 @@ class CaseExplorer extends Component {
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
 
-      // Building a unit dictionary to group the cases together
       const unitsDict = caseList.reduce((dict, caseItem) => {
         if (assignedFilter(caseItem) && !isClosed(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType } = caseItem
@@ -145,25 +144,22 @@ class CaseExplorer extends Component {
       })
     }
   )
+
   render () {
-    const { isLoading, caseList, allNotifications, unreadNotifications, searchResult } = this.props
+    const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
     const { selectedRoleFilter, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-
-    const caseGrouping = searchResult && searchResult.length !== 0
-      ? this.makeCaseGrouping({
-        searchResult,
-        selectedRoleFilter,
-        sortBy,
-        allNotifs: allNotifications,
-        unreadNotifs: unreadNotifications
-      }) : this.makeCaseGrouping({
-        caseList,
-        selectedRoleFilter,
-        sortBy,
-        allNotifs: allNotifications,
-        unreadNotifs: unreadNotifications
-      })
+    // const matcher = new RegExp(this.props.searchText, 'i')
+    // const searchResult = caseList.filter(x => !matcher || (x.title && x.title.match(matcher)))
+    // const cases = this.props.searchText === '' ? caseList : searchResult
+    const caseGrouping =
+        this.makeCaseGrouping({
+          caseList,
+          selectedRoleFilter,
+          sortBy,
+          allNotifs: allNotifications,
+          unreadNotifs: unreadNotifications
+        })
     return (
       <div className='flex flex-column roboto overflow-hidden flex-grow h-100 relative'>
         <UnverifiedWarning />
@@ -222,7 +218,7 @@ CaseExplorer.propTypes = {
 
 let casesError
 const connectedWrapper = connect(
-  () => ({}) // map redux state to props
+  ({ caseSearchState }) => ({ searchText: caseSearchState.searchText, searchResult: caseSearchState.searchResult }) // map redux state to props
 )(createContainer(() => { // map meteor state to props
   const casesHandle = Meteor.subscribe(`${collectionName}.associatedWithMe`, { showOpenOnly: true }, {
     onStop: (error) => {
