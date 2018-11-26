@@ -81,7 +81,6 @@ class CaseMaster extends Component {
 
   handleSearch = (searchText) => {
     this.setState({ searchText: searchText })
-    console.log('searchText', searchText)
     if (searchText === '') {
       this.setState({ searchMode: false })
     } else {
@@ -90,14 +89,12 @@ class CaseMaster extends Component {
       const searchResult = this.state.componentsProps['/case'].caseList
         .filter(x => !matcher || (x.title && x.title.match(matcher)))
       this.props.dispatch(updateSearch(searchText, searchResult))
-      console.log('master search')
     }
   }
 
   render () {
-    const { isLoading, componentsProps, searchText, searchResult, caseSearchState } = this.state
+    const { isLoading, componentsProps, searchText, searchResult } = this.state
     const { user } = this.props
-    console.log('this props casemasters', this.props.caseSearchState)
     return (
       <div className='flex flex-column full-height roboto overflow-hidden'>
         {isLoading ? (
@@ -112,15 +109,7 @@ class CaseMaster extends Component {
                   onSearchChanged={this.handleSearch}
                 />
               )} />
-            ))}   
-            {/* for case explore & cases, givce mobileheader ; what is compnentsProps path? */}
-          {/* how is routecomp.mobileheader connected to connectedwrapper in case-explorer? why is it useful to connect connectedWrapper to mobileheader? */}
-            {/* a. connectedwrapper: why use connected and createContainer? they just seem to fetch lots of data? how is this relevant to mobile header?  */}
-            {/* know what createcontainer & connect do; explain how they are connected in your words; before asking */}
-
-          {/* when is contentProps used? how does componentsProps know the case list? */}
-          {/* how does switch work? it overrides it current locatio nmatches;  */}
-          {/* why pass contentProps when not using it?  */}
+            ))}
           </Switch>
         ) : (
           <RootAppBar title='Open Cases'
@@ -151,8 +140,6 @@ class CaseMaster extends Component {
           <div className={isLoading ? 'dn' : 'flex flex-grow overflow-hidden'}>
             <div className='flex-3'>
               <CaseExplorer
-                searchText={searchText}
-                // searchResult={caseSearchState}
                 dispatchLoadingResult={() => {
                   this.setState({
                     isLoading: false

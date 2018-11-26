@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import memoizeOne from 'memoize-one'
-import Cases, { collectionName, isClosed } from '../../api/caseList'
+import Cases, { collectionName, isClosed } from '../../api/cases'
 import CaseNotifications, { collectionName as notifCollName } from '../../api/case-notifications'
 import UnitMetaData from '../../api/unit-meta-data'
 import Units, { collectionName as unitCollName } from '../../api/units'
@@ -62,7 +62,6 @@ class CaseExplorer extends Component {
       this.props.dispatchLoadingResult({ caseList })
     }
   }
-
   makeCaseUpdateTimeDict = memoizeOne(
     allNotifications => allNotifications.reduce((dict, curr) => {
       const caseIdStr = curr.caseId.toString()
@@ -93,7 +92,7 @@ class CaseExplorer extends Component {
       const assignedFilter = selectedRoleFilter !== 'Assigned to me' ? x => true : x => x.assignee === this.props.currentUser.bugzillaCreds.login
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
-
+      // Building a unit dictionary to group the cases together
       const unitsDict = caseList.reduce((dict, caseItem) => {
         if (assignedFilter(caseItem) && !isClosed(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType, isActive } = caseItem
@@ -146,17 +145,14 @@ class CaseExplorer extends Component {
       })
     }
   )
-
   render () {
-    const { isLoading, caseList, allNotifications, unreadNotifications } = this.props
+    const { isLoading, caseList, allNotifications, unreadNotifications, searchResult } = this.props
     const { selectedRoleFilter, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    // const matcher = new RegExp(this.props.searchText, 'i')
-    // const searchResult = caseList.filter(x => !matcher || (x.title && x.title.match(matcher)))
-    // const cases = this.props.searchText === '' ? caseList : searchResult
+    const cases = this.props.searchText === '' ? caseList : searchResult
     const caseGrouping =
         this.makeCaseGrouping({
-          caseList,
+          cases,
           selectedRoleFilter,
           sortBy,
           allNotifs: allNotifications,
