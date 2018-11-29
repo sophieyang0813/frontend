@@ -88,7 +88,7 @@ class CaseMaster extends Component {
       const matcher = new RegExp(searchText, 'i')
       const searchResult = this.state.componentsProps['/case'].caseList
         .filter(x => !matcher || (x.title && x.title.match(matcher)))
-      this.props.dispatch(updateSearch(searchText, searchResult))
+      this.props.dispatch(updateSearch(searchResult))
     }
   }
 

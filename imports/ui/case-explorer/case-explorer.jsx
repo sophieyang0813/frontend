@@ -217,7 +217,7 @@ CaseExplorer.propTypes = {
 let casesError
 let unitsError
 const connectedWrapper = connect(
-  ({ caseSearchState }) => ({ searchText: caseSearchState.searchText, searchResult: caseSearchState.searchResult }) // map redux state to props
+  ({ caseSearchState }) => ({ searchResult: caseSearchState.searchResult }) // map redux state to props
 )(createContainer(() => { // map meteor state to props
   const casesHandle = Meteor.subscribe(`${collectionName}.associatedWithMe`, { showOpenOnly: true }, {
     onStop: (error) => {
