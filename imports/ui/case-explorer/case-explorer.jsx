@@ -88,12 +88,12 @@ class CaseExplorer extends Component {
     (a, b) => a.length === b.length
   )
   makeCaseGrouping = memoizeOne(
-    ({ caseList, selectedRoleFilter, sortBy, allNotifs, unreadNotifs }) => {
+    ({ cases, selectedRoleFilter, sortBy, allNotifs, unreadNotifs }) => {
       const assignedFilter = selectedRoleFilter !== 'Assigned to me' ? x => true : x => x.assignee === this.props.currentUser.bugzillaCreds.login
       const caseUpdateTimeDict = this.makeCaseUpdateTimeDict(allNotifs)
       const caseUnreadDict = this.makeCaseUnreadDict(unreadNotifs)
       // Building a unit dictionary to group the cases together
-      const unitsDict = caseList.reduce((dict, caseItem) => {
+      const unitsDict = cases.reduce((dict, caseItem) => {
         if (assignedFilter(caseItem) && !isClosed(caseItem)) { // Filtering only the cases that match the selection
           const { selectedUnit: unitTitle, selectedUnitBzId: bzId, unitType, isActive } = caseItem
           // Pulling the existing or creating a new dictionary entry if none
@@ -131,7 +131,7 @@ class CaseExplorer extends Component {
       return Object.keys(a).every(key => {
         const aAttr = a[key]
         const bAttr = b[key]
-        if (key === 'caseList') {
+        if (key === 'cases') {
           if (Array.isArray(aAttr) && Array.isArray(bAttr)) {
             return aAttr.length === bAttr.length && aAttr.filter(isClosed).length === bAttr.filter(isClosed).length
           } else {
@@ -149,7 +149,7 @@ class CaseExplorer extends Component {
     const { isLoading, caseList, allNotifications, unreadNotifications, searchResult } = this.props
     const { selectedRoleFilter, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const cases = this.props.searchText === '' ? caseList : searchResult
+    const cases = searchResult.length !== 0 ? searchResult : caseList
     const caseGrouping =
         this.makeCaseGrouping({
           cases,
