@@ -26,7 +26,6 @@ class CaseMaster extends Component {
       isLoading: true,
       isSubLoading: false,
       searchText: '',
-      searchResult: [],
       searchMode: false
     }
     this.routes = [
@@ -85,15 +84,12 @@ class CaseMaster extends Component {
       this.setState({ searchMode: false })
     } else {
       this.setState({ searchMode: true })
-      const matcher = new RegExp(searchText, 'i')
-      const searchResult = this.state.componentsProps['/case'].caseList
-        .filter(x => !matcher || (x.title && x.title.match(matcher)))
-      this.props.dispatch(updateSearch(searchResult))
     }
+    this.props.dispatch(updateSearch(searchText))
   }
 
   render () {
-    const { isLoading, componentsProps, searchText, searchResult } = this.state
+    const { isLoading, componentsProps, searchText } = this.state
     const { user } = this.props
     return (
       <div className='flex flex-column full-height roboto overflow-hidden'>
@@ -126,7 +122,7 @@ class CaseMaster extends Component {
             {this.routes.map(({ path, RouteComp, exact }) => (
               <Route key={path} exact={exact} path={path} render={() => {
                 return (
-                  <RouteComp searchResult={searchResult} className={isLoading ? 'dn' : ''} dispatchLoadingResult={data => {
+                  <RouteComp className={isLoading ? 'dn' : ''} dispatchLoadingResult={data => {
                     this.setState({
                       componentsData: Object.assign(componentsProps, { [path]: data }),
                       isLoading: false

@@ -1,8 +1,8 @@
 export const UPDATE_SEARCH_RESULT = 'update_search_result'
 
-export function updateSearch (searchResult) {
+export function updateSearch (searchText) {
   return {
     type: UPDATE_SEARCH_RESULT,
-    searchResult: searchResult
+    searchText: searchText
   }
 }

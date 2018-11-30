@@ -45,7 +45,6 @@ class RootAppBar extends Component {
               hintStyle={whiteInput}
               fullWidth
               value={searchText}
-              // onChange={(evt) => onSearchChanged(evt.target.value)}
               onChange={this.handleSearch}
             />
           )

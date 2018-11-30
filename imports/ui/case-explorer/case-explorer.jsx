@@ -146,10 +146,12 @@ class CaseExplorer extends Component {
     }
   )
   render () {
-    const { isLoading, caseList, allNotifications, unreadNotifications, searchResult } = this.props
+    const { isLoading, caseList, allNotifications, unreadNotifications, searchText } = this.props
     const { selectedRoleFilter, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const cases = searchResult.length !== 0 ? searchResult : caseList
+    const matcher = new RegExp(searchText, 'i')
+    const searchResult = caseList.filter(x => !matcher || (x.title && x.title.match(matcher)))
+    const cases = searchResult.length !== 0 && searchText !== '' ? searchResult : caseList
     const caseGrouping =
         this.makeCaseGrouping({
           cases,
@@ -217,7 +219,7 @@ CaseExplorer.propTypes = {
 let casesError
 let unitsError
 const connectedWrapper = connect(
-  ({ caseSearchState }) => ({ searchResult: caseSearchState.searchResult }) // map redux state to props
+  ({ caseSearchState }) => ({ searchText: caseSearchState.searchText }) // map redux state to props
 )(createContainer(() => { // map meteor state to props
   const casesHandle = Meteor.subscribe(`${collectionName}.associatedWithMe`, { showOpenOnly: true }, {
     onStop: (error) => {
