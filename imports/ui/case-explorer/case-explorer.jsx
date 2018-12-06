@@ -149,9 +149,9 @@ class CaseExplorer extends Component {
     const { isLoading, caseList, allNotifications, unreadNotifications, searchText } = this.props
     const { selectedRoleFilter, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const matcher = new RegExp(searchText, 'i')
-    const searchResult = caseList.filter(x => !matcher || (x.title && x.title.match(matcher)))
-    const cases = searchResult.length !== 0 && searchText !== '' ? searchResult : caseList
+    const searchResult = caseList.filter(x => x.title.indexOf(searchText) !== -1)
+    const cases = searchText === null ? caseList : searchResult
+
     const caseGrouping =
         this.makeCaseGrouping({
           cases,
