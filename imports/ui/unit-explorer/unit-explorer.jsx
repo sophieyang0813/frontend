@@ -17,6 +17,7 @@ import { NoItemMsg } from '../explorer-components/no-item-msg'
 import { Sorter } from '../explorer-components/sorter'
 import { StatusFilter } from '../explorer-components/status-filter'
 import { RoleFilter } from '../explorer-components/role-filter'
+import { finishSearch, startSearch } from '../case/case-search.actions.js'
 
 class UnitExplorer extends Component {
   constructor (props) {
@@ -62,17 +63,18 @@ class UnitExplorer extends Component {
 
   onSearchChanged = (searchText) => {
     this.setState({ searchText })
-    if (searchText === '') {
-      this.setState({ searchMode: false })
-    } else {
-      this.setState({ searchMode: true })
-      const matcher = new RegExp(searchText, 'i')
-      const searchResult = this.props.unitList
-        .filter(unit => !matcher || (unit.name && unit.name.match(matcher)))
-      this.setState({
-        searchResult: searchResult
-      })
-    }
+    const searchResult = searchText !== '' ? this.props.unitList.filter(x => x.name.indexOf(searchText) !== -1) : []
+    this.setState({
+      searchResult: searchResult
+    })
+  }
+
+  handleReturn = () => {
+    this.props.dispatch(finishSearch())
+  }
+
+  handleStart = () => {
+    this.props.dispatch(startSearch())
   }
 
   get filteredUnits () {
@@ -111,9 +113,10 @@ class UnitExplorer extends Component {
   }
 
   render () {
-    const { isLoading, dispatch } = this.props
+    const { isLoading, dispatch, searchFinished } = this.props
     const { filteredUnits } = this
-    const { searchResult, searchMode, searchText, selectedStatusFilter, selectedRoleFilter, sortBy } = this.state
+    const { searchResult, searchText, selectedStatusFilter, selectedRoleFilter, sortBy } = this.state
+    const units = searchFinished !== false ? filteredUnits : searchResult
     if (isLoading) return <Preloader />
     return (
       <div className='flex flex-column flex-grow full-height'>
@@ -124,52 +127,50 @@ class UnitExplorer extends Component {
           shadowless
           searchText={searchText}
           onSearchChanged={this.onSearchChanged}
+          onReturn={this.handleReturn}
+          onStart={this.handleStart}
           showSearch
         />
         <UnverifiedWarning />
-        { searchMode ? (
-          <FilteredUnits filteredUnits={searchResult}
-            handleUnitClicked={this.handleUnitClicked}
-          />
-        ) : (
-          <div className='flex-grow flex flex-column overflow-hidden'>
-            <div className='flex bg-very-light-gray'>
-              <StatusFilter
-                selectedStatusFilter={selectedStatusFilter}
-                onFilterClicked={this.handleStatusFilterClicked}
-                status={['All', 'Active', 'Disabled']}
-              />
-              <RoleFilter
-                selectedRoleFilter={selectedRoleFilter}
-                onRoleFilterClicked={this.handleRoleFilterClicked}
-                roles={['All', 'Created', 'Involved']}
-              />
-              <Sorter
-                onSortClicked={this.handleSortClicked}
-                sortBy={sortBy}
-                labels={[
-                  [SORT_BY.NAME_ASCENDING, { category: 'Name (A to Z)', selected: 'Name ↑' }],
-                  [SORT_BY.NAME_DESCENDING, { category: 'Name (Z to A)', selected: 'Name ↓' }]
-                ]}
-              />
-            </div>
-            <div className='flex-grow flex flex-column overflow-auto'>
-              <div className='flex-grow bb b--very-light-gray bg-white pb6'>
-                { filteredUnits.length === 0 ? (
-                  <NoItemMsg item={'unit'} iconType={'location_on'} />
-                ) : (
-                  <FilteredUnits
-                    filteredUnits={filteredUnits}
-                    handleUnitClicked={this.handleUnitClicked}
-                    handleAddCaseClicked={this.handleAddCaseClicked}
-                    showAddBtn
-                  />
-                )
-                }
-              </div>
+        <div className='flex-grow flex flex-column overflow-hidden'>
+          { searchFinished !== false &&
+          <div className='flex bg-very-light-gray'>
+            <StatusFilter
+              selectedStatusFilter={selectedStatusFilter}
+              onFilterClicked={this.handleStatusFilterClicked}
+              status={['All', 'Active', 'Disabled']}
+            />
+            <RoleFilter
+              selectedRoleFilter={selectedRoleFilter}
+              onRoleFilterClicked={this.handleRoleFilterClicked}
+              roles={['All', 'Created', 'Involved']}
+            />
+            <Sorter
+              onSortClicked={this.handleSortClicked}
+              sortBy={sortBy}
+              labels={[
+                [SORT_BY.NAME_ASCENDING, { category: 'Name (A to Z)', selected: 'Name ↑' }],
+                [SORT_BY.NAME_DESCENDING, { category: 'Name (Z to A)', selected: 'Name ↓' }]
+              ]}
+            />
+          </div>
+          }
+          <div className='flex-grow flex flex-column overflow-auto'>
+            <div className='flex-grow bb b--very-light-gray bg-white pb6'>
+              { units.length === 0 ? (
+                <NoItemMsg item={'unit'} iconType={'location_on'} />
+              ) : (
+                <FilteredUnits
+                  filteredUnits={units}
+                  handleUnitClicked={this.handleUnitClicked}
+                  handleAddCaseClicked={this.handleAddCaseClicked}
+                  showAddBtn
+                />
+              )
+              }
             </div>
           </div>
-        ) }
+        </div>
         <div className='absolute bottom-2 right-2'>
           <FloatingActionButton
             onClick={() => dispatch(push(`/unit/new`))}
@@ -191,7 +192,7 @@ UnitExplorer.propTypes = {
 
 let unitsError
 export default connect(
-  () => ({}) // Redux store to props
+  ({ caseSearchState }) => ({ searchFinished: caseSearchState.searchFinished }) // Redux store to props
 )(createContainer(
   () => {
     const unitsHandle = Meteor.subscribe(`${collectionName}.forBrowsing`, {

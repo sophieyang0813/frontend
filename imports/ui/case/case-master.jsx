@@ -93,7 +93,6 @@ class CaseMaster extends Component {
   }
 
   handleStart = () => {
-    console.log('handle starrt')
     this.props.dispatch(startSearch())
   }
 
