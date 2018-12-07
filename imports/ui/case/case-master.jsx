@@ -7,7 +7,7 @@ import { createContainer } from 'meteor/react-meteor-data'
 import _ from 'lodash'
 import { UneeTIcon } from '../components/unee-t-icons'
 import { setDrawerState } from '../general-actions'
-import { updateSearch } from './case-search.actions'
+import { updateSearch, finishSearch, startSearch } from './case-search.actions'
 import CaseExplorer from '../case-explorer/case-explorer'
 import Preloader from '../preloader/preloader'
 import Case from './case'
@@ -88,6 +88,15 @@ class CaseMaster extends Component {
     this.props.dispatch(updateSearch(searchText))
   }
 
+  handleReturn = () => {
+    this.props.dispatch(finishSearch())
+  }
+
+  handleStart = () => {
+    console.log('handle starrt')
+    this.props.dispatch(startSearch())
+  }
+
   render () {
     const { isLoading, componentsProps, searchText } = this.state
     const { user } = this.props
@@ -103,6 +112,8 @@ class CaseMaster extends Component {
                   onIconClick={this.handleIconClick}
                   searchText={searchText}
                   onSearchChanged={this.handleSearch}
+                  onReturn={this.handleReturn}
+                  onStart={this.handleStart}
                 />
               )} />
             ))}
@@ -112,6 +123,8 @@ class CaseMaster extends Component {
             onIconClick={this.handleIconClick}
             searchText={searchText}
             onSearchChanged={this.handleSearch}
+            onReturn={this.handleReturn}
+            onStart={this.handleStart}
             showSearch
             user={user}
             cases

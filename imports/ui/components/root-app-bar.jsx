@@ -23,11 +23,20 @@ class RootAppBar extends Component {
     this.state = {
       searchTextDisplay: false
     }
-    this.handleSearch = this.handleSearch.bind(this)
   }
 
-  handleSearch (evt) {
+  handleSearch = (evt) => {
     this.props.onSearchChanged(evt.target.value)
+  }
+
+  handleReturn = () => {
+    this.setState({ searchTextDisplay: false })
+    this.props.onReturn()
+  }
+
+  handleStart = () => {
+    this.setState({ searchTextDisplay: true })
+    this.props.onStart()
   }
 
   render () {
@@ -56,7 +65,7 @@ class RootAppBar extends Component {
         iconElementLeft={
           searchTextDisplay ? (
             <IconButton
-              onClick={() => this.setState({ searchTextDisplay: false })}
+              onClick={this.handleReturn}
             >
               <FontIcon className='material-icons' color='white'>
                arrow_back</FontIcon>
@@ -70,7 +79,7 @@ class RootAppBar extends Component {
         iconElementRight={
           <div className={cases && 'flex items-center'}>
             <span className={((!showSearch || searchTextDisplay) ? 'dn' : '')}>
-              <IconButton onClick={() => this.setState({ searchTextDisplay: true })}>
+              <IconButton onClick={this.handleStart}>
                 <FontIcon className='material-icons' color='white'>
                   search
                 </FontIcon>

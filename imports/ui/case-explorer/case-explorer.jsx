@@ -146,11 +146,11 @@ class CaseExplorer extends Component {
     }
   )
   render () {
-    const { isLoading, caseList, allNotifications, unreadNotifications, searchText } = this.props
+    const { isLoading, caseList, allNotifications, unreadNotifications, searchText, searchFinished } = this.props
     const { selectedRoleFilter, sortBy, open } = this.state
     if (isLoading) return <Preloader />
-    const searchResult = caseList.filter(x => x.title.indexOf(searchText) !== -1)
-    const cases = searchText === null ? caseList : searchResult
+    const searchResult = searchText !== '' ? caseList.filter(x => x.title.indexOf(searchText) !== -1) : []
+    const cases = searchText === null || searchFinished ? caseList : searchResult
 
     const caseGrouping =
         this.makeCaseGrouping({
@@ -219,7 +219,7 @@ CaseExplorer.propTypes = {
 let casesError
 let unitsError
 const connectedWrapper = connect(
-  ({ caseSearchState }) => ({ searchText: caseSearchState.searchText }) // map redux state to props
+  ({ caseSearchState }) => ({ searchText: caseSearchState.searchText, searchFinished: caseSearchState.searchFinished }) // map redux state to props
 )(createContainer(() => { // map meteor state to props
   const casesHandle = Meteor.subscribe(`${collectionName}.associatedWithMe`, { showOpenOnly: true }, {
     onStop: (error) => {
@@ -249,11 +249,13 @@ const connectedWrapper = connect(
   }
 }, CaseExplorer))
 
-connectedWrapper.MobileHeader = ({ onIconClick, searchText, onSearchChanged, caseList }) => (
+connectedWrapper.MobileHeader = ({ onIconClick, searchText, onSearchChanged, caseList, onReturn, onStart }) => (
   <RootAppBar title='Open Cases'
     onIconClick={onIconClick}
     searchText={searchText}
     onSearchChanged={onSearchChanged}
+    onReturn={onReturn}
+    onStart={onStart}
     caseList={caseList}
     showSearch
   />
